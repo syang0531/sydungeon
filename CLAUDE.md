@@ -66,7 +66,15 @@ hub의 남문이 `boss_approach_1`을 부르고, 그 풀의 유일한 원소 `bo
 
 **클리어 판정과 보상은 트라이얼 스포너가 한다.** 상자는 싸우지 않고 열 수 있고, "다 죽였는지"를 판정하려면 Java가 필요하다. 트라이얼 스포너는 인원에 맞춰 웨이브를 내고 다 잡으면 `loot_tables_to_eject`를 싸운 플레이어마다 뱉는다. 스포너 설정은 `data/sydungeon/trial_spawner/dungeon/`(boss, guards), 블록엔티티 NBT는 그 id만 가리킨다. `target_cooldown_length`가 사실상 무한이라 던전당 한 번이다.
 
-## 조각 목록 (0.1.0, `structure/dungeon/`)
+### 8. 전리품 상자의 첫 풀은 생존 물자다
+
+두 상자 테이블 모두 **풀이 둘**이다. 첫 풀은 rolls 1에 횃불·식량·석탄·**침대**만 들어 있어 상자마다 생존 물자 하나가 확정으로 나오고, 둘째 풀이 나머지를 굴린다. 던전이 어두워진 뒤로 횃불은 소모품이 아니라 필수품이고(§6), 파밍 없는 진행에서는 침대도 마찬가지다. 하나의 큰 풀에 섞으면 빵 네 개가 든 상자가 생긴다. 감방 상자 기준 침대 12%·횃불 24%.
+
+### 9. 데이터의 id는 게임 jar와 대조한다
+
+`python tools/validate_data.py`. 같은 종류의 버그가 두 번 났고 둘 다 빌드는 통과했다. `minecraft:chain`은 26.2에서 `iron_chain`이라 **감방 전리품 테이블 전체가 로드되지 않아 상자가 전부 비었고**, `minecraft:dappled_forest`는 26.3 전용이라 **월드가 아예 안 열렸다.** 검사기는 아이템·블록·엔티티·속성·바이옴·마법을 게임 jar에서 읽어 대조하고, 조각·풀·전리품·스포너 설정의 상호 참조와 아무도 안 쓰는 파일까지 본다. 빌드 전에 돌린다.
+
+## 조각 목록 (`structure/dungeon/`)
 
 | 조각 | 크기 | 직소 | 풀 | 비고 |
 |---|---|---|---|---|
@@ -91,6 +99,8 @@ hub의 남문이 `boss_approach_1`을 부르고, 그 풀의 유일한 원소 `bo
 
 풍화는 `processor_list/dungeon_weathering.json`이 모든 풀 원소에 걸려 있다: 돌벽돌의 18%가 금간 벽돌, 14%가 이끼 벽돌, 4%가 조약돌, 철창의 8%가 사라진다. 조각은 그대로고 매번 다르게 보인다.
 
+생성 위치는 **온대·냉대 숲과 평원 13종**(`tags/worldgen/biome/has_structure/dungeon.json`), spacing 30 / separation 10. 바이옴은 던전마다 겹치지 않게 나눈다 — 어두운숲·창백한 정원은 저주받은 묘지, 눈 타이가·그로브는 얼음 성채 몫이다 (`docs/concepts.md` §4.1).
+
 ## 원본과 도구
 
 원본 연습 조각은 월드 `C:\Users\syang\AppData\Roaming\.minecraft\saves\던전`의 `generated/yame/structure/`에 있고, **그 월드는 건드리지 않는다.** 읽기 전용 스냅샷이 `tools/orig_yame/`에 있다.
@@ -98,6 +108,7 @@ hub의 남문이 `boss_approach_1`을 부르고, 그 풀의 유일한 원소 `bo
 | 도구 | 하는 일 |
 |---|---|
 | `tools/nbt.py` | 의존성 없는 NBT 읽기/쓰기. 원본을 바이트 단위로 되살린다 |
+| `tools/validate_data.py` | **빌드 전에 돌린다.** 데이터팩의 모든 id를 게임 jar와 대조 + 상호 참조 검사 (§9) |
 | `tools/make_pieces.py` | 아래 셋을 순서대로. **조각을 다시 만들 때는 이것 하나만 돈다** |
 | `tools/convert_yame.py` | 스냅샷 → `structure/dungeon/*.nbt` (이름 변경, 직소 name/target/pool 치환, 26.3→26.2 팔레트 내림) |
 | `tools/generate_pieces.py` | cap · shaft_cap · entrance · shaft · hub · boss_room을 코드로 생성, boss_passage는 cross에서 파생 |
@@ -141,4 +152,4 @@ python tools/pack_datapack.py <월드 경로>     # 바닐라 월드용. 개발 
 
 ## 다음
 
-`docs/concepts.md` §9의 순서. 0.1.0은 CurseForge에 배포됐다(프로젝트 1703811). 다음은 **감옥 마무리(바이옴 축소, 상자에 침대·횃불·고기) → 대피라미드 → 마법사의 성 → 마녀의 늪**.
+`docs/concepts.md` §9의 순서. 0.1.0은 CurseForge에 배포됐다(프로젝트 1703811). 0.1.1에서 감옥을 마무리했다(바이옴 13종으로 축소, 상자에 침대·횃불·고기). 다음은 **대피라미드 → 마법사의 성 → 마녀의 늪**.

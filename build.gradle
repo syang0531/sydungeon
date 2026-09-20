@@ -70,6 +70,40 @@ tasks.named('test', Test) {
     testLogging { events 'passed', 'skipped', 'failed' }
 }
 
+// Checks every id in the data pack against the game's own jar, and the cross-references
+// between pieces, pools, loot tables and spawner configs. This is wired into the build
+// because the two bugs it exists to catch both passed the build and only showed up in the
+// game: a loot table that silently failed to load, and a biome id that stopped the world
+// from opening. See CLAUDE.md section 9.
+//
+// It needs the sources jar the moddev plugin unpacks, so it runs after that. Skip it with
+// -x validateData if you have no Python.
+tasks.register('validateData', Exec) {
+    group = 'verification'
+    description = 'Validates data/sydungeon ids against the Minecraft jar.'
+    dependsOn 'createMinecraftArtifacts'
+    workingDir = project.projectDir
+    // Windows ships `python`, most CI images ship `python3`.
+    def python = ['python', 'python3'].find { exe ->
+        try {
+            def probe = new ProcessBuilder(exe, '--version').redirectErrorStream(true).start()
+            probe.waitFor() == 0
+        } catch (IOException ignored) {
+            false
+        }
+    }
+    if (python == null) {
+        doFirst { throw new GradleException('validateData needs Python on PATH (or run with -x validateData)') }
+        commandLine 'cmd', '/c', 'exit', '1'   // never reached; keeps the task configurable
+    } else {
+        commandLine python, 'tools/validate_data.py'
+    }
+}
+
+tasks.named('check') {
+    dependsOn 'validateData'
+}
+
 // Expand ${...} placeholders in neoforge.mods.toml at build time.
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
