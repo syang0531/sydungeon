@@ -1,0 +1,42 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 1.0,
+  "simultaneous_mobs": 1.0,
+  "total_mobs_added_per_player": 0.0,
+  "simultaneous_mobs_added_per_player": 0.0,
+  "ticks_between_spawn": 20,
+  "spawn_potentials": [
+    {
+      "weight": 1,
+      "data": {
+        "entity": {
+          "id": "minecraft:husk",
+          "CustomName": "The Sleepless Pharaoh",
+          "CustomNameVisible": true,
+          "PersistenceRequired": true,
+          "IsBaby": false,
+          "attributes": [
+            { "id": "minecraft:max_health", "base": 80.0 },
+            { "id": "minecraft:attack_damage", "base": 7.0 },
+            { "id": "minecraft:armor", "base": 6.0 },
+            { "id": "minecraft:knockback_resistance", "base": 0.4 }
+          ],
+          "Health": 80.0,
+          "equipment": {
+            "head": { "id": "minecraft:golden_helmet", "count": 1,
+              "components": { "minecraft:enchantments": { "minecraft:protection": 2 } } },
+            "chest": { "id": "minecraft:golden_chestplate", "count": 1 },
+            "legs": { "id": "minecraft:chainmail_leggings", "count": 1 },
+            "feet": { "id": "minecraft:golden_boots", "count": 1 },
+            "mainhand": { "id": "minecraft:golden_sword", "count": 1,
+              "components": { "minecraft:enchantments": { "minecraft:sharpness": 3, "minecraft:fire_aspect": 1 } } }
+          },
+          "drop_chances": { "head": 0.1, "mainhand": 0.15 }
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    { "weight": 1, "data": "sydungeon:trial/pharaoh_reward" }
+  ]
+}

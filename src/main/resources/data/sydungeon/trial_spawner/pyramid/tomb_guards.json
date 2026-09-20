@@ -1,0 +1,50 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 2.0,
+  "simultaneous_mobs": 2.0,
+  "total_mobs_added_per_player": 1.0,
+  "simultaneous_mobs_added_per_player": 0.5,
+  "ticks_between_spawn": 30,
+  "spawn_potentials": [
+    {
+      "weight": 4,
+      "data": {
+        "entity": {
+          "id": "minecraft:husk",
+          "PersistenceRequired": true,
+          "IsBaby": false,
+          "equipment": {
+            "head": { "id": "minecraft:golden_helmet", "count": 1 },
+            "mainhand": { "id": "minecraft:golden_sword", "count": 1 }
+          }
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "data": {
+        "entity": {
+          "id": "minecraft:skeleton",
+          "PersistenceRequired": true,
+          "equipment": {
+            "head": { "id": "minecraft:golden_helmet", "count": 1 },
+            "mainhand": { "id": "minecraft:bow", "count": 1,
+              "components": { "minecraft:enchantments": { "minecraft:power": 1 } } }
+          }
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "data": {
+        "entity": {
+          "id": "minecraft:cave_spider",
+          "PersistenceRequired": true
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    { "weight": 1, "data": "sydungeon:trial/tomb_guard_reward" }
+  ]
+}

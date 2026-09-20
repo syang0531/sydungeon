@@ -3,10 +3,11 @@
 
     python tools/make_pieces.py
 
-Three steps, each its own script:
+Four steps, each its own script:
   1. convert_yame.py     the hand-built practice pieces, renamed and rewired, brought to 26.2
-  2. generate_pieces.py  the plugs and the entrance shaft, described in code
+  2. generate_pieces.py  the prison's plugs and entrance shaft, described in code
   3. decorate.py         loot chests and spawners placed into the pieces above
+  4. generate_pyramid.py the pyramid: shell, spine, burial chamber, maze and its pools
 
 Pieces saved from the dev client and brought in with import_piece.py are not touched by
 this - they are already ours. Note that step 1 overwrites the eight converted pieces, so a
@@ -21,6 +22,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import convert_yame  # noqa: E402
 import decorate  # noqa: E402
 import generate_pieces  # noqa: E402
+import generate_pyramid  # noqa: E402
 
 if __name__ == '__main__':
     print('-- convert')
@@ -29,3 +31,5 @@ if __name__ == '__main__':
     generate_pieces.main()
     print('-- decorate')
     decorate.main()
+    print('-- pyramid')
+    generate_pyramid.main()

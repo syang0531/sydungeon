@@ -1,0 +1,19 @@
+{
+  "fallback": "sydungeon:pyramid/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/passage", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/corner", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/cross", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/niche", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/sand_den", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 3, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/trap_tnt", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:pyramid/trap_sand", "projection": "rigid", "processors": "sydungeon:pyramid_weathering" } }
+  ]
+}
