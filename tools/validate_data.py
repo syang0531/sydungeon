@@ -32,18 +32,25 @@ NS = 'sydungeon'
 
 
 def game_jar():
-    """The sources jar for the version in gradle.properties."""
+    """The game's own jar for the version in gradle.properties.
+
+    Any of the artifacts moddev unpacks carries the assets and data we read, but only the
+    plain one is produced by every build - CI once failed here because it looked for the
+    sources jar, which is only unpacked when something asks for it."""
     version = None
     with open(os.path.join(ROOT, 'gradle.properties'), encoding='utf-8') as f:
         for line in f:
             if line.startswith('minecraft_version='):
                 version = line.split('=', 1)[1].strip()
-    jars = glob.glob(os.path.join(ROOT, 'build', 'moddev', 'artifacts',
-                                  '*%s*sources*.jar' % version))
-    if not jars:
-        sys.exit('no %s sources jar under build/moddev/artifacts - run ./gradlew build first'
-                 % version)
-    return version, zipfile.ZipFile(jars[0])
+    jars = glob.glob(os.path.join(ROOT, 'build', 'moddev', 'artifacts', '*%s*.jar' % version))
+    plain = [j for j in jars if not j.endswith(('-sources.jar', '-merged.jar'))]
+    for candidate in plain + jars:
+        z = zipfile.ZipFile(candidate)
+        if 'assets/minecraft/lang/en_us.json' in z.namelist():
+            return version, z
+        z.close()
+    sys.exit('no %s jar with game data under build/moddev/artifacts - run ./gradlew build first'
+             % version)
 
 
 def registry(z, prefix, suffix='.json'):
@@ -185,6 +192,12 @@ def main():
         rel = os.path.relpath(path, os.path.dirname(DATA)).replace(os.sep, '/')
         root = nbt.read(path)
         palette = root['palette']
+        # every block a piece places has to exist in this version too: a typo here is a
+        # piece that logs an error and leaves a hole where the block should be
+        for entry in palette:
+            block = nbt.palette_name(entry)
+            if block.startswith('minecraft:') and block.split(':', 1)[1] not in game['block']:
+                problems.append('%s: no block %s in its palette' % (rel, block))
         for block in root['blocks']:
             meta = block.get('nbt')
             if not meta:
