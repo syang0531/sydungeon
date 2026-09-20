@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:dungeon/shaft_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/shaft", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } }
+  ]
+}

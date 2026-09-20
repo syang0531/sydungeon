@@ -1,0 +1,19 @@
+{
+  "fallback": "sydungeon:dungeon/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/passage", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/passage_cell", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/passage_cells", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/cross", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/stair", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/cross_guard", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/dead_end", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } }
+  ]
+}

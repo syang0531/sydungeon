@@ -1,0 +1,9 @@
+{
+  "fallback": "sydungeon:dungeon/caps",
+  "elements": [
+    { "weight": 2, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/boss_passage", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } },
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dungeon/boss_room", "projection": "rigid", "processors": "sydungeon:dungeon_weathering" } }
+  ]
+}

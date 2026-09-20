@@ -1,0 +1,57 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 2.0,
+  "simultaneous_mobs": 2.0,
+  "total_mobs_added_per_player": 1.0,
+  "simultaneous_mobs_added_per_player": 0.5,
+  "ticks_between_spawn": 30,
+  "spawn_potentials": [
+    {
+      "weight": 3,
+      "data": {
+        "entity": {
+          "id": "minecraft:skeleton",
+          "PersistenceRequired": true,
+          "equipment": {
+            "head": { "id": "minecraft:iron_helmet", "count": 1 },
+            "chest": { "id": "minecraft:chainmail_chestplate", "count": 1 },
+            "mainhand": { "id": "minecraft:bow", "count": 1,
+              "components": { "minecraft:enchantments": { "minecraft:power": 1 } } }
+          }
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "data": {
+        "entity": {
+          "id": "minecraft:zombie",
+          "PersistenceRequired": true,
+          "IsBaby": false,
+          "equipment": {
+            "head": { "id": "minecraft:iron_helmet", "count": 1 },
+            "legs": { "id": "minecraft:chainmail_leggings", "count": 1 },
+            "mainhand": { "id": "minecraft:iron_sword", "count": 1 }
+          }
+        }
+      }
+    },
+    {
+      "weight": 1,
+      "data": {
+        "entity": {
+          "id": "minecraft:husk",
+          "PersistenceRequired": true,
+          "IsBaby": false,
+          "equipment": {
+            "chest": { "id": "minecraft:iron_chestplate", "count": 1 },
+            "mainhand": { "id": "minecraft:iron_axe", "count": 1 }
+          }
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    { "weight": 1, "data": "sydungeon:trial/guard_reward" }
+  ]
+}
