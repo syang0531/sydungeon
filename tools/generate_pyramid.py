@@ -273,37 +273,31 @@ def sand_den():
     return p
 
 
-def trap_tnt():
-    """The desert temple's own trap, in one cell: treasure on a plinth, and stone pressure
-    plates sitting straight on top of buried TNT. A plate powers the block beneath it, which
-    is all TNT asks for."""
-    p = cell(['west'])
-    door(p, 'west', POOL['passages'])
-    p.box(4, 1, 2, 5, 1, 4, CUT)
-    p.set(4, 2, 3, 'minecraft:chest', {'facing': 'west', 'type': 'single', 'waterlogged': 'false'},
-          {'id': 'minecraft:chest', 'LootTable': NS + ':chests/pyramid_niche'})
-    for x, z in ((2, 3), (3, 2), (3, 3), (3, 4)):
-        p.set(x, 0, z, 'minecraft:tnt', {'unstable': 'false'})
-        p.set(x, 1, z, 'minecraft:stone_pressure_plate', {'powered': 'false'})
-    return p
-
-
-def trap_sand():
-    """Sand hanging over the corridor with a tripwire underneath. Walking into the wire
-    changes its state, that updates the block above it, and the ceiling comes down. The sand
-    is up there in the first place only because structures place blocks without updates."""
+def dig_site():
+    """A drift of sand with things buried in it. Brushing suspicious sand is something only a
+    player can do, which is the point: the two trigger traps that stood here before - a plate
+    on TNT and sand hung over a tripwire - were set off by the wandering mobs long before
+    anyone walked in, and the TNT one took a piece of the pyramid with it."""
     p = cell(['west', 'east'])
     door(p, 'west', POOL['passages'])
     door(p, 'east', POOL['passages'])
-    p.box(1, 3, 2, 5, 5, 4, SAND)          # clear of the 2-high walking space below
-    p.set(0, 1, 3, 'minecraft:tripwire_hook',
-          {'facing': 'east', 'attached': 'true', 'powered': 'false'})
-    p.set(6, 1, 3, 'minecraft:tripwire_hook',
-          {'facing': 'west', 'attached': 'true', 'powered': 'false'})
-    for x in range(1, 6):
-        p.set(x, 1, 3, 'minecraft:tripwire',
-              {'attached': 'true', 'powered': 'false', 'disarmed': 'false',
-               'north': 'false', 'south': 'false', 'east': 'true', 'west': 'true'})
+    p.box(1, 1, 1, 5, 2, 1, SAND)        # the drift against the north wall
+    p.box(1, 1, 5, 5, 1, 5, SAND)        # and a lower one on the south side
+    for x, y, z in ((2, 1, 1), (4, 2, 1), (2, 1, 5), (5, 1, 5)):
+        p.set(x, y, z, 'minecraft:suspicious_sand', {'dusted': '0'},
+              {'id': 'minecraft:brushable_block', 'LootTable': NS + ':archaeology/pyramid'})
+    return p
+
+
+def guard_post():
+    """A crossroads with a husk on a plinth in the middle of it. The maze needs somewhere the
+    mobs come from besides the dark."""
+    p = cell(['west', 'east', 'north', 'south'])
+    for side in ('west', 'east', 'north', 'south'):
+        door(p, side, POOL['passages'])
+    p.set(3, 1, 3, 'minecraft:spawner', None, husk_spawner())
+    for x, z in ((2, 2), (2, 4), (4, 2), (4, 4)):
+        p.set(x, 1, z, CHISELED)
     return p
 
 
@@ -560,7 +554,7 @@ def main():
         'skin_base': skin_base(), 'skin_mid': skin_mid(), 'skin_top': skin_top(),
         'core': core(), 'tomb': tomb(), 'crypt': crypt(), 'well': well(),
         'passage': passage(), 'corner': corner(), 'cross': cross(), 'niche': niche(),
-        'sand_den': sand_den(), 'trap_tnt': trap_tnt(), 'trap_sand': trap_sand(),
+        'sand_den': sand_den(), 'dig_site': dig_site(), 'guard_post': guard_post(),
         'cap': cap(),
     }
     for i in range(1, SPINE_STEPS + 1):
@@ -575,9 +569,12 @@ def main():
         write_pool(one, [element(one, 1)], fallback=EMPTY)
     for i in range(1, SPINE_STEPS + 1):
         write_pool('spine_%d' % i, [element('spine_%d' % i, 1)], fallback=EMPTY)
+    # Weights, and what they buy. Expected new doors per piece is
+    # (10 + 8 + 7*3 + 0 + 6 + 6*3 + 5) / 51 = 1.33, comfortably over one, so the maze still
+    # fills the floor. A chest in 18% of cells and a spawner in 24% of them.
     write_pool('passages', [element('passage', 10), element('corner', 8), element('cross', 7),
-                            element('niche', 6), element('sand_den', 4),
-                            element('trap_tnt', 3), element('trap_sand', 4)])
+                            element('niche', 9), element('sand_den', 6),
+                            element('guard_post', 6), element('dig_site', 5)])
     write_pool('caps', [element('cap', 1)], fallback=EMPTY)
     print('  pools -> %s' % os.path.relpath(POOL_JSON, ROOT))
 

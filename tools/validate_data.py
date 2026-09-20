@@ -216,12 +216,13 @@ def main():
                         used_spawners.add(config.split(':', 1)[1])
                         if config.split(':', 1)[1] not in mine['trial_spawner']:
                             problems.append('%s: no trial spawner config %s' % (rel, config))
-            elif name in ('minecraft:chest', 'minecraft:barrel'):
-                table = meta.get('LootTable', '')
-                if table.startswith(NS + ':'):
-                    used_tables.add(table.split(':', 1)[1])
-                    if table.split(':', 1)[1] not in mine['loot_table']:
-                        problems.append('%s: no loot table %s' % (rel, table))
+            # any block entity may carry one: chests and barrels, and the brushable blocks
+            # that suspicious sand and gravel are
+            table = meta.get('LootTable', '')
+            if table.startswith(NS + ':'):
+                used_tables.add(table.split(':', 1)[1])
+                if table.split(':', 1)[1] not in mine['loot_table']:
+                    problems.append('%s: no loot table %s' % (rel, table))
 
     # things we ship that nothing refers to: usually a rename that missed a spot
     start_pools = set()
