@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0 (unreleased)
+## 0.1.0 (2026-09-20)
 
 - 지하감옥 조각 12개 (`structure/dungeon/`): entrance, shaft, hub, shaft_cap, passage, passage_cell, passage_cells, cross, stair, dead_end, cell, cap
 - 풀 6개 (start / shafts / shaft_caps / passages / cells / caps), 모든 풀의 fallback은 1칸 마개
