@@ -8,7 +8,7 @@ Five steps, each its own script:
   2. generate_pieces.py  the prison's plugs and entrance shaft, described in code
   3. decorate.py         loot chests and spawners placed into the pieces above
   4. generate_pyramid.py the pyramid: shell, spine, burial chamber, maze and its pools
-  5. generate_castle.py  the wizard's castle: keep, tower, library, sanctum and its pools
+  5. generate_tower.py   the wizard's tower: shell, stairwell, library, sanctum and its pools
 
 Pieces saved from the dev client and brought in with import_piece.py are not touched by
 this - they are already ours. Note that step 1 overwrites the eight converted pieces, so a
@@ -23,7 +23,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 import convert_yame  # noqa: E402
 import decorate  # noqa: E402
 import generate_pieces  # noqa: E402
-import generate_castle  # noqa: E402
+import generate_tower  # noqa: E402
 import generate_pyramid  # noqa: E402
 
 if __name__ == '__main__':
@@ -35,5 +35,5 @@ if __name__ == '__main__':
     decorate.main()
     print('-- pyramid')
     generate_pyramid.main()
-    print('-- castle')
-    generate_castle.main()
+    print('-- tower')
+    generate_tower.main()
