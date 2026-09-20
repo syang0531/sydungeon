@@ -1,0 +1,11 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 14,
+    "salt": 60218773
+  },
+  "structures": [
+    { "structure": "sydungeon:castle", "weight": 1 }
+  ]
+}

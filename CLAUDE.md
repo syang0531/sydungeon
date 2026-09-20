@@ -99,7 +99,7 @@ hub의 남문이 `boss_approach_1`을 부르고, 그 풀의 유일한 원소 `bo
 
 풍화는 `processor_list/dungeon_weathering.json`이 모든 풀 원소에 걸려 있다: 돌벽돌의 18%가 금간 벽돌, 14%가 이끼 벽돌, 4%가 조약돌, 철창의 8%가 사라진다. 조각은 그대로고 매번 다르게 보인다.
 
-생성 위치는 **온대·냉대 숲과 평원 13종**(`tags/worldgen/biome/has_structure/dungeon.json`), spacing 30 / separation 10. 바이옴은 던전마다 겹치지 않게 나눈다 — 어두운숲·창백한 정원은 저주받은 묘지, 눈 타이가·그로브는 얼음 성채 몫이다 (`docs/concepts.md` §4.1).
+생성 위치는 **온대 숲과 평원 10종**(`tags/worldgen/biome/has_structure/dungeon.json`), spacing 30 / separation 10. 바이옴은 던전마다 겹치지 않게 나눈다 — 어두운숲·창백한 정원은 저주받은 묘지, 눈 타이가·그로브는 얼음 성채, **타이가 셋은 마법사의 성** 몫이다 (`docs/concepts.md` §4.1).
 
 ## 대피라미드 (`structure/pyramid/`)
 
@@ -156,6 +156,50 @@ skin_top  (35×18×35) ─안쪽→ crypt (7×7×7)
 
 파라오(허스크, 체력 80, 금 장비, 날카로움 III·화염 II 금검) + 경비 웨이브. 클리어하면 **흑요석 14 + 화염과 강철 + 마법 부여(22~30레벨) 다이아 장비 1개**가 확정이다. 앞의 둘은 네더 포탈과 마법 부여대고, 다이아 장비는 §2.4의 "보스당 한 조각"이다 (`docs/concepts.md`). 처음엔 다이아 장비를 빼먹어서 감옥 보스와 규칙이 어긋나 있었다. 그 위에 금·경험치·다이아·30레벨 책·사구 장식 템플릿. 지하실 상자에는 마법 황금사과가 확정.
 
+## 마법사의 성 (`structure/castle/`)
+
+0.3.0. 타이가 셋(타이가·원시 가문비·원시 소나무)에만, spacing 40 / separation 14. 돌벽돌·심층암 본관 39×39, 그 위 탑, 그 아래 성소. 전부 `tools/generate_castle.py`가 만든다.
+
+형태 보장은 피라미드와 같다 (§10). `keep`이 껍데기이고 그 박스가 울타리다.
+
+```
+keep (39×21×39) ─안쪽→ core_l1 (35×7×35) ─안쪽→ 1층 미로
+                ─안쪽→ core_l2 (35×7×35) ─안쪽→ 도서관·연금실·미로
+                ─안쪽→ tower_1 → tower_2 → tower_3 → observatory
+                ─아래→ sanctum (21×21×21)
+```
+
+### 13. 있어야 하는 방은 단일 원소 풀의 사슬로 건다
+
+성이 존재하는 이유가 되는 방들은 **무작위 미로에 맡기지 않는다.** 각각 원소가 하나뿐인 풀을 사슬로 이어 놓으면 반드시, 정확히 한 번 놓인다.
+
+```
+gate → spine_l1 → hall_l1 → (사다리 아래) sanctum   대마법사와 네더 포탈
+hall_l2 → library     진짜 마법 부여대 + 유효 책장 15
+hall_l2 → alchemy     양조기
+tower_1 → tower_2 → tower_3 → observatory
+```
+
+세 층의 hall은 **같은 칸**에 있어서 사다리 기둥 하나가 성소 바닥부터 탑 꼭대기까지 통한다. 기둥은 각 조각에 같은 좌표표(`SHAFT`, `LADDER_X/Z`)로 새겨진다 (§11).
+
+**hall에 북문이 없는 이유:** 사다리가 북쪽 버트레스에 걸리는데, 거기 문을 뚫으면 사다리 뒤가 구멍이 된다.
+
+### 14. 커넥터가 면에 있는지 검사한다
+
+`DOOR_AT`는 7칸 면을 기준으로 한 표다. 도서관은 14칸이라 그 표를 쓰면 남문 직소가 **방 한가운데**에 놓여 맞은편 벽을 가리킨다. 실제로 그랬다. `generate_castle.verify()`가 이제 **미로 커넥터(`DOOR`)만** 면 위에 있는지 본다 — 구조용 직소는 자기 박스 안쪽을 가리키는 것이 일이므로 검사에서 뺀다.
+
+### 방
+
+| 방 | 크기 | 내용 |
+|---|---|---|
+| `library` | 14×7×14 | 마법 부여대 1, 그 둘레 2칸 고리에 **유효 책장 15**(한 칸은 들어가는 길). 벽면 책장은 장식. 강대·상자 |
+| `alchemy` | 7×7×7 | 양조기, 가마솥 둘, 상자 |
+| `observatory` | 7×7×7 | 탑 꼭대기. 자수정·엔드스톤·유리창, 엔더 진주 확정 상자 |
+| `sanctum` | 21×21×21 | 지하. 단상의 대마법사(이보커, 체력 100) + 사분면 경비 4, **불 붙이지 않은 흑요석 포탈 틀**과 화염과 강철 상자 |
+| `study` `vex_cage` `lab` | 7×7×7 | 미로. 서재(상자), 벡스 우리, 좀비 주민 실험실 |
+
+보스 보상(확정): **엔더의 눈 4 + 불사의 토템 + 마법 부여(25~30) 다이아 장비 1**. 엔더의 눈은 여기가 주 공급원이고, 포탈 틀은 네더로 가는 두 번째 길이다.
+
 ## 원본과 도구
 
 원본 연습 조각은 월드 `C:\Users\syang\AppData\Roaming\.minecraft\saves\던전`의 `generated/yame/structure/`에 있고, **그 월드는 건드리지 않는다.** 읽기 전용 스냅샷이 `tools/orig_yame/`에 있다.
@@ -168,6 +212,7 @@ skin_top  (35×18×35) ─안쪽→ crypt (7×7×7)
 | `tools/convert_yame.py` | 스냅샷 → `structure/dungeon/*.nbt` (이름 변경, 직소 name/target/pool 치환, 26.3→26.2 팔레트 내림) |
 | `tools/generate_pieces.py` | 감옥의 cap · shaft_cap · entrance · shaft · hub · boss_room을 코드로 생성, boss_passage는 cross에서 파생 |
 | `tools/generate_pyramid.py` | 대피라미드 전체(껍데기·스파인·묘실·미로·함정)와 그 풀 JSON. 기하 자체 검사 포함 |
+| `tools/generate_castle.py` | 마법사의 성 전체(본관·탑·도서관·성소)와 그 풀 JSON. 기하 자체 검사 포함 |
 | `tools/simulate.py` | 풀 가중치로 던전 크기·계단 수·층 수 분포를 종이 위에서 굴려 본다 |
 | `tools/inspect_world.py` | 개발 월드 region 파일에서 실제 생성된 던전의 조각·층 분포를 읽는다 |
 | `tools/gen_logo.py` | CurseForge 로고 (`docs/curseforge/logo.png`, `src/main/resources/logo.png`) |
@@ -208,4 +253,4 @@ python tools/pack_datapack.py <월드 경로>     # 바닐라 월드용. 개발 
 
 ## 다음
 
-`docs/concepts.md` §9의 순서. CurseForge 프로젝트 1703811에 0.1.0과 0.1.1을 배포했다. 0.1.1에서 감옥을 마무리했고(바이옴 13종, 상자에 침대·횃불·고기), 0.2.0이 대피라미드다. 다음은 **마법사의 성 → 마녀의 늪**.
+`docs/concepts.md` §9의 순서. CurseForge 프로젝트 1703811에 0.1.0·0.1.1·0.2.0을 배포했다. 0.1.1이 감옥 마무리, 0.2.0이 대피라미드, 0.3.0이 마법사의 성이다. 다음은 **마녀의 늪**(양조를 네더 전에 연다).

@@ -1,0 +1,17 @@
+{
+  "fallback": "sydungeon:castle/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/passage", "projection": "rigid", "processors": "sydungeon:castle_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/corner", "projection": "rigid", "processors": "sydungeon:castle_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/cross", "projection": "rigid", "processors": "sydungeon:castle_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/study", "projection": "rigid", "processors": "sydungeon:castle_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/vex_cage", "projection": "rigid", "processors": "sydungeon:castle_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:castle/lab", "projection": "rigid", "processors": "sydungeon:castle_weathering" } }
+  ]
+}
