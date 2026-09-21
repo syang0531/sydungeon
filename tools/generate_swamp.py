@@ -43,8 +43,10 @@ PRIORITY = 10
 
 CELL = 7
 UNDER = 3                       # courses of water between the world's surface and the deck
-DECK_Y = UNDER                  # the deck itself
-HUT = 11                        # a village piece is this tall: y 0..10
+DECK_Y = UNDER                  # the deck of the great hut, which is the start piece
+HUT = 11                        # the great hut is this tall: y 0..10
+ABOVE = HUT - UNDER             # and this much of it stands above the deck
+DROP = 9                        # how far every other village piece carries its posts down
 GREAT = 21                      # the great hut, three cells across
 SHAFT_H = 21
 BOSS = (21, 14, 21)
@@ -71,7 +73,8 @@ POST = {'north': 'false', 'south': 'false', 'east': 'false', 'west': 'false',
         'waterlogged': 'false'}
 
 POOL = {k: NS + ':swamp/' + k for k in
-        ['start', 'decks', 'deck_caps', 'down', 'cellar', 'cellar_first', 'cellar_caps',
+        ['start', 'decks', 'deck_caps', 'pilings', 'down', 'cellar', 'cellar_first',
+         'cellar_caps',
          'mother_approach'] +
         ['mother_approach_%d' % i for i in range(1, MIN_BOSS_STEPS + 1)]}
 
@@ -109,18 +112,19 @@ def stairs(facing, half='bottom'):
 SIDES = ('west', 'east', 'north', 'south')
 
 
-def deck_door(size):
+def deck_door(size, deck_y=DECK_Y):
     """Where a boardwalk's doorway and its jigsaw sit on each face of a piece `size` across."""
     mid = size // 2
-    return {'west': ((0, DECK_Y, mid), 'west_up'), 'east': ((size - 1, DECK_Y, mid), 'east_up'),
-            'north': ((mid, DECK_Y, 0), 'north_up'), 'south': ((mid, DECK_Y, size - 1), 'south_up')}
+    return {'west': ((0, deck_y, mid), 'west_up'), 'east': ((size - 1, deck_y, mid), 'east_up'),
+            'north': ((mid, deck_y, 0), 'north_up'),
+            'south': ((mid, deck_y, size - 1), 'south_up')}
 
 
 def open_deck(p, side, size=CELL):
     """Three wide and four tall above the deck - the same doorway as everywhere else, just
     three courses higher because the floor here is a boardwalk over water."""
     mid = size // 2
-    lo, hi = DECK_Y + 1, DECK_Y + 4
+    lo, hi = p.deck_y + 1, p.deck_y + 4
     if side == 'west':
         p.box(0, lo, mid - 1, 0, hi, mid + 1, AIR)
     elif side == 'east':
@@ -132,26 +136,38 @@ def open_deck(p, side, size=CELL):
 
 
 def stilts(p, size=CELL):
-    """Posts down into the water, and nothing else below the deck: the rest of the piece is
-    never written, so the swamp keeps whatever it had there."""
+    """Posts from just under the deck down to the floor of the piece, and nothing else below
+    it: the rest is never written, so the swamp keeps whatever it had there.
+
+    That floor is DROP courses down for every piece but the great hut, because the swamp is
+    not flat. A post three long only reaches ground that happens to sit where the start piece
+    found it; one bank further and the village stands on stumps in the air. Where the ground
+    comes up sooner the extra posts are underground, and nobody sees them."""
     for x, z in ((0, 0), (0, size - 1), (size - 1, 0), (size - 1, size - 1)):
-        for y in range(UNDER):
+        for y in range(p.deck_y):
             p.set(x, y, z, LOG, {'axis': 'y'})
 
 
-def deck_piece(doors, size=CELL, roofed=False):
-    """A boardwalk cell: posts, deck, railing where there is no door, and air above."""
-    p = Piece(size, HUT, size, 'minecraft:structure_void')
+def deck_piece(doors, size=CELL, roofed=False, drop=DROP):
+    """A boardwalk cell: posts, deck, railing where there is no door, and air above.
+
+    `drop` is how far the piece hangs below the water line. A child is placed by the height of
+    its jigsaw alone, so hanging lower is free - but not for the start piece, which the game
+    pins by its floor (JigsawPlacement moves it until minY + 1 is the surface it found). The
+    great hut is the start and passes drop=0; `pilings` carries its posts down instead."""
+    deck_y = drop + UNDER
+    p = Piece(size, deck_y + ABOVE, size, 'minecraft:structure_void')
+    p.deck_y = deck_y
     stilts(p, size)
-    p.box(0, DECK_Y, 0, size - 1, DECK_Y, size - 1, PLANK)
-    p.box(0, DECK_Y + 1, 0, size - 1, HUT - 1, size - 1, AIR)
+    p.box(0, deck_y, 0, size - 1, deck_y, size - 1, PLANK)
+    p.box(0, deck_y + 1, 0, size - 1, deck_y + ABOVE - 1, size - 1, AIR)
     for i in range(size):                       # railings all round, opened by the doors
         for x, z in ((0, i), (size - 1, i), (i, 0), (i, size - 1)):
-            p.set(x, DECK_Y + 1, z, FENCE, RAIL)
+            p.set(x, deck_y + 1, z, FENCE, RAIL)
     if roofed:
-        p.box(0, DECK_Y + 1, 0, size - 1, DECK_Y + 5, size - 1, PLANK)
-        p.box(1, DECK_Y + 1, 1, size - 2, DECK_Y + 4, size - 2, AIR)
-        p.box(0, DECK_Y + 6, 0, size - 1, DECK_Y + 6, size - 1, SLAB, {'type': 'bottom',
+        p.box(0, deck_y + 1, 0, size - 1, deck_y + 5, size - 1, PLANK)
+        p.box(1, deck_y + 1, 1, size - 2, deck_y + 4, size - 2, AIR)
+        p.box(0, deck_y + 6, 0, size - 1, deck_y + 6, size - 1, SLAB, {'type': 'bottom',
                                                                       'waterlogged': 'false'})
     for side in doors:
         open_deck(p, side, size)
@@ -159,7 +175,7 @@ def deck_piece(doors, size=CELL, roofed=False):
 
 
 def deck_jigsaws(p, doors, pool, size=CELL, name=DECK, target=DECK, priority=0):
-    at = deck_door(size)
+    at = deck_door(size, p.deck_y)
     for side in doors:
         (x, y, z), orientation = at[side]
         p.jigsaw(x, y, z, orientation, pool, PLANK, priority=priority, name=name, target=target)
@@ -169,9 +185,9 @@ def walk(doors, guard=None):
     p = deck_piece(doors)
     deck_jigsaws(p, doors, POOL['decks'])
     for x, z in ((1, 1), (CELL - 2, CELL - 2)):
-        p.set(x, DECK_Y + 1, z, LANTERN, {'hanging': 'false', 'waterlogged': 'false'})
+        p.set(x, p.deck_y + 1, z, LANTERN, {'hanging': 'false', 'waterlogged': 'false'})
     if guard:
-        p.set(CELL // 2, DECK_Y + 1, CELL // 2, 'minecraft:spawner', None,
+        p.set(CELL // 2, p.deck_y + 1, CELL // 2, 'minecraft:spawner', None,
               mob_spawner(guard, 1))
     return p
 
@@ -180,28 +196,29 @@ def hut(kind):
     """A one-cell hut on the boardwalk: the way in is west, and what is inside is the point."""
     p = deck_piece(['west'], roofed=True)
     deck_jigsaws(p, ['west'], POOL['decks'])
-    mid = CELL // 2
+    mid, d = CELL // 2, p.deck_y
     if kind == 'loot':
-        p.set(CELL - 2, DECK_Y + 1, mid, *chest('swamp_hut', 'west'))
-        p.set(mid, DECK_Y + 1, 1, 'minecraft:cauldron', {'level': '0'})
-        p.set(mid, DECK_Y + 4, mid, LANTERN, HANGING)
+        p.set(CELL - 2, d + 1, mid, *chest('swamp_hut', 'west'))
+        p.set(mid, d + 1, 1, 'minecraft:cauldron', {'level': '0'})
+        p.set(mid, d + 4, mid, LANTERN, HANGING)
     elif kind == 'witch':
-        p.set(mid, DECK_Y + 1, mid, 'minecraft:spawner', None, mob_spawner('minecraft:witch', 1))
-        p.set(1, DECK_Y + 1, 1, 'minecraft:cauldron', {'level': '3'})
-        p.set(CELL - 2, DECK_Y + 1, 1, 'minecraft:brewing_stand',
+        p.set(mid, d + 1, mid, 'minecraft:spawner', None, mob_spawner('minecraft:witch', 1))
+        p.set(1, d + 1, 1, 'minecraft:cauldron', {'level': '3'})
+        p.set(CELL - 2, d + 1, 1, 'minecraft:brewing_stand',
               {'has_bottle_0': 'false', 'has_bottle_1': 'false', 'has_bottle_2': 'false'})
-        p.set(CELL - 2, DECK_Y + 1, CELL - 2, *chest('swamp_hut', 'west'))
+        p.set(CELL - 2, d + 1, CELL - 2, *chest('swamp_hut', 'west'))
     else:
-        p.set(mid, DECK_Y + 1, mid, 'minecraft:spawner', None, mob_spawner('minecraft:slime', 2))
-        p.box(1, DECK_Y + 1, CELL - 2, CELL - 2, DECK_Y + 1, CELL - 2, ROOTS)
-        p.set(1, DECK_Y + 2, 1, *chest('swamp_hut', 'south'))
+        p.set(mid, d + 1, mid, 'minecraft:spawner', None, mob_spawner('minecraft:slime', 2))
+        p.box(1, d + 1, CELL - 2, CELL - 2, d + 1, CELL - 2, ROOTS)
+        p.set(1, d + 2, 1, *chest('swamp_hut', 'south'))
     return p
 
 
 def deck_cap():
     """The plug at the end of a boardwalk: one course of railing, so a run that meets the edge
     of the world stops at a handrail instead of in mid air."""
-    p = Piece(1, HUT, CELL, 'minecraft:structure_void')
+    p = Piece(1, HUT, CELL, 'minecraft:structure_void')   # a jigsaw's own height places it,
+    p.deck_y = DECK_Y                                     # so the plug can stay a short piece
     for z in range(CELL):
         p.set(0, DECK_Y, z, PLANK)
         p.set(0, DECK_Y + 1, z, FENCE, RAIL)
@@ -215,7 +232,7 @@ def great_hut():
     Three cells across so the boardwalks leave from the middle of each side, and the only
     jigsaw that is not a boardwalk is the one pointing down."""
     n = GREAT
-    p = deck_piece(SIDES, size=n, roofed=True)
+    p = deck_piece(SIDES, size=n, roofed=True, drop=0)
     deck_jigsaws(p, SIDES, POOL['decks'], size=n)
     mid = n // 2
 
@@ -245,6 +262,28 @@ def great_hut():
     # sit in the middle of the ladder shaft, where it read as a stray block to climb round.
     for y in range(0, DECK_Y):
         p.set(mid + 2, y, mid - 1, LOG, {'axis': 'y'})
+    p.jigsaw(mid + 2, 0, mid - 1, 'down_east', POOL['pilings'], LOG, joint='aligned',
+             priority=PRIORITY, name=DOWN, target=DOWN)
+    return p
+
+
+def pilings():
+    """What the great hut stands on. The hut is the start piece and the game pins a start
+    piece by its floor, so its own posts can never reach below the surface it landed on,
+    however long they are drawn. This hangs underneath instead: the four corner posts and the
+    hatch's post carried DROP further down, with the ladder and its column of air continuing
+    so the climb is unbroken. The shaft to the cellar hangs off the bottom of it."""
+    n, mid = GREAT, GREAT // 2
+    p = Piece(n, DROP, n, 'minecraft:structure_void')
+    for x, z in ((0, 0), (0, n - 1), (n - 1, 0), (n - 1, n - 1), (mid + 2, mid - 1)):
+        for y in range(DROP):
+            p.set(x, y, z, LOG, {'axis': 'y'})
+    p.box(mid - 1, 0, mid - 2, mid + 1, DROP - 1, mid, AIR)   # water pushed out of the way
+    for y in range(DROP):
+        p.set(mid + 1, y, mid - 2, 'minecraft:ladder', {'facing': 'west',
+                                                        'waterlogged': 'false'})
+    p.jigsaw(mid + 2, DROP - 1, mid - 1, 'up_east', EMPTY, LOG, joint='aligned',
+             name=DOWN, target=DOWN)
     p.jigsaw(mid + 2, 0, mid - 1, 'down_east', POOL['down'], LOG, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     return p
@@ -405,6 +444,37 @@ def write_pool(name, elements, fallback):
         f.write(text)
 
 
+def ladder_problems(pieces):
+    """Stack the way down as the game stacks it and climb it. Each piece hangs off the one
+    above by its own jigsaw, so the four of them have to agree on a single column of blocks -
+    and a jigsaw is a block, so one standing in that column is a rung missing. Four of them
+    were, once."""
+    mid = GREAT // 2
+    at = {'great_hut': (0, 0, 0), 'pilings': (0, -DROP, 0),
+          'shaft': (CELL, -DROP - SHAFT_H, CELL),
+          'cellar_hub': (CELL, -DROP - SHAFT_H - CELL, CELL)}
+    bottom = at['cellar_hub'][1] + 1                        # the cellar floor is course 0
+    problems, rungs = [], (mid + 1, mid - 2)                # where the ladder is nailed up
+    for y in range(bottom, DECK_Y + 1):
+        for x in range(mid - 1, mid + 2):
+            for z in range(mid - 2, mid + 1):
+                for name, (ox, oy, oz) in at.items():
+                    piece = pieces[name]
+                    local = (x - ox, y - oy, z - oz)
+                    if local in piece.grid:
+                        block = piece.grid[local][0]
+                        break
+                else:
+                    problems.append('nothing covers %s on the way down' % ((x, y, z),))
+                    continue
+                want = 'minecraft:ladder' if (x, z) == rungs else AIR
+                if block != want and not (block == AIR and (x, z) == rungs and y > DECK_Y):
+                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
+                                    % (name, block.split(':')[-1], (x, y, z),
+                                       want.split(':')[-1]))
+    return problems
+
+
 def verify(pieces):
     problems = []
     for name, piece in pieces.items():
@@ -418,24 +488,34 @@ def verify(pieces):
         if counts.get(MOTHER, 0) > 1:
             problems.append('%s carries %d jigsaws named %s; the chain could be entered '
                             'through its own continuation' % (name, counts[MOTHER], MOTHER))
-        if name.startswith(('walk', 'hut', 'great')) and piece.size[1] != HUT:
-            problems.append('%s is %d tall; every village piece must be %d so the decks line '
-                            'up' % (name, piece.size[1], HUT))
         if name.startswith(('walk', 'hut', 'great')):
+            deck_y = piece.deck_y
+            want = UNDER if name == 'great_hut' else UNDER + DROP
+            if deck_y != want:
+                problems.append('%s holds its deck %d up; the great hut is pinned at %d and '
+                                'every other piece hangs %d lower so its posts reach the '
+                                'ground' % (name, deck_y, UNDER, DROP))
+            if piece.size[1] != deck_y + ABOVE:
+                problems.append('%s is %d tall; a village piece is its deck plus %d'
+                                % (name, piece.size[1], ABOVE))
+        if name.startswith(('walk', 'hut', 'great', 'pilings')):
             # under the deck only the posts, and the great hut's way down, may be written:
             # everything else has to stay whatever the swamp had there
             allowed = ('minecraft:structure_void', 'minecraft:dark_oak_log', AIR,
                        'minecraft:jigsaw', 'minecraft:ladder')
-            below = [p for p in piece.grid if p[1] < DECK_Y and piece.grid[p][0] not in allowed]
+            floor = getattr(piece, 'deck_y', piece.size[1])
+            below = [p for p in piece.grid if p[1] < floor and piece.grid[p][0] not in allowed]
             if below:
                 problems.append('%s writes %s under its deck; the swamp should keep what it '
                                 'had there' % (name, piece.grid[below[0]][0]))
+    problems += ladder_problems(pieces)
     for line in problems:
         print('  PROBLEM  ' + line)
     if problems:
         raise SystemExit('the swamp does not hold together')
-    print('  checked: decks all %d tall, nothing but posts under them, one way into the '
-          'mother' % HUT)
+    print('  checked: the great hut sits %d over the water and every other piece hangs %d '
+          'lower, nothing but posts under any deck, the ladder unbroken from the deck to the '
+          'cellar floor, one way into the mother' % (UNDER, DROP))
 
 
 def main():
@@ -448,7 +528,7 @@ def main():
         'walk_corner': walk(['west', 'south']),
         'walk_cross': walk(['west', 'east', 'north', 'south']),
         'hut_loot': hut('loot'), 'hut_witch': hut('witch'), 'hut_slime': hut('slime'),
-        'deck_cap': deck_cap(),
+        'deck_cap': deck_cap(), 'pilings': pilings(),
         'shaft': shaft(), 'cellar_hub': cellar_hub(),
         'cellar_passage': cellar('passage'), 'cellar_corner': cellar('corner'),
         'cellar_cross': cellar('cross'), 'cellar_brew': cellar('brew'),
@@ -465,6 +545,7 @@ def main():
         print('  %-16s %s' % (name, list(piece.size)))
 
     write_pool('start', [element('great_hut', 1)], EMPTY)
+    write_pool('pilings', [element('pilings', 1)], EMPTY)
     write_pool('down', [element('shaft', 1)], EMPTY)
     write_pool('decks', [element('walk', 9), element('walk_guard', 5),
                          element('walk_corner', 8), element('walk_cross', 6),
