@@ -12,6 +12,16 @@ Identical cells are written once. Rotations are written once too: vanilla turns 
 meet the jigsaw it attaches to, so a corridor that bends left is the same piece whichever way
 it faces, and a floor plan that shows four of them only has one.
 
+Three things the mock-up does that the pieces must not:
+
+  - cells whose shared walls were cut away are one room, not four. They are stitched back
+    into a single piece (the gap between them closes too)
+  - the stair climbs through two floors, so its two cells are stitched into one 7x14x7
+  - doorways were cut three tall; the mod's are three wide by four. Every doorway is opened
+    one course further up on the way out
+
+A cell that is still the plain hollow box was never filled in, and is dropped.
+
 The result lands in tools/handmade/, the same place tools/orig_yame/ holds the first
 prototype: a read-only record of what a person built, for a generator to read.
 """
@@ -77,44 +87,94 @@ def write(name, cell, sx=CELL, sy=CELL, sz=CELL):
     return piece
 
 
+MERGED = [(2, (0, 0), 2, 2)]        # floor 2's north-west four cells are one room
+STAIRWAY = (1, (2, 1), 2)           # floor 1 cell (2,1) and the floor above it are one stair
+BLANK = 218                         # a hollow 7-cube: a cell nobody got round to filling in
+
+
+def widen_doors(cell, sx, sy, sz):
+    """The mock-up cut doorways three tall; ours are four (CLAUDE.md section 2)."""
+    faces = {'W': [(0, z) for z in range(sz)], 'E': [(sx - 1, z) for z in range(sz)],
+             'N': [(x, 0) for x in range(sx)], 'S': [(x, sz - 1) for x in range(sx)]}
+    for side, line in faces.items():
+        for a, b in line:
+            at = (lambda y: (a, y, b)) if side in 'WE' else (lambda y: (a, y, b))
+            if all(at(y) not in cell for y in (1, 2, 3)) and at(4) in cell:
+                del cell[at(4)]
+    return cell
+
+
+def stitch(blocks, floor, cell, wide, deep=1, tall=1):
+    """Several cells of the mock-up as one piece, with the block of air between them closed."""
+    cx, cz = cell
+    out = {}
+    for fz in range(deep if tall == 1 else 1):
+        pass
+    for ty in range(tall):
+        for tz in range(deep):
+            for tx in range(wide):
+                x0, z0 = X0[cx + tx], Z0[cz + tz]
+                y0 = Y0[floor - 1 + ty]
+                for (dx, dy, dz), block in take(blocks, x0, y0, z0).items():
+                    out[(tx * CELL + dx, ty * CELL + dy, tz * CELL + dz)] = block
+    return out
+
+
 def main():
     world = world_folder(sys.argv[1] if len(sys.argv) > 1 else None)
     print('world: %s' % os.path.relpath(world, ROOT))
     raw = read_box(world, (-20, -64, -24), (30, 8, 24))
     blocks = {p: n for p, n in raw.items() if n not in NATURAL}
 
-    # one entry per distinct piece, rotations folded together
+    skip = set()
+    for floor, (cx, cz), wide, deep in MERGED:
+        for tx in range(wide):
+            for tz in range(deep):
+                skip.add((floor, cx + tx, cz + tz))
+    sf, (scx, scz), stall = STAIRWAY
+    for ty in range(stall):
+        skip.add((sf + ty, scx, scz))
+
     kinds = OrderedDict()
     for f, y0 in enumerate(Y0):
         for cz, z0 in enumerate(Z0):
             for cx, x0 in enumerate(X0):
+                if (f + 1, cx, cz) in skip:
+                    continue
                 cell = take(blocks, x0, y0, z0)
+                if len(cell) == BLANK:
+                    continue                    # never filled in, not a piece
                 key = min(rotations(cell))
                 kinds.setdefault(key, {'cell': cell, 'where': [], 'sig': signature(set(cell))})
                 kinds[key]['where'].append((f + 1, cx, cz))
 
-    print('\n72칸 -> 회전을 접으면 서로 다른 조각 %d개' % len(kinds))
-    names = {}
+    print('\n손으로 지은 칸 -> 회전을 접으면 조각 %d개' % len(kinds))
     counts = Counter()
     for key, info in sorted(kinds.items(), key=lambda kv: -len(kv[1]['where'])):
-        sig = info['sig']
-        open_faces = set(sig) & set('WENS')
-        base = {4: 'cross', 3: 'tee', 1: 'dead_end', 0: 'blank'}.get(len(open_faces))
-        if base is None:                       # two ways out: through, or round a corner
+        open_faces = set(info['sig']) & set('WENS')
+        base = {4: 'cross', 3: 'tee', 1: 'dead_end', 0: 'sealed'}.get(len(open_faces))
+        if base is None:
             base = 'straight' if open_faces in ({'W', 'E'}, {'N', 'S'}) else 'corner'
-        stairs = sum(1 for v in info['cell'].values() if v.endswith('_stairs'))
-        if stairs > 4:
-            base = 'stair_lower'
-        elif stairs:
-            base = 'stair_upper'
         counts[base] += 1
         name = base if counts[base] == 1 else '%s_%d' % (base, counts[base])
-        names[key] = name
-        print('  %-13s %-5s %3d블록  %2d곳  %s' % (name, sig, len(info['cell']),
+        cell = widen_doors(dict(info['cell']), CELL, CELL, CELL)
+        print('  %-11s %-5s %3d블록  %2d곳  %s' % (name, info['sig'], len(cell),
                                                  len(info['where']), info['where'][:4]))
-        write(name, info['cell'])
+        write(name, cell)
 
-    # the ring: the circle round the rooms, on the same grid, mostly one course of floor
+    for floor, cell, wide, deep in MERGED:
+        big = stitch(blocks, floor, cell, wide, deep)
+        big = widen_doors(big, wide * CELL, CELL, deep * CELL)
+        print('\n%-11s %dx%dx%-2d %3d블록  %d층 %s에서 네 칸이 한 방'
+              % ('room4', wide * CELL, CELL, deep * CELL, len(big), floor, cell))
+        write('room4', big, wide * CELL, CELL, deep * CELL)
+
+    stairs = stitch(blocks, sf, (scx, scz), 1, 1, stall)
+    stairs = widen_doors(stairs, CELL, stall * CELL, CELL)
+    print('  %-11s %dx%dx%-2d %3d블록  %d층 %s에서 두 층을 오른다'
+          % ('stair', CELL, stall * CELL, CELL, len(stairs), sf, (scx, scz)))
+    write('stair', stairs, CELL, stall * CELL, CELL)
+
     print('\n원형 테두리 (1층, y=-60):')
     for zi, (za, zb) in enumerate(RING_Z):
         for xi, (xa, xb) in enumerate(RING_X):
@@ -122,11 +182,12 @@ def main():
                 continue
             sx, sz = xb - xa + 1, zb - za + 1
             cell = take(blocks, xa, -60, za, sx, CELL, sz)
-            tall = max([p[1] for p in cell], default=-1) + 1
             if not cell:
                 continue
+            tall = max(p[1] for p in cell) + 1
             name = 'ring_%d%d' % (xi, zi)
-            print('  %-9s %2dx%dx%-2d  %3d블록  높이 %d' % (name, sx, CELL, sz, len(cell), tall))
+            print('  %-9s %2dx%dx%-2d  %3d블록  높이 %d%s'
+                  % (name, sx, CELL, sz, len(cell), tall, '   <- 입구' if tall > 1 else ''))
             write(name, cell, sx, CELL, sz)
     print('\n-> %s' % os.path.relpath(OUT, ROOT))
 
