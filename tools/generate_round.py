@@ -119,34 +119,3 @@ def shell():
     return p
 
 
-def show(p, y, axis='y'):
-    """One layer, or one cut down the middle."""
-    sx, sy, sz = p.size
-    if axis == 'y':
-        rows = [[(x, y, z) for x in range(sx)] for z in range(sz)]
-    else:
-        rows = [[(x, h, y) for x in range(sx)] for h in range(sy - 1, -1, -1)]
-    for row in rows:
-        print('  ' + ''.join('#' if p.grid[c][0] != AIR else '.' for c in row))
-
-
-def main():
-    footprint = plan()
-    print('테두리 평면: %d칸 (%dx%d 중), 안쪽 %dx%d는 방' % (
-        len(footprint), WIDE, WIDE, CORE, CORE))
-    ground = ring_floor(load('ring_02'))
-    upper = ring_floor()
-    for name, piece in (('ring_ground', ground), ('ring_floor', upper)):
-        piece.write(os.path.join(HAND, name + '.nbt'))
-        print('  %-12s %s' % (name, list(piece.size)))
-    print('\n평면 (테두리만, 가운데 %dx%d는 방이 채운다)' % (CORE, CORE))
-    show(upper, 0)
-    print('\n1층 y=2 — 서쪽 문')
-    show(ground, 2)
-    tower = shell()
-    print('\n%dx%dx%d 껍데기, 단면 x=%d' % (tower.size + (WIDE // 2,)))
-    show(tower, WIDE // 2, axis='z')
-
-
-if __name__ == '__main__':
-    main()
