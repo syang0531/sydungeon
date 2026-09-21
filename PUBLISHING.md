@@ -1,8 +1,8 @@
 # SY Dungeon 배포 가이드 (CurseForge)
 
-`syalchemy`·`syvillage`와 동일한 구조입니다. **한 번만 준비(A)** 해두면 이후에는 **태그만 push하면 자동 배포(B)** 됩니다.
+**한 번만 준비(A)** 해두면 이후에는 **태그만 push하면 자동 배포(B)** 됩니다.
 
-버전 정보: Minecraft **26.2** / NeoForge **26.2.0.88** / **Java 25**. 형제 모드(syalchemy·syvillage)와 같은 스택입니다.
+버전 정보: Minecraft **26.2** / NeoForge **26.2.0.88** / **Java 25**.
 
 ---
 

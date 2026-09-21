@@ -2,8 +2,6 @@
 
 마인크래프트 자바 에디션 모드. **손으로 지은 조각을 직소가 이어 붙여, 매번 다른 던전을 만든다.**
 
-Stan Yang의 모드 가족(`sy…`) 세 번째. [SY Alchemy](https://www.curseforge.com/minecraft/mc-mods/syalchemy)·[SY Village](https://www.curseforge.com/minecraft/mc-mods/syvillage)와 함께 플레이하는 것이 전제다.
-
 ## 무엇이 나오나
 
 **지하감옥** — 평원·숲·타이가의 지표에 선 돌벽돌 정자에서 사다리로 내려가면 미로가 시작된다. 직선 통로·십자 교차로·계단이 7×7 격자로 이어지고, 통로 옆 철창 뒤 감방에는 상자가, 막다른 경비실에는 스포너가 있다. 던전마다 깊이가 다르고 벽은 금 가고 이끼 끼어 있다. 허브에서 뻗은 복도 하나는 세 배 큰 보스방으로 이어지고, 거기서 좀비말을 탄 간수장과 무장 경비를 잡으면 트라이얼 스포너가 마법 부여 다이아 장비를 뱉는다. `/locate structure sydungeon:dungeon`으로 찾는다.

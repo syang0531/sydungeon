@@ -12,7 +12,7 @@ itself is never touched) and writes data/sydungeon/structure/dungeon/*.nbt with:
   - every jigsaw's pool pointed at our pools (passages / cells)
   - the palette and DataVersion brought down from 26.3 to 26.2
 
-The practice world is 26.3 and the mod is 26.2 (the family's version). Between the two the
+The practice world is 26.3 and the mod is 26.2. Between the two the
 structure palette changed its keys (`id`/`properties` -> `Name`/`Properties`, DataVersion
 5023 -> 4903); the blocks themselves - stone bricks, iron bars, a lantern, a jigsaw - did not,
 so renaming the keys is the whole downgrade. Everything else is written back unchanged.
