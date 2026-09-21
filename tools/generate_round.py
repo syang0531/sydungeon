@@ -328,7 +328,7 @@ def sealed():
     way in is to notice the floor is a cell short and dig."""
     p = Piece(CELL, CELL, CELL, STONE)
     p.box(1, 1, 1, CELL - 2, CELL - 2, CELL - 2, AIR)
-    p.set(3, 1, 3, *chest('tower_library'))
+    p.set(3, 1, 3, *chest('tower_observatory'))
     p.jigsaw(0, 0, 3, 'west_up', EMPTY, STONE, name=ANCHOR, target=ANCHOR)
     return p
 
@@ -348,6 +348,9 @@ def build_pieces():
             flipped, flipped_size = mirror_z(blocks, size)
             out['corner_right'] = as_piece(flipped, flipped_size)
     out['corner_left'] = out.pop('corner')
+    out['cross_guard'] = guarded(out['cross'], 'minecraft:vex')
+    out['tee_guard'] = guarded(out['tee'], 'minecraft:zombie_villager')
+    out['dead_end'] = rewarded(out['dead_end'], 'tower_study')
     out['sealed'] = sealed()
     big = load('room4')
     shape, shape_size = canonical('room4', big)
@@ -398,10 +401,12 @@ def write_pool(name, elements, fallback=EMPTY):
 # which pieces may stand in a cell that must open a given way. Every one of them has the door
 # the pool promises; what differs is what else it has, and what is in it.
 POOL_PIECES = {
-    'link_through': [('straight', 10), ('cross', 4)],
-    'link_left': [('corner_left', 10), ('tee', 5), ('cross', 3)],
-    'link_right': [('corner_right', 10), ('tee', 5), ('cross', 3)],
-    'link_cross': [('cross', 1)],
+    'link_through': [('straight', 10), ('cross', 3), ('cross_guard', 2)],
+    'link_left': [('corner_left', 9), ('tee', 4), ('tee_guard', 3), ('cross', 2),
+                  ('cross_guard', 1)],
+    'link_right': [('corner_right', 9), ('tee', 4), ('tee_guard', 3), ('cross', 2),
+                   ('cross_guard', 1)],
+    'link_cross': [('cross', 2), ('cross_guard', 1)],
     'leaf': [('dead_end', 10), ('sealed', 4)],
     'stair': [('stair', 1)],
     'library': [('library', 1)],
@@ -657,6 +662,50 @@ def furnish_sanctum(blocks, size):
     for x, z in ((3, 6), (10, 6), (6, 3), (6, 10)):
         p.set(x, 5, z, 'minecraft:soul_lantern', {'hanging': 'true', 'waterlogged': 'false'})
     return p
+
+
+
+
+# ------------------------------------------------------- what goes in the corridors and rooms
+ANY_LIGHT = {'block_light_limit': {'min_inclusive': nbt.Int(0), 'max_inclusive': nbt.Int(15)}}
+
+
+def mob_spawner(entity, count=2):
+    """A spawner that ignores light. Without the rule it obeys the mob's own, and a lit
+    corridor would make it scenery (CLAUDE.md section 6)."""
+    return {'id': 'minecraft:mob_spawner',
+            'SpawnData': {'entity': {'id': entity}, 'custom_spawn_rules': ANY_LIGHT},
+            'Delay': nbt.Short(20), 'MinSpawnDelay': nbt.Short(240),
+            'MaxSpawnDelay': nbt.Short(900), 'SpawnCount': nbt.Short(count),
+            'MaxNearbyEntities': nbt.Short(5), 'RequiredPlayerRange': nbt.Short(14),
+            'SpawnRange': nbt.Short(4)}
+
+
+def copy_piece(piece):
+    out = Piece(piece.size[0], piece.size[1], piece.size[2], AIR)
+    for pos, (block, props) in piece.grid.items():
+        out.set(pos[0], pos[1], pos[2], block, dict(props) if props else None)
+        if pos in piece.extra:
+            out.extra[pos] = piece.extra[pos]
+    return out
+
+
+def guarded(piece, entity):
+    """A junction with something standing in it. The streets are where the fighting is; the
+    rooms are where the reward is."""
+    out = copy_piece(piece)
+    out.set(3, 1, 3, 'minecraft:spawner', None, mob_spawner(entity))
+    return out
+
+
+def rewarded(piece, table, facing='west'):
+    """A room worth walking into: a chest against the far wall and a light to find it by."""
+    out = copy_piece(piece)
+    out.set(5, 1, 3, *chest(table, facing))
+    out.set(1, 1, 1, 'minecraft:bookshelf')
+    out.set(1, 1, 5, 'minecraft:bookshelf')
+    out.set(3, 5, 3, 'minecraft:lantern', {'hanging': 'true', 'waterlogged': 'false'})
+    return out
 
 
 if __name__ == '__main__':
