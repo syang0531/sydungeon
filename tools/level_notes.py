@@ -391,5 +391,7 @@ NOTES['pyramid/cap'] = '두께 1의 사암 벽. 모든 풀의 fallback.'
 # The tower's prose lives in its own module: it is the longest of the three and the one that
 # changes most often.
 from level_notes_tower import install as _install_tower   # noqa: E402
+from level_notes_swamp import install as _install_swamp   # noqa: E402
 
 _install_tower(INTRO, NOTES)
+_install_swamp(INTRO, NOTES)

@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -64,6 +64,12 @@ STYLE = OrderedDict([
     ('iron_chain',            ('i', '#8b9096', '쇠사슬')),
     ('glass_pane',            ('g', '#bfe9ee', '유리판')),
     ('dark_oak_planks',       ('w', '#4a2f18', '짙은 참나무 판자')),
+    ('dark_oak_log',          ('L', '#3a2a16', '짙은 참나무 원목')),
+    ('dark_oak_slab',         ('_', '#5a3a1e', '짙은 참나무 반 블록')),
+    ('mud_bricks',            ('N', '#8a6a52', '진흙 벽돌')),
+    ('packed_mud',            ('n', '#9a7a5e', '굳은 진흙')),
+    ('muddy_mangrove_roots',  ('R', '#4a3a2a', '진흙 맹그로브 뿌리')),
+    ('water',                 ('~', '#3f76e4', '물')),
     ('dark_oak_fence',        ('f', '#6b452a', '짙은 참나무 울타리')),
     ('spruce_planks',         ('w', '#6b4f2c', '가문비나무 판자')),
     ('spruce_fence',          ('f', '#7d5e36', '가문비나무 울타리')),
@@ -616,7 +622,8 @@ def build(family):
     pieces = load_family(family)
     pools = load_pools(family)
     structure = load_json('worldgen', 'structure', '%s.json' % family)
-    sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers'}
+    sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
+            'swamp': 'swamps'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

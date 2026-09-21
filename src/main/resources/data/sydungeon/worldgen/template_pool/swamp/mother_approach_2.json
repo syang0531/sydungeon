@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:swamp/cellar_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/approach_2", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } }
+  ]
+}

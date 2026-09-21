@@ -25,6 +25,7 @@ import decorate  # noqa: E402
 import generate_pieces  # noqa: E402
 import generate_tower  # noqa: E402
 import generate_pyramid  # noqa: E402
+import generate_swamp  # noqa: E402
 
 if __name__ == '__main__':
     print('-- convert')
@@ -37,3 +38,5 @@ if __name__ == '__main__':
     generate_pyramid.main()
     print('-- tower')
     generate_tower.main()
+    print('-- swamp')
+    generate_swamp.main()

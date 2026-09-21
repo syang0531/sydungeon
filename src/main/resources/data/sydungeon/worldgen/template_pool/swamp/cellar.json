@@ -1,0 +1,17 @@
+{
+  "fallback": "sydungeon:swamp/cellar_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_passage", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_corner", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_cross", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_brew", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_drowned", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/cellar_still", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } }
+  ]
+}
