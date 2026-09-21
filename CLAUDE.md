@@ -256,17 +256,41 @@ y  0– 6   받침 39폭, 1층 5×5칸       base  (39× 7×39) ─안쪽→ cor
 | `tools/decorate.py` | cell과 dead_end에 상자·스포너 NBT 삽입 |
 | `tools/dump_structure.py` | 조각을 층별 텍스트로 출력 + 직소 목록. 26.2/26.3 팔레트 둘 다 읽음 |
 | `tools/pack_datapack.py` | `data/`를 바닐라 데이터팩 zip으로 묶음. 모드 빌드 없이 26.2 월드에서 `/place`로 확인 |
-| `tools/import_piece.py` | 개발 클라이언트(`run/saves/*/generated/sydungeon/structure/`)에서 저장한 조각을 모드로 복사하고 직소·격자 규약을 검사 |
+| `tools/workshop.py` | 개발 월드에 작업장 데이터팩을 깐다. `/function workshop:tower` 한 번이면 모든 조각이 **SAVE 설정된 구조물 블록과 함께** 바닥에 깔린다 |
+| `tools/import_piece.py` | 손으로 고친 조각을 모드로 되가져온다. **모드에 있는 같은 이름 조각을 계약으로 삼아** 크기·직소(위치/향/name/target/pool/joint)·문 구멍이 그대로인지 대조한다 |
+
+### 16. 어떻게 생겼는지는 사람 것이고, 어떻게 배선됐는지는 코드 것이다
+
+코드로 만든 조각은 **출발점**이다. 예쁘게 만드는 일은 개발 클라이언트에서 손으로 한다 (§1).
+코드가 지키는 것은 직소(위치·향·name·target·pool·joint)와 상자 기하뿐이고, `import_piece.py`가
+**모드에 이미 있는 같은 이름 조각을 계약으로 삼아** 대조한다. 벽지·가구·조명·방 모양은 전부 자유다.
+
+구조물 블록은 한 변 **48칸**이 한계다. 그래서 탑에서 손으로 못 만드는 것은 `shaft`(25×49×25)와
+`core_shaft`(21×49×21) 둘뿐이고, 그 중 외형인 `shaft`는 **한 층짜리 원본 조각**
+`tower/shaft_floor`(25×7×25)로 나눠 뒀다. 생성기는 그 파일이 **없을 때만** 만들고, 있으면 읽어서
+일곱 번 쌓는다. 그래서 몸통 외벽도 손으로 지을 수 있다. 이런 조각은 어느 풀에도 안 들어가므로
+`validate_data.SOURCE_PIECES`에 적어 둔다.
 
 ## 조각 만들기 (개발 클라이언트)
 
 `./gradlew runClient`로 뜨는 게임이 곧 26.2 + 이 모드다. 조각은 거기서 만든다.
 
-1. 크리에이티브 월드에서 7×7×7 셀 규약대로 짓는다 (§2)
-2. 구조물 블록 SAVE, 이름 `sydungeon:dungeon/<이름>` → `run/saves/<월드>/generated/sydungeon/structure/dungeon/<이름>.nbt`
-3. `python tools/import_piece.py` 로 목록 확인, `python tools/import_piece.py dungeon/<이름>` 으로 가져온다. 직소 이름·풀·격자 위치를 검사해 어긋난 것을 말해 준다
-4. 풀 JSON에 원소를 추가한다 — 도구가 해 주지 않는다
-5. 게임에서 `/reload` 하면 데이터팩 부분(풀·구조물 JSON)은 다시 읽지만 **jar 안의 조각은 재시작**해야 바뀐다. 개발 중에는 저장한 조각이 `generated/`에 있는 한 월드가 그것을 먼저 읽으므로, 그 월드 안에서는 `/place jigsaw`로 바로 볼 수 있다
+```bash
+python tools/workshop.py tower      # 개발 월드마다 작업장 데이터팩을 깐다
+```
+
+1. 크리에이티브 월드에서 빈 곳으로 날아가 `/reload` 후 `/function workshop:tower`.
+   조각이 전부 동쪽·남쪽으로 깔리고, 각각 **자기 이름으로 SAVE 설정된 구조물 블록**이
+   왼쪽 아래 모서리에 붙는다 (경계 상자 표시 켜져 있음)
+2. 고친다. 7×7×7 셀 규약(§2)과 직소는 건드리지 않는다
+3. 그 조각의 구조물 블록에서 **SAVE** →
+   `run/saves/<월드>/generated/sydungeon/structure/tower/<이름>.nbt`
+4. `python tools/import_piece.py tower/<이름>` — 모드에 있던 것과 배선을 대조해서
+   직소가 사라졌거나 문이 막혔으면 말해 준다. `--all`로 한꺼번에도 된다
+5. `./gradlew build` → 다시 실행. **jar 안의 조각은 재시작해야 바뀐다.** 다만 저장한 조각이
+   그 월드의 `generated/`에 있는 한 월드는 그것을 먼저 읽으므로, 그 안에서는 `/place`로 바로 보인다
+
+새 조각을 아예 추가했다면 풀 JSON에 원소를 넣는 것은 사람 몫이다 — 도구가 해 주지 않는다.
 
 ## 생성 결과 읽기
 

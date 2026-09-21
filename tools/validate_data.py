@@ -31,6 +31,13 @@ DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 NS = 'sydungeon'
 
 
+# Pieces that are deliberately in no pool: a generator reads them and builds something else
+# out of them, so they exist to be edited by hand rather than to be placed. `shaft_floor` is
+# one floor of the tower's wall, which `generate_tower.py` stacks seven times because a
+# structure block cannot save the forty-nine-block whole.
+SOURCE_PIECES = {'tower/shaft_floor'}
+
+
 def game_jar():
     """The game's own jar for the version in gradle.properties.
 
@@ -234,7 +241,7 @@ def main():
     orphans = []
     for name in sorted(mine['worldgen/template_pool'] - used_pools - start_pools):
         orphans.append('template pool %s is never used' % name)
-    for name in sorted(mine['structure'] - used_pieces):
+    for name in sorted(mine['structure'] - used_pieces - SOURCE_PIECES):
         orphans.append('structure piece %s is in no pool' % name)
     for name in sorted(mine['loot_table'] - used_tables):
         orphans.append('loot table %s is never used' % name)

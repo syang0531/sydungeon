@@ -2,23 +2,30 @@
 """Bring pieces saved in the dev client into the mod.
 
     python tools/import_piece.py                 # list what the dev worlds have saved
-    python tools/import_piece.py dungeon/foo     # import one (or several) into the mod
+    python tools/import_piece.py tower/hall      # import one (or several) into the mod
     python tools/import_piece.py --all           # import everything
 
-In the dev client (./gradlew runClient) a structure block in SAVE mode with the name
-`sydungeon:dungeon/foo` writes run/saves/<world>/generated/sydungeon/structure/dungeon/foo.nbt.
-That file is already in the mod's format - the dev client *is* Minecraft 26.2 - so importing is
-a copy into src/main/resources/data/sydungeon/structure/. This does the copy and, because a
-piece that looks right can still be wired wrong, checks what cannot be seen in the world:
+In the dev client (./gradlew runClient) a structure block in SAVE mode named
+`sydungeon:tower/hall` writes run/saves/<world>/generated/sydungeon/structure/tower/hall.nbt.
+That file is already in the mod's format - the dev client *is* Minecraft 26.2 - so importing
+is a copy into src/main/resources/data/sydungeon/structure/.
 
-  - every jigsaw is named `sydungeon:door` or `sydungeon:boss_door` and targets one of them
-  - every jigsaw points at one of our pools
-  - the piece is a whole number of 7-block cells, or one block thin (a plug)
-  - a horizontal jigsaw sits on a cell floor at the centre of its face; a vertical one sits
-    on the top or bottom layer in the shaft column (x 3, z 2)
+The point of the check is this: **how a piece looks is yours, how it is wired is not.** A
+redecorated room that has lost a jigsaw, moved one, or bricked up a doorway will still build
+a structure, just a broken one - a chain that runs backwards, a room with no way in. So the
+piece already in the mod is treated as the contract, and the new one is held against it:
+
+  - same size
+  - the same jigsaws, block for block: position, facing, name, target, pool, joint
+  - every doorway a jigsaw stands in is still open (three wide, four tall)
+  - whole 7-block cells, or one block thin (a plug)
+
+Everything else - blocks, furniture, light, the shape of the room inside its walls - is free.
+Use `tools/workshop.py` to lay the pieces out in a creative world with their structure blocks
+already set up, edit them there, then bring them back with this.
 
 A failed check is printed, not fatal: the file is still copied so you can look at it with
-dump_structure.py, but the pool JSON is your job either way - this does not edit it.
+dump_structure.py. The pool JSON is your job either way - this does not edit it.
 """
 import glob
 import os
@@ -59,44 +66,82 @@ def pools():
     return out
 
 
-def check(name, root):
-    problems = []
-    sx, sy, sz = root['size']
-    if (sx % CELL or sz % CELL or sy % CELL) and 1 not in (sx, sy, sz):
-        problems.append('size %dx%dx%d is not whole 7-cells (nor a 1-block plug)' % (sx, sy, sz))
+def jigsaws(root):
+    """{position: what decides who attaches here}, which is what must survive an edit."""
+    out = {}
     palette = root['palette']
-    known = pools()
-    jigsaws = 0
     for b in root['blocks']:
         if nbt.palette_name(palette[b['state']]) != 'minecraft:jigsaw':
             continue
-        jigsaws += 1
-        x, y, z = b['pos']
         meta = b.get('nbt', {})
-        where = 'jigsaw at (%d,%d,%d)' % (x, y, z)
-        if meta.get('name') not in NAMES or meta.get('target') not in NAMES:
-            problems.append('%s: name/target %s/%s, expected one of %s' % (
-                where, meta.get('name'), meta.get('target'), NAMES))
-        if meta.get('pool') not in known:
-            problems.append('%s: pool %s is not one of %s' % (where, meta.get('pool'), sorted(known)))
-        orientation = nbt.palette_props(palette[b['state']]).get('orientation', '')
-        vertical = orientation.startswith(('up_', 'down_'))
-        if vertical:
-            if y not in (0, sy - 1):
-                problems.append('%s: vertical jigsaw not on the top or bottom layer' % where)
-            if (x, z) != (3, 2):
-                problems.append('%s: vertical jigsaw not in the shaft column (3, _, 2)' % where)
-            if meta.get('joint') != 'aligned':
-                problems.append('%s: vertical jigsaw should be joint=aligned' % where)
-        else:
-            if y % CELL:
-                problems.append('%s: not on a cell floor (y %% 7 != 0)' % where)
-            on_face = x in (0, sx - 1) or z in (0, sz - 1)
-            centred = (x % CELL == 3) or (z % CELL == 3)
-            if not (on_face and centred):
-                problems.append('%s: not at the centre of a face' % where)
-    if jigsaws == 0:
+        out[tuple(int(v) for v in b['pos'])] = (
+            str(nbt.palette_props(palette[b['state']]).get('orientation', '')),
+            str(meta.get('name')), str(meta.get('target')), str(meta.get('pool')),
+            str(meta.get('joint', 'rollable')))
+    return out
+
+
+def is_air(root, x, y, z):
+    palette = root['palette']
+    for b in root['blocks']:
+        if tuple(int(v) for v in b['pos']) == (x, y, z):
+            return nbt.palette_name(palette[b['state']]) == 'minecraft:air'
+    return True
+
+
+def doorway(root, pos, orientation, size):
+    """The three-wide, four-tall hole a face jigsaw stands in. Vertical jigsaws are anchors
+    rather than doors - the way through those is cut into both pieces by hand - so they are
+    not checked here."""
+    facing = orientation.split('_')[0]
+    x, y, z = pos
+    sx, sy, sz = size
+    if facing in ('up', 'down'):
+        return []
+    span = {'west': [(0, y + dy, z + dz) for dy in range(1, 5) for dz in (-1, 0, 1)],
+            'east': [(sx - 1, y + dy, z + dz) for dy in range(1, 5) for dz in (-1, 0, 1)],
+            'north': [(x + dx, y + dy, 0) for dy in range(1, 5) for dx in (-1, 0, 1)],
+            'south': [(x + dx, y + dy, sz - 1) for dy in range(1, 5) for dx in (-1, 0, 1)]}[facing]
+    return [c for c in span
+            if 0 <= c[0] < sx and 0 <= c[1] < sy and 0 <= c[2] < sz and not is_air(root, *c)]
+
+
+def check(name, new, old):
+    problems = []
+    sx, sy, sz = [int(v) for v in new['size']]
+    if (sx % CELL or sz % CELL or sy % CELL) and 1 not in (sx, sy, sz):
+        problems.append('size %dx%dx%d is not whole 7-cells (nor a 1-block plug)' % (sx, sy, sz))
+
+    mine = jigsaws(new)
+    if not mine:
         problems.append('no jigsaw at all - nothing can attach to it')
+    known = pools()
+    for pos, wiring in sorted(mine.items()):
+        if wiring[3] not in known and wiring[3] != 'minecraft:empty':
+            problems.append('jigsaw at %s: pool %s is not one of ours' % (pos, wiring[3]))
+        blocked = doorway(new, pos, wiring[0], (sx, sy, sz))
+        if blocked:
+            problems.append('jigsaw at %s: its doorway is walled up at %s'
+                            % (pos, ', '.join(str(c) for c in blocked[:4])))
+
+    if old is None:
+        problems.append('nothing of this name in the mod yet, so there is no wiring to hold '
+                        'it against - check it by hand, and add it to a pool')
+        return problems
+    if [int(v) for v in old['size']] != [sx, sy, sz]:
+        problems.append('size changed: was %s, now %s' % (list(old['size']), [sx, sy, sz]))
+    theirs = jigsaws(old)
+    for pos in sorted(set(theirs) - set(mine)):
+        problems.append('jigsaw gone from %s (was %s -> %s)' % (pos, theirs[pos][1], theirs[pos][3]))
+    for pos in sorted(set(mine) - set(theirs)):
+        problems.append('jigsaw added at %s (%s -> %s); the generator does not know about it'
+                        % (pos, mine[pos][1], mine[pos][3]))
+    for pos in sorted(set(mine) & set(theirs)):
+        if mine[pos] != theirs[pos]:
+            for field, was, now in zip(('facing', 'name', 'target', 'pool', 'joint'),
+                                       theirs[pos], mine[pos]):
+                if was != now:
+                    problems.append('jigsaw at %s: %s was %s, now %s' % (pos, field, was, now))
     return problems
 
 
@@ -116,12 +161,14 @@ def main():
             print('%s: not saved in any dev world' % name)
             continue
         dst = os.path.join(DST, *name.split('/')) + '.nbt'
+        old = nbt.read(dst) if os.path.exists(dst) else None
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copyfile(have[name], dst)
         root = nbt.read(dst)
-        problems = check(name, root)
-        print('%s -> %s  (DataVersion %s, size %s)' % (name, os.path.relpath(dst, ROOT),
-                                                      root['DataVersion'], list(root['size'])))
+        problems = check(name, root, old)
+        print('%s -> %s  (DataVersion %s, size %s)%s' % (
+            name, os.path.relpath(dst, ROOT), root['DataVersion'], list(root['size']),
+            '' if problems else '   wiring intact'))
         for p in problems:
             print('   ! ' + p)
 

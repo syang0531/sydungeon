@@ -359,39 +359,63 @@ def base():
     return p
 
 
-def shaft():
-    """The tall part. Two courses of wall, a copper band at every floor, and slit windows;
-    the inside is left solid for core_shaft to hand to the rooms."""
-    n, h = SHAFT_W, SHAFT_H
-    p = Piece(n, h, n, STONE)
-    for y in range(h):
+def shaft_floor():
+    """One floor of the tall part's outer wall: two courses of wall, a copper band at the top,
+    slit windows, quoins at the corners. The inside is left solid for core_shaft to hand to
+    the rooms.
+
+    **This is a source piece.** `shaft` is this stacked seven times, so the forty-nine-block
+    tower wall - which no structure block can save, being one over the limit of forty-eight -
+    can still be built by hand: edit this one floor in the workshop and the generator repeats
+    it. The generator writes it only when it is missing, so an edited one is never clobbered.
+    """
+    n = SHAFT_W
+    p = Piece(n, CELL, n, STONE)
+    for y in range(CELL):
         for x in range(n):
             for z in range(n):
                 if x < WALL or x >= n - WALL or z < WALL or z >= n - WALL:
                     weather(p, x, y, z)
-    for floor in range(FLOORS):
-        y = floor * CELL + CELL - 1
-        ring(p, y, 0, n - 1, COPPER_CUT)
-        ring(p, y - 1, 0, n - 1, CHISELED)
-        # windows: one wide, three tall, cut through both courses so they read as openings
-        for i in (6, 12, 18):
-            for x, z, dx, dz in ((0, i, 1, 0), (n - 1, i, -1, 0),
-                                 (i, 0, 0, 1), (i, n - 1, 0, -1)):
-                for depth in range(WALL):
-                    for dy in range(2, 5):
-                        p.set(x + dx * depth, floor * CELL + dy, z + dz * depth, GLASS, PANE)
-    # quoins up the corners
+    ring(p, CELL - 1, 0, n - 1, COPPER_CUT)
+    ring(p, CELL - 2, 0, n - 1, CHISELED)
+    # windows: one wide, three tall, cut through both courses so they read as openings
+    for i in (6, 12, 18):
+        for x, z, dx, dz in ((0, i, 1, 0), (n - 1, i, -1, 0), (i, 0, 0, 1), (i, n - 1, 0, -1)):
+            for depth in range(WALL):
+                for dy in range(2, 5):
+                    p.set(x + dx * depth, dy, z + dz * depth, GLASS, PANE)
     for cx, cz in ((0, 0), (0, n - 1), (n - 1, 0), (n - 1, n - 1)):
-        for y in range(h):
-            if y % 2 == 0:
-                p.set(cx, y, cz, CHISELED)
+        for y in range(0, CELL, 2):
+            p.set(cx, y, cz, CHISELED)
+    return p
+
+
+def shaft(floor_piece):
+    """Seven copies of one floor, and the three jigsaws that join the shells."""
+    n, h = SHAFT_W, SHAFT_H
+    p = Piece(n, h, n, STONE)
+    for floor in range(FLOORS):
+        for (x, y, z), (block, props) in floor_piece.grid.items():
+            p.set(x, floor * CELL + y, z, block, dict(props) if props else None)
 
     p.jigsaw(0, 0, 0, 'down_east', EMPTY, STONE, joint='aligned', name=ANCHOR, target=ANCHOR)
-    ox, oy, oz = AT['core_shaft']
     p.jigsaw(WALL - 1, 0, SIZE['shaft'][2] // 2, 'east_up', POOL['core_shaft'], STONE,
              priority=PRIORITY, name=PLACER, target=ANCHOR)
     p.jigsaw(0, h - 1, 0, 'up_east', POOL['crown'], STONE, joint='aligned',
              priority=PRIORITY, name=PLACER, target=ANCHOR)
+    return p
+
+
+def load_piece(path):
+    """Read a saved piece back into a Piece, so a hand-built source can be stacked."""
+    root = nbt.read(path)
+    sx, sy, sz = [int(v) for v in root['size']]
+    p = Piece(sx, sy, sz, AIR)
+    palette = [(nbt.palette_name(e), dict(nbt.palette_props(e) or {})) for e in root['palette']]
+    for b in root['blocks']:
+        x, y, z = [int(v) for v in b['pos']]
+        name, props = palette[int(b['state'])]
+        p.set(x, y, z, name, props or None, b.get('nbt'))
     return p
 
 
@@ -955,8 +979,13 @@ def verify(pieces):
 
 def main():
     os.makedirs(DST, exist_ok=True)
+    # the one source piece: kept if it is already there, so a hand-built floor survives
+    floor_path = os.path.join(DST, 'shaft_floor.nbt')
+    hand_built = os.path.exists(floor_path)
+    floor_piece = load_piece(floor_path) if hand_built else shaft_floor()
     pieces = {
-        'base': base(), 'shaft': shaft(), 'crown': crown(), 'roof': roof(),
+        'base': base(), 'shaft': shaft(floor_piece), 'crown': crown(), 'roof': roof(),
+        'shaft_floor': floor_piece,
         'core_base': core_base(), 'core_shaft': core_shaft(),
         'hall': hall(), 'corridor': corridor(), 'great_stair': great_stair(),
         'alchemy': alchemy(), 'library': library(), 'sanctum': sanctum(),
@@ -969,6 +998,9 @@ def main():
             pieces['stair_%d' % floor] = stair(floor)
     verify(pieces)
     for name, piece in sorted(pieces.items()):
+        if name == 'shaft_floor' and hand_built:
+            print('  %-12s %s  kept (built by hand)' % (name, list(piece.size)))
+            continue
         piece.write(os.path.join(DST, name + '.nbt'))
         print('  %-12s %s' % (name, list(piece.size)))
 
