@@ -37,7 +37,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.LiquidSetting
  */
 public final class RangedJigsawStructure extends Structure {
 
-    public static final int MAX_DEPTH = 32;
+    public static final int MAX_DEPTH = 64;
 
     public static final MapCodec<RangedJigsawStructure> CODEC = RecordCodecBuilder.<RangedJigsawStructure>mapCodec(
             i -> i.group(

@@ -38,6 +38,8 @@ STYLE = OrderedDict([
     ('stone_bricks',          ('#', '#8f8f8f', '돌벽돌')),
     ('chiseled_stone_bricks', ('%', '#74747a', '조각한 돌벽돌')),
     ('stone_brick_stairs',    ('/', '#a6a6a6', '돌벽돌 계단')),
+    ('mossy_stone_bricks',    ('m', '#7c8a72', '이끼 낀 돌벽돌')),
+    ('mossy_cobblestone',     ('n', '#6f7c66', '이끼 낀 조약돌')),
     ('deepslate_bricks',      ('D', '#4b4b52', '심층암 벽돌')),
     ('polished_deepslate',    ('d', '#3a3a40', '윤나는 심층암')),
     ('sandstone',             ('=', '#ddd0a1', '사암')),
@@ -63,6 +65,16 @@ STYLE = OrderedDict([
     ('glass_pane',            ('g', '#bfe9ee', '유리판')),
     ('dark_oak_planks',       ('w', '#4a2f18', '짙은 참나무 판자')),
     ('dark_oak_fence',        ('f', '#6b452a', '짙은 참나무 울타리')),
+    ('spruce_planks',         ('w', '#6b4f2c', '가문비나무 판자')),
+    ('spruce_fence',          ('f', '#7d5e36', '가문비나무 울타리')),
+    ('spruce_log',            ('l', '#4b3a22', '가문비나무 원목')),
+    ('oxidized_copper',       ('K', '#4f9e86', '산화 구리')),
+    ('oxidized_cut_copper',   ('k', '#57a98f', '깎은 산화 구리')),
+    ('oxidized_cut_copper_stairs', ('r', '#6bbda2', '산화 구리 계단')),
+    ('oxidized_chiseled_copper', ('R', '#448d78', '조각한 산화 구리')),
+    ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
+    ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
+    ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
     ('jigsaw',                ('J', '#ff2fa0', '직소')),
     ('structure_void',        (' ', '#ffffff', '구조물 공백')),
     ('air',                   ('.', None, '공기')),
@@ -284,7 +296,10 @@ def composite(placed, pieces):
                 continue
             key = (ox + x, oy + y, oz + z)
             blocks[key] = None if name == 'air' else name
-            owner[key] = spot['name']
+            if name == 'air':
+                owner.pop(key, None)      # colour the shape, not the box
+            else:
+                owner[key] = spot['name']
     return blocks, owner
 
 

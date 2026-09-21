@@ -1,7 +1,0 @@
-{
-  "fallback": "minecraft:empty",
-  "elements": [
-    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
-        "location": "sydungeon:tower/well_6", "projection": "rigid", "processors": "sydungeon:tower_weathering" } }
-  ]
-}
