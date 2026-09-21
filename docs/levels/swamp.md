@@ -19,7 +19,7 @@
 | 간격 / 최소거리 | spacing 36 / separation 12 |
 | 직소 깊이 | 12 ~ 20 (`sydungeon:ranged_jigsaw`) |
 | 시작 풀 | `start` |
-| 조각 / 풀 | 21개 / 11개 |
+| 조각 / 풀 | 25개 / 11개 |
 
 ## 2. 조립 원리
 
@@ -50,6 +50,15 @@ fallback이 **난간 한 장**(`deck_cap`)으로 막는다. 허공에 뚫린 널
 조각은 전부 **높이 11**로 고정이라 덱이 어긋날 수 없고, `verify()`가 그것과 "덱 아래에
 말뚝 말고 다른 것이 쓰였는지"를 검사한다.
 
+### 막다른 방은 보상, 통로는 싸움
+
+**문이 하나뿐인 방은 상자를 준다.** 들어갔다 돌아 나와야 하는 자리라 그만한 값이 있어야
+하고, 아무것도 없으면 빈 방을 왜 들어갔나 싶어진다. 널다리의 오두막 셋과 지하의
+`cellar_room`·`cellar_brew`·`cellar_still`이 전부 상자를 갖는다.
+
+**문이 둘 이상인 방은 스포너를 준다.** 지나가는 자리니까. 평범한 조각과 스포너가 든 조각이
+**같은 풀에 나란히** 들어가서 섞여 나온다.
+
 ### 지형을 건드리지 않는다
 
 `terrain_adaptation`이 **`none`**이다. 다른 던전은 beard가 땅을 받쳐 주지만, 이건 물 위에
@@ -79,9 +88,12 @@ flowchart LR
   E_cellar_cap["cellar_cap"]
   E_cellar_corner["cellar_corner"]
   E_cellar_cross["cellar_cross"]
+  E_cellar_cross_guard["cellar_cross_guard"]
   E_cellar_drowned["cellar_drowned"]
   E_cellar_hub["cellar_hub"]
   E_cellar_passage["cellar_passage"]
+  E_cellar_passage_guard["cellar_passage_guard"]
+  E_cellar_room["cellar_room"]
   E_cellar_still["cellar_still"]
   E_deck_cap["deck_cap"]
   E_great_hut["great_hut"]
@@ -93,19 +105,24 @@ flowchart LR
   E_walk["walk"]
   E_walk_corner["walk_corner"]
   E_walk_cross["walk_cross"]
-  P_cellar -- 10 --> E_cellar_passage
+  E_walk_guard["walk_guard"]
+  P_cellar -- 9 --> E_cellar_passage
+  P_cellar -- 5 --> E_cellar_passage_guard
   P_cellar -- 9 --> E_cellar_corner
-  P_cellar -- 6 --> E_cellar_cross
+  P_cellar -- 4 --> E_cellar_cross
+  P_cellar -- 3 --> E_cellar_cross_guard
+  P_cellar -- 8 --> E_cellar_room
   P_cellar -- 6 --> E_cellar_brew
-  P_cellar -- 5 --> E_cellar_drowned
   P_cellar -- 5 --> E_cellar_still
+  P_cellar -- 5 --> E_cellar_drowned
   P_cellar_caps -- 1 --> E_cellar_cap
   P_cellar_first -- 1 --> E_cellar_hub
   P_deck_caps -- 1 --> E_deck_cap
-  P_decks -- 10 --> E_walk
+  P_decks -- 9 --> E_walk
+  P_decks -- 5 --> E_walk_guard
   P_decks -- 8 --> E_walk_corner
   P_decks -- 6 --> E_walk_cross
-  P_decks -- 7 --> E_hut_loot
+  P_decks -- 8 --> E_hut_loot
   P_decks -- 5 --> E_hut_witch
   P_decks -- 4 --> E_hut_slime
   P_down -- 1 --> E_shaft
@@ -125,10 +142,13 @@ flowchart LR
   E_cellar_cap -.-> P_cellar_caps
   E_cellar_corner -.-> P_cellar
   E_cellar_cross -.-> P_cellar
+  E_cellar_cross_guard -.-> P_cellar
   E_cellar_drowned -.-> P_cellar
   E_cellar_hub -.-> P_cellar
   E_cellar_hub -.-> P_mother_approach_1
   E_cellar_passage -.-> P_cellar
+  E_cellar_passage_guard -.-> P_cellar
+  E_cellar_room -.-> P_cellar
   E_cellar_still -.-> P_cellar
   E_deck_cap -.-> P_deck_caps
   E_great_hut -.-> P_decks
@@ -140,17 +160,18 @@ flowchart LR
   E_walk -.-> P_decks
   E_walk_corner -.-> P_decks
   E_walk_cross -.-> P_decks
+  E_walk_guard -.-> P_decks
   P_start:::start
   classDef start fill:#ffe9a8,stroke:#c99a00,stroke-width:2px
 ```
 
 | 풀 | fallback | 원소 (가중치) |
 |---|---|---|
-| `cellar` | `cellar_caps` | `cellar_passage` 10, `cellar_corner` 9, `cellar_cross` 6, `cellar_brew` 6, `cellar_drowned` 5, `cellar_still` 5 |
+| `cellar` | `cellar_caps` | `cellar_passage` 9, `cellar_passage_guard` 5, `cellar_corner` 9, `cellar_cross` 4, `cellar_cross_guard` 3, `cellar_room` 8, `cellar_brew` 6, `cellar_still` 5, `cellar_drowned` 5 |
 | `cellar_caps` | `minecraft:empty` | `cellar_cap` 1 |
 | `cellar_first` | `minecraft:empty` | `cellar_hub` 1 |
 | `deck_caps` | `minecraft:empty` | `deck_cap` 1 |
-| `decks` | `deck_caps` | `walk` 10, `walk_corner` 8, `walk_cross` 6, `hut_loot` 7, `hut_witch` 5, `hut_slime` 4 |
+| `decks` | `deck_caps` | `walk` 9, `walk_guard` 5, `walk_corner` 8, `walk_cross` 6, `hut_loot` 8, `hut_witch` 5, `hut_slime` 4 |
 | `down` | `minecraft:empty` | `shaft` 1 |
 | `mother_approach` | `cellar_caps` | `mother` 1, `approach_3` 1 |
 | `mother_approach_1` | `cellar_caps` | `approach_1` 1 |
@@ -195,7 +216,7 @@ flowchart LR
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
-| (10, 0, 9) | ◇ 아래 | `swamp_down` | `swamp_down` | `swamp/down` |
+| (12, 0, 9) | ◇ 아래 | `swamp_down` | `swamp_down` | `swamp/down` |
 | (10, 3, 0) | ▲ 북 | `swamp_deck` | `swamp_deck` | `swamp/decks` |
 | (0, 3, 10) | ◀ 서 | `swamp_deck` | `swamp_deck` | `swamp/decks` |
 | (20, 3, 10) | ▶ 동 | `swamp_deck` | `swamp_deck` | `swamp/decks` |
@@ -203,7 +224,7 @@ flowchart LR
 
 **뚫린 면** — 서: z 0–20, y 0–10 (90칸) / 동: z 0–20, y 0–10 (90칸) / 북: x 0–20, y 0–10 (90칸) / 남: x 0–20, y 0–10 (90칸) / 아래: x 0–20, z 0–20 (435칸) / 위: x 0–20, z 0–20 (441칸)
 
-**블록** — 짙은 참나무 판자 1121, 짙은 참나무 반 블록 441, 짙은 참나무 원목 32, 진흙 벽돌 13, 직소 5, 랜턴 4, 사다리 4, 양조기 3
+**블록** — 짙은 참나무 판자 1121, 짙은 참나무 반 블록 441, 짙은 참나무 원목 34, 진흙 벽돌 13, 직소 5, 랜턴 4, 사다리 4, 양조기 3
 
 ![great_hut](img/swamp/great_hut.svg)
 
@@ -220,7 +241,7 @@ y = 0   x →동, z ↓남
   .....................
   .....................
   ...........H.........
-  ..........J..........
+  ............J........
   .....................
   .....................
   .....................
@@ -242,7 +263,7 @@ y = 1–2   x →동, z ↓남
   .....................
   .....................
   ...........H.........
-  .....................
+  ............L........
   .....................
   .....................
   .....................
@@ -460,7 +481,7 @@ y = 10   x →동, z ↓남
   Jwwwwwww...wwwwwwwwwJ
   .....................
   .....................
-  .........J...........
+  .....................
 ```
 
 </details>
@@ -471,7 +492,7 @@ y = 10   x →동, z ↓남
 널다리의 기본 단위. 말뚝 넷, 판자 덱, 사방 난간 — 문이 난 쪽만 뚫린다. **덱 아래는 말뚝
 말고 아무것도 쓰지 않아서** 물이 그대로 남는다.
 
-**어느 풀에 있나** — `decks` (가중치 10)
+**어느 풀에 있나** — `decks` (가중치 9)
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
@@ -546,6 +567,94 @@ y = 5–10   x →동, z ↓남
   .......
   .......
   f.....f
+  wwwwwww
+  .......
+  .......
+  .......
+```
+
+</details>
+
+
+### `walk_guard` — 7×11×7
+
+널다리 한가운데 마녀 스포너. 피할 데가 없는 자리다.
+
+**어느 풀에 있나** — `decks` (가중치 5)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 3, 3) | ◀ 서 | `swamp_deck` | `swamp_deck` | `swamp/decks` |
+| (6, 3, 3) | ▶ 동 | `swamp_deck` | `swamp_deck` | `swamp/decks` |
+
+**뚫린 면** — 서: z 0–6, y 0–10 (60칸) / 동: z 0–6, y 0–10 (60칸) / 북: x 0–6, y 0–10 (57칸) / 남: x 0–6, y 0–10 (57칸) / 아래: x 0–6, z 0–6 (45칸) / 위: x 0–6, z 0–6 (49칸)
+
+**블록** — 짙은 참나무 판자 47, 짙은 참나무 울타리 18, 짙은 참나무 원목 12, 직소 2, 랜턴 2, 몬스터 스포너 1
+
+![walk_guard](img/swamp/walk_guard.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–2   x →동, z ↓남
+  L.....L
+  .......
+  .......
+  .......
+  .......
+  .......
+  L.....L
+y = 3   x →동, z ↓남
+  wwwwwww
+  wwwwwww
+  wwwwwww
+  JwwwwwJ
+  wwwwwww
+  wwwwwww
+  wwwwwww
+y = 4   x →동, z ↓남
+  fffffff
+  f*....f
+  .......
+  ...S...
+  .......
+  f....*f
+  fffffff
+y = 5–10   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 3   x →동, y ↑하늘
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  ...S...
+  JwwwwwJ
+  .......
+  .......
+  .......
+단면 x = 3   z →남, y ↑하늘
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  f..S..f
   wwwwwww
   .......
   .......
@@ -738,7 +847,7 @@ y = 5–10   x →동, z ↓남
 상자가 든 오두막. 문이 서쪽 하나뿐이라 들어갔다 나와야 한다. 지붕이 있어서 널다리와
 멀리서도 구별된다.
 
-**어느 풀에 있나** — `decks` (가중치 7)
+**어느 풀에 있나** — `decks` (가중치 8)
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
@@ -865,7 +974,7 @@ y = 10   x →동, z ↓남
 
 **뚫린 면** — 서: z 0–6, y 0–10 (34칸) / 동: z 0–6, y 0–10 (22칸) / 북: x 0–6, y 0–10 (22칸) / 남: x 0–6, y 0–10 (22칸) / 아래: x 0–6, z 0–6 (45칸) / 위: x 0–6, z 0–6 (49칸)
 
-**블록** — 짙은 참나무 판자 181, 짙은 참나무 반 블록 49, 짙은 참나무 원목 12, 직소 1, 가마솥 1, 몬스터 스포너 1, 양조기 1
+**블록** — 짙은 참나무 판자 181, 짙은 참나무 반 블록 49, 짙은 참나무 원목 12, 직소 1, 가마솥 1, 몬스터 스포너 1, 양조기 1, 상자 1
 
 ![hut_witch](img/swamp/hut_witch.svg)
 
@@ -894,7 +1003,7 @@ y = 4   x →동, z ↓남
   ......w
   ...S..w
   ......w
-  w.....w
+  w....cw
   wwwwwww
 y = 5–7   x →동, z ↓남
   wwwwwww
@@ -976,7 +1085,7 @@ y = 10   x →동, z ↓남
 
 **뚫린 면** — 서: z 0–6, y 0–10 (34칸) / 동: z 0–6, y 0–10 (22칸) / 북: x 0–6, y 0–10 (22칸) / 남: x 0–6, y 0–10 (22칸) / 아래: x 0–6, z 0–6 (45칸) / 위: x 0–6, z 0–6 (49칸)
 
-**블록** — 짙은 참나무 판자 181, 짙은 참나무 반 블록 49, 짙은 참나무 원목 12, 진흙 맹그로브 뿌리 5, 직소 1, 몬스터 스포너 1
+**블록** — 짙은 참나무 판자 181, 짙은 참나무 반 블록 49, 짙은 참나무 원목 12, 진흙 맹그로브 뿌리 5, 직소 1, 상자 1, 몬스터 스포너 1
 
 ![hut_slime](img/swamp/hut_slime.svg)
 
@@ -1007,7 +1116,15 @@ y = 4   x →동, z ↓남
   ......w
   wRRRRRw
   wwwwwww
-y = 5–7   x →동, z ↓남
+y = 5   x →동, z ↓남
+  wwwwwww
+  wc....w
+  ......w
+  ......w
+  ......w
+  w.....w
+  wwwwwww
+y = 6–7   x →동, z ↓남
   wwwwwww
   w.....w
   ......w
@@ -1172,12 +1289,12 @@ y = 5–10   x →동, z ↓남
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
-| (3, 0, 2) | ◇ 아래 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar_first` |
-| (3, 20, 2) | ◆ 위 | `swamp_down` | `swamp_down` | `—` |
+| (5, 0, 2) | ◇ 아래 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar_first` |
+| (5, 20, 2) | ◆ 위 | `swamp_down` | `swamp_down` | `—` |
 
-**뚫린 면** — 아래: x 2–4, z 1–3 (7칸) / 위: x 2–4, z 1–3 (7칸)
+**뚫린 면** — 아래: x 2–4, z 1–3 (8칸) / 위: x 2–4, z 1–3 (8칸)
 
-**블록** — 진흙 벽돌 840, 사다리 21, 직소 2
+**블록** — 진흙 벽돌 838, 사다리 21, 직소 2
 
 ![shaft](img/swamp/shaft.svg)
 
@@ -1187,7 +1304,7 @@ y = 5–10   x →동, z ↓남
 y = 0   x →동, z ↓남
   NNNNNNN
   NN..HNN
-  NN.J.NN
+  NN...JN
   NN...NN
   NNNNNNN
   NNNNNNN
@@ -1203,7 +1320,7 @@ y = 1–19   x →동, z ↓남
 y = 20   x →동, z ↓남
   NNNNNNN
   NN..HNN
-  NN.J.NN
+  NN...JN
   NN...NN
   NNNNNNN
   NNNNNNN
@@ -1238,7 +1355,6 @@ y = 20   x →동, z ↓남
   NN...NN
   NN...NN
 단면 x = 3   z →남, y ↑하늘
-  N.J.NNN
   N...NNN
   N...NNN
   N...NNN
@@ -1258,7 +1374,8 @@ y = 20   x →동, z ↓남
   N...NNN
   N...NNN
   N...NNN
-  N.J.NNN
+  N...NNN
+  N...NNN
 ```
 
 </details>
@@ -1279,11 +1396,11 @@ y = 20   x →동, z ↓남
 | (0, 0, 3) | ◀ 서 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
 | (6, 0, 3) | ▶ 동 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
 | (3, 0, 6) | ▼ 남 | `swamp_cellar` | `swamp_mother` | `swamp/mother_approach_1` |
-| (3, 6, 2) | ◆ 위 | `swamp_cellar` | `swamp_cellar` | `—` |
+| (5, 6, 2) | ◆ 위 | `swamp_cellar` | `swamp_cellar` | `—` |
 
-**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 위: x 2–4, z 1–3 (7칸)
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 위: x 2–4, z 1–3 (8칸)
 
-**블록** — 진흙 벽돌 124, 굳은 진흙 46, 사다리 6, 직소 4, 랜턴 1
+**블록** — 진흙 벽돌 123, 굳은 진흙 46, 사다리 6, 직소 4, 랜턴 1
 
 ![cellar_hub](img/swamp/cellar_hub.svg)
 
@@ -1310,9 +1427,9 @@ y = 4   x →동, z ↓남
   NNNNNNN
   N...H.N
   .......
-  ...*...
   .......
-  N.....N
+  .......
+  N.*...N
   NN...NN
 y = 5   x →동, z ↓남
   NNNNNNN
@@ -1325,7 +1442,7 @@ y = 5   x →동, z ↓남
 y = 6   x →동, z ↓남
   NNNNNNN
   NN..HNN
-  NN.J.NN
+  NN...JN
   NN...NN
   NNNNNNN
   NNNNNNN
@@ -1339,7 +1456,7 @@ y = 6   x →동, z ↓남
 
 미로의 기본 단위.
 
-**어느 풀에 있나** — `cellar` (가중치 10)
+**어느 풀에 있나** — `cellar` (가중치 9)
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
@@ -1364,6 +1481,71 @@ y = 0   x →동, z ↓남
   nnnnnnn
   nnnnnnn
 y = 1–4   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  .......
+  .......
+  .......
+  N.....N
+  NNNNNNN
+y = 5   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  NNNNNNN
+y = 6   x →동, z ↓남
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+```
+
+</details>
+
+
+### `cellar_passage_guard` — 7×7×7 — 1×1×1 셀
+
+통로 한가운데 마녀 스포너. 평범한 통로와 같은 풀에 섞여 나온다.
+
+**어느 풀에 있나** — `cellar` (가중치 5)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+| (6, 0, 3) | ▶ 동 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸)
+
+**블록** — 진흙 벽돌 145, 굳은 진흙 47, 직소 2, 몬스터 스포너 1
+
+![cellar_passage_guard](img/swamp/cellar_passage_guard.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  nnnnnnn
+  nnnnnnn
+  nnnnnnn
+  JnnnnnJ
+  nnnnnnn
+  nnnnnnn
+  nnnnnnn
+y = 1   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  .......
+  ...S...
+  .......
+  N.....N
+  NNNNNNN
+y = 2–4   x →동, z ↓남
   NNNNNNN
   N.....N
   .......
@@ -1453,7 +1635,7 @@ y = 6   x →동, z ↓남
 
 십자 교차로.
 
-**어느 풀에 있나** — `cellar` (가중치 6)
+**어느 풀에 있나** — `cellar` (가중치 4)
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
@@ -1487,6 +1669,154 @@ y = 1–4   x →동, z ↓남
   .......
   N.....N
   NN...NN
+y = 5   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  NNNNNNN
+y = 6   x →동, z ↓남
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+```
+
+</details>
+
+
+### `cellar_cross_guard` — 7×7×7 — 1×1×1 셀
+
+십자 교차로 한가운데 슬라임 스포너.
+
+**어느 풀에 있나** — `cellar` (가중치 3)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+| (0, 0, 3) | ◀ 서 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+| (6, 0, 3) | ▶ 동 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+| (3, 0, 6) | ▼ 남 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
+
+**블록** — 진흙 벽돌 121, 굳은 진흙 45, 직소 4, 몬스터 스포너 1
+
+![cellar_cross_guard](img/swamp/cellar_cross_guard.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  nnnJnnn
+  nnnnnnn
+  nnnnnnn
+  JnnnnnJ
+  nnnnnnn
+  nnnnnnn
+  nnnJnnn
+y = 1   x →동, z ↓남
+  NN...NN
+  N.....N
+  .......
+  ...S...
+  .......
+  N.....N
+  NN...NN
+y = 2–4   x →동, z ↓남
+  NN...NN
+  N.....N
+  .......
+  .......
+  .......
+  N.....N
+  NN...NN
+y = 5   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  N.....N
+  NNNNNNN
+y = 6   x →동, z ↓남
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+  NNNNNNN
+```
+
+</details>
+
+
+### `cellar_room` — 7×7×7 — 1×1×1 셀
+
+막다른 방. 문이 하나뿐이니 들어갔다 돌아 나와야 하고, 그래서 **상자가 있다.**
+빈 막다른 방은 들어간 값이 없다.
+
+**어느 풀에 있나** — `cellar` (가중치 8)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `swamp_cellar` | `swamp_cellar` | `swamp/cellar` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸)
+
+**블록** — 진흙 벽돌 157, 굳은 진흙 48, 이끼 낀 조약돌 5, 직소 1, 가마솥 1, 랜턴 1, 상자 1
+
+![cellar_room](img/swamp/cellar_room.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  nnnnnnn
+  nnnnnnn
+  nnnnnnn
+  Jnnnnnn
+  nnnnnnn
+  nnnnnnn
+  nnnnnnn
+y = 1   x →동, z ↓남
+  NNNNNNN
+  Nn....N
+  .n....N
+  .n...cN
+  .n....N
+  Nn....N
+  NNNNNNN
+y = 2   x →동, z ↓남
+  NNNNNNN
+  NU....N
+  ......N
+  ......N
+  ......N
+  N.....N
+  NNNNNNN
+y = 3   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  ......N
+  ......N
+  ......N
+  N.....N
+  NNNNNNN
+y = 4   x →동, z ↓남
+  NNNNNNN
+  N.....N
+  ......N
+  ...*..N
+  ......N
+  N.....N
+  NNNNNNN
 y = 5   x →동, z ↓남
   NNNNNNN
   N.....N

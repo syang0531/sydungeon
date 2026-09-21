@@ -165,11 +165,14 @@ def deck_jigsaws(p, doors, pool, size=CELL, name=DECK, target=DECK, priority=0):
         p.jigsaw(x, y, z, orientation, pool, PLANK, priority=priority, name=name, target=target)
 
 
-def walk(doors):
+def walk(doors, guard=None):
     p = deck_piece(doors)
     deck_jigsaws(p, doors, POOL['decks'])
     for x, z in ((1, 1), (CELL - 2, CELL - 2)):
         p.set(x, DECK_Y + 1, z, LANTERN, {'hanging': 'false', 'waterlogged': 'false'})
+    if guard:
+        p.set(CELL // 2, DECK_Y + 1, CELL // 2, 'minecraft:spawner', None,
+              mob_spawner(guard, 1))
     return p
 
 
@@ -187,9 +190,11 @@ def hut(kind):
         p.set(1, DECK_Y + 1, 1, 'minecraft:cauldron', {'level': '3'})
         p.set(CELL - 2, DECK_Y + 1, 1, 'minecraft:brewing_stand',
               {'has_bottle_0': 'false', 'has_bottle_1': 'false', 'has_bottle_2': 'false'})
+        p.set(CELL - 2, DECK_Y + 1, CELL - 2, *chest('swamp_hut', 'west'))
     else:
         p.set(mid, DECK_Y + 1, mid, 'minecraft:spawner', None, mob_spawner('minecraft:slime', 2))
         p.box(1, DECK_Y + 1, CELL - 2, CELL - 2, DECK_Y + 1, CELL - 2, ROOTS)
+        p.set(1, DECK_Y + 2, 1, *chest('swamp_hut', 'south'))
     return p
 
 
@@ -235,7 +240,12 @@ def great_hut():
                                                         'waterlogged': 'false'})
     for x, z in ((mid - 2, mid - 1), (mid + 2, mid - 1)):
         p.set(x, DECK_Y + 1, z, FENCE, RAIL)
-    p.jigsaw(mid, 0, mid - 1, 'down_east', POOL['down'], PLANK, joint='aligned',
+    # A post beside the hatch, with the jigsaw that calls the shaft standing in it. A jigsaw
+    # is a block - it becomes its final_state when the piece is placed - and this one used to
+    # sit in the middle of the ladder shaft, where it read as a stray block to climb round.
+    for y in range(0, DECK_Y):
+        p.set(mid + 2, y, mid - 1, LOG, {'axis': 'y'})
+    p.jigsaw(mid + 2, 0, mid - 1, 'down_east', POOL['down'], LOG, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     return p
 
@@ -274,8 +284,9 @@ def shaft():
     p.box(2, 0, 1, 4, SHAFT_H - 1, 3, AIR)
     for y in range(SHAFT_H):
         p.set(4, y, 1, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
-    p.jigsaw(3, SHAFT_H - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=DOWN, target=DOWN)
-    p.jigsaw(3, 0, 2, 'down_east', POOL['cellar_first'], MUD, joint='aligned',
+    # both in the wall, clear of the ladder, for the same reason
+    p.jigsaw(5, SHAFT_H - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=DOWN, target=DOWN)
+    p.jigsaw(5, 0, 2, 'down_east', POOL['cellar_first'], MUD, joint='aligned',
              priority=PRIORITY, name=CELLAR, target=CELLAR)
     return p
 
@@ -287,21 +298,23 @@ def cellar_hub():
     # the hole first, then the jigsaw: the other way round the hole erases it, which is the
     # same order trap CLAUDE.md section 11 records for the pyramid's ladder
     p.box(2, CELL - 1, 1, 4, CELL - 1, 3, AIR)
-    p.jigsaw(3, CELL - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=CELLAR, target=CELLAR)
+    p.jigsaw(5, CELL - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=CELLAR, target=CELLAR)
     for y in range(1, CELL):
         p.set(4, y, 1, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
     cellar_door(p, 'west', POOL['cellar'])
     cellar_door(p, 'east', POOL['cellar'])
     cellar_door(p, 'south', POOL['mother_approach_1'], name=CELLAR, target=MOTHER,
                 priority=PRIORITY)
-    p.set(3, 4, 3, LANTERN, HANGING)
+    p.set(2, 4, 5, LANTERN, HANGING)      # clear of the hole the ladder comes down
     return p
 
 
 def cellar(kind):
     doors = {'passage': ['west', 'east'], 'corner': ['west', 'south'],
              'cross': ['west', 'east', 'north', 'south'],
-             'brew': ['west'], 'drowned': ['west', 'east'], 'still': ['west']}[kind]
+             'brew': ['west'], 'drowned': ['west', 'east'], 'still': ['west'],
+             'room': ['west'], 'passage_guard': ['west', 'east'],
+             'cross_guard': ['west', 'east', 'north', 'south']}[kind]
     p = cellar_room(doors)
     for side in doors:
         cellar_door(p, side, POOL['cellar'])
@@ -321,6 +334,16 @@ def cellar(kind):
         p.set(mid, 1, CELL - 2, 'minecraft:cauldron', {'level': '3'})
         p.set(mid, 1, 1, 'minecraft:spawner', None, mob_spawner('minecraft:witch', 1))
         p.set(CELL - 2, 1, 1, *chest('swamp_brewery', 'west'))
+    elif kind == 'room':
+        # a room with only one way in and out is a reward, not a corridor: it gets the chest
+        p.set(CELL - 2, 1, mid, *chest('swamp_brewery', 'west'))
+        p.box(1, 1, 1, 1, 1, CELL - 2, MOSSY)
+        p.set(1, 2, 1, 'minecraft:cauldron', {'level': '0'})
+        p.set(mid, 4, mid, LANTERN, HANGING)
+    elif kind.endswith('_guard'):
+        # and a corridor is where the fighting is
+        entity = 'minecraft:witch' if kind == 'passage_guard' else 'minecraft:slime'
+        p.set(mid, 1, mid, 'minecraft:spawner', None, mob_spawner(entity, 1))
     return p
 
 
@@ -421,6 +444,7 @@ def main():
     pieces = {
         'great_hut': great_hut(),
         'walk': walk(['west', 'east']),
+        'walk_guard': walk(['west', 'east'], guard='minecraft:witch'),
         'walk_corner': walk(['west', 'south']),
         'walk_cross': walk(['west', 'east', 'north', 'south']),
         'hut_loot': hut('loot'), 'hut_witch': hut('witch'), 'hut_slime': hut('slime'),
@@ -429,6 +453,8 @@ def main():
         'cellar_passage': cellar('passage'), 'cellar_corner': cellar('corner'),
         'cellar_cross': cellar('cross'), 'cellar_brew': cellar('brew'),
         'cellar_drowned': cellar('drowned'), 'cellar_still': cellar('still'),
+        'cellar_room': cellar('room'), 'cellar_passage_guard': cellar('passage_guard'),
+        'cellar_cross_guard': cellar('cross_guard'),
         'cellar_cap': cellar_cap(), 'mother': mother(),
     }
     for step in range(1, MIN_BOSS_STEPS + 1):
@@ -440,14 +466,17 @@ def main():
 
     write_pool('start', [element('great_hut', 1)], EMPTY)
     write_pool('down', [element('shaft', 1)], EMPTY)
-    write_pool('decks', [element('walk', 10), element('walk_corner', 8),
-                         element('walk_cross', 6), element('hut_loot', 7),
-                         element('hut_witch', 5), element('hut_slime', 4)],
+    write_pool('decks', [element('walk', 9), element('walk_guard', 5),
+                         element('walk_corner', 8), element('walk_cross', 6),
+                         element('hut_loot', 8), element('hut_witch', 5),
+                         element('hut_slime', 4)],
                POOL['deck_caps'])
     write_pool('deck_caps', [element('deck_cap', 1)], EMPTY)
-    write_pool('cellar', [element('cellar_passage', 10), element('cellar_corner', 9),
-                          element('cellar_cross', 6), element('cellar_brew', 6),
-                          element('cellar_drowned', 5), element('cellar_still', 5)],
+    write_pool('cellar', [element('cellar_passage', 9), element('cellar_passage_guard', 5),
+                          element('cellar_corner', 9), element('cellar_cross', 4),
+                          element('cellar_cross_guard', 3), element('cellar_room', 8),
+                          element('cellar_brew', 6), element('cellar_still', 5),
+                          element('cellar_drowned', 5)],
                POOL['cellar_caps'])
     write_pool('cellar_first', [element('cellar_hub', 1)], EMPTY)
     write_pool('cellar_caps', [element('cellar_cap', 1)], EMPTY)

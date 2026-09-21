@@ -44,6 +44,15 @@ fallback이 **난간 한 장**(`deck_cap`)으로 막는다. 허공에 뚫린 널
 조각은 전부 **높이 11**로 고정이라 덱이 어긋날 수 없고, `verify()`가 그것과 "덱 아래에
 말뚝 말고 다른 것이 쓰였는지"를 검사한다.
 
+### 막다른 방은 보상, 통로는 싸움
+
+**문이 하나뿐인 방은 상자를 준다.** 들어갔다 돌아 나와야 하는 자리라 그만한 값이 있어야
+하고, 아무것도 없으면 빈 방을 왜 들어갔나 싶어진다. 널다리의 오두막 셋과 지하의
+`cellar_room`·`cellar_brew`·`cellar_still`이 전부 상자를 갖는다.
+
+**문이 둘 이상인 방은 스포너를 준다.** 지나가는 자리니까. 평범한 조각과 스포너가 든 조각이
+**같은 풀에 나란히** 들어가서 섞여 나온다.
+
 ### 지형을 건드리지 않는다
 
 `terrain_adaptation`이 **`none`**이다. 다른 던전은 beard가 땅을 받쳐 주지만, 이건 물 위에
@@ -58,11 +67,12 @@ fallback이 **난간 한 장**(`deck_cap`)으로 막는다. 허공에 뚫린 널
 
         'floors': [('널다리', 4), ('물속 말뚝', 1), ('양조장', -26)],
 
-        'order': ['great_hut', 'walk', 'walk_corner', 'walk_cross',
+        'order': ['great_hut', 'walk', 'walk_guard', 'walk_corner', 'walk_cross',
                   'hut_loot', 'hut_witch', 'hut_slime', 'deck_cap',
-                  'shaft', 'cellar_hub', 'cellar_passage', 'cellar_corner', 'cellar_cross',
-                  'cellar_brew', 'cellar_still', 'cellar_drowned', 'cellar_cap',
-                  'approach_1', 'approach_2', 'approach_3', 'mother'],
+                  'shaft', 'cellar_hub', 'cellar_passage', 'cellar_passage_guard',
+                  'cellar_corner', 'cellar_cross', 'cellar_cross_guard',
+                  'cellar_room', 'cellar_brew', 'cellar_still', 'cellar_drowned',
+                  'cellar_cap', 'approach_1', 'approach_2', 'approach_3', 'mother'],
 
         'outro': """
 ## 다듬을 곳
@@ -129,6 +139,13 @@ fallback이 **난간 한 장**(`deck_cap`)으로 막는다. 허공에 뚫린 널
 물이 찬 방. 바닥 한 켜가 물이고 가운데 드라운드 스포너가 있다. 지하에서 물을 만나는 유일한
 자리다.
 """
+    NOTES['swamp/cellar_room'] = """
+막다른 방. 문이 하나뿐이니 들어갔다 돌아 나와야 하고, 그래서 **상자가 있다.**
+빈 막다른 방은 들어간 값이 없다.
+"""
+    NOTES['swamp/cellar_passage_guard'] = '통로 한가운데 마녀 스포너. 평범한 통로와 같은 풀에 섞여 나온다.'
+    NOTES['swamp/cellar_cross_guard'] = '십자 교차로 한가운데 슬라임 스포너.'
+    NOTES['swamp/walk_guard'] = '널다리 한가운데 마녀 스포너. 피할 데가 없는 자리다.'
     NOTES['swamp/cellar_passage'] = '미로의 기본 단위.'
     NOTES['swamp/cellar_corner'] = '꺾이는 통로.'
     NOTES['swamp/cellar_cross'] = '십자 교차로.'

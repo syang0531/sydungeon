@@ -1,13 +1,15 @@
 {
   "fallback": "sydungeon:swamp/deck_caps",
   "elements": [
-    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
         "location": "sydungeon:swamp/walk", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:swamp/walk_guard", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
     { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
         "location": "sydungeon:swamp/walk_corner", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
     { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
         "location": "sydungeon:swamp/walk_cross", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
-    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
         "location": "sydungeon:swamp/hut_loot", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
     { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
         "location": "sydungeon:swamp/hut_witch", "projection": "rigid", "processors": "sydungeon:swamp_weathering" } },
