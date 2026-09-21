@@ -4,7 +4,7 @@
 
 Stan Yang의 모드 가족(`sy…`) 세 번째. 형제는 `C:\Projects\syalchemy`(금속·합금·마법 장비)와 `C:\Projects\syvillage`(스스로 자라는 마을)이고, 셋을 같이 플레이하는 것이 전제다.
 
-**목적: 파밍과 채굴 없이, 탐험만으로 엔드 콘텐츠(엔더 드래곤·풀 마법 부여·네더라이트)에 닿는다.** 바이옴마다 던전 하나, 던전마다 확정 시그니처 보상 하나. 바닐라가 파밍·채굴로 주던 것을 던전 보상으로 옮긴다. 전체 설계는 `docs/concepts.md`. 지하감옥·대피라미드·마법사의 탑을 만들었다. 보상 테이블에 다른 모드의 아이템은 넣지 않는다.
+**목적: 파밍과 채굴 없이, 탐험만으로 엔드 콘텐츠(엔더 드래곤·풀 마법 부여·네더라이트)에 닿는다.** 바이옴마다 던전 하나, 던전마다 확정 시그니처 보상 하나. 바닐라가 파밍·채굴로 주던 것을 던전 보상으로 옮긴다. 전체 설계는 `docs/concepts.md`, 던전별 레벨 설계(조각 단면도와 조립 원리)는 `docs/levels/`다. 지하감옥·대피라미드·마법사의 탑을 만들었다. 보상 테이블에 다른 모드의 아이템은 넣지 않는다.
 
 ## 환경
 
@@ -224,6 +224,8 @@ core → well_1 → well_2 → … → well_7
 | `tools/generate_pieces.py` | 감옥의 cap · shaft_cap · entrance · shaft · hub · boss_room을 코드로 생성, boss_passage는 cross에서 파생 |
 | `tools/generate_pyramid.py` | 대피라미드 전체(껍데기·스파인·묘실·미로·함정)와 그 풀 JSON. 기하 자체 검사 포함 |
 | `tools/generate_tower.py` | 마법사의 탑 전체(껍데기·계단실·도서관·성소)와 그 풀 JSON. 기하·직소 이름 자체 검사 포함 |
+| `tools/gen_level_doc.py` | `docs/levels/*.md`와 조각별 층 단면도 SVG를 만든다. **조각을 고쳤으면 돌린다** |
+| `tools/level_notes.py` | 그 문서의 설명 문장. 도구가 아니라 원고다 |
 | `tools/simulate.py` | 풀 가중치로 던전 크기·계단 수·층 수 분포를 종이 위에서 굴려 본다 |
 | `tools/inspect_world.py` | 개발 월드 region 파일에서 실제 생성된 던전의 조각·층 분포를 읽는다 |
 | `tools/gen_logo.py` | CurseForge 로고 (`docs/curseforge/logo.png`, `src/main/resources/logo.png`) |

@@ -22,6 +22,8 @@ Stan Yang의 모드 가족(`sy…`) 세 번째. [SY Alchemy](https://www.cursefo
 
 조각은 크리에이티브에서 구조물 블록으로 저장한 `.nbt`, 이어 붙이는 규칙은 바닐라 worldgen JSON이다. Java는 바닐라 직소가 못 하는 일이 생길 때만 쓴다. 조각을 바꾸고 싶으면 코드가 아니라 월드에서 바꾼다 — [CLAUDE.md](CLAUDE.md)와 [docs/design.md](docs/design.md).
 
+던전마다 **레벨 설계 문서**가 있다. 조각을 층마다 한 장씩 블록 단위로 그리고, 그것들이 어떤 규칙으로 이어 붙는지를 적은 것이다 — [docs/levels/](docs/levels/).
+
 | 항목 | 값 |
 |---|---|
 | Minecraft | 26.2 (Java Edition) |
