@@ -61,13 +61,27 @@ def signature(solid):
     return out or 'X'
 
 
+TURN = {'west': 'north', 'north': 'east', 'east': 'south', 'south': 'west'}
+
+
+def turned(props):
+    if not props or 'facing' not in props or props['facing'] not in TURN:
+        return props
+    out = dict(props)
+    out['facing'] = TURN[out['facing']]
+    return out
+
+
 def rotations(cell):
-    """The same piece turned four ways. Vanilla does this itself, so only one is kept."""
+    """The same piece turned four ways. Vanilla does this itself, so only one is kept.
+
+    A block's own facing turns with it, or a staircase compares equal to itself pointing the
+    wrong way and the wrong one of the two gets written out."""
     out = []
     grid = dict(cell)
     for _ in range(4):
         out.append(tuple(sorted(grid.items())))
-        grid = {(CELL - 1 - z, y, x): v for (x, y, z), v in grid.items()}
+        grid = {(CELL - 1 - z, y, x): (v[0], turned(v[1])) for (x, y, z), v in grid.items()}
     return out
 
 
@@ -79,8 +93,8 @@ def take(blocks, x0, y0, z0, sx=CELL, sy=CELL, sz=CELL):
 
 def write(name, cell, sx=CELL, sy=CELL, sz=CELL):
     piece = Piece(sx, sy, sz, 'minecraft:air')
-    for (x, y, z), block in cell.items():
-        piece.set(x, y, z, 'minecraft:' + block)
+    for (x, y, z), (block, props) in cell.items():
+        piece.set(x, y, z, 'minecraft:' + block, props)
     if not os.path.isdir(OUT):
         os.makedirs(OUT)
     piece.write(os.path.join(OUT, name + '.nbt'))
@@ -124,7 +138,7 @@ def main():
     world = world_folder(sys.argv[1] if len(sys.argv) > 1 else None)
     print('world: %s' % os.path.relpath(world, ROOT))
     raw = read_box(world, (-20, -64, -24), (30, 8, 24))
-    blocks = {p: n for p, n in raw.items() if n not in NATURAL}
+    blocks = {p: v for p, v in raw.items() if v[0] not in NATURAL}
 
     skip = set()
     for floor, (cx, cz), wide, deep in MERGED:

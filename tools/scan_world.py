@@ -78,11 +78,16 @@ def player(world):
 
 
 def section_blocks(section):
-    """Unpack one 16x16x16 section into {(x, y, z) inside it: name}."""
+    """Unpack one 16x16x16 section into {(x, y, z) inside it: (name, properties)}.
+
+    The properties matter: a staircase read back without its `facing` is a pile of steps all
+    pointing north, which is what a spiral built by hand turns into if they are thrown away.
+    """
     states = section.get('block_states')
     if not states:
         return {}
-    palette = [nbt.palette_name(e).replace('minecraft:', '') for e in states['palette']]
+    palette = [(nbt.palette_name(e).replace('minecraft:', ''),
+                dict(nbt.palette_props(e) or {}) or None) for e in states['palette']]
     if len(palette) == 1:
         return {} if palette[0] in ('air', 'cave_air', 'void_air') else \
             {(x, y, z): palette[0] for x in range(16) for y in range(16) for z in range(16)}
@@ -101,7 +106,7 @@ def section_blocks(section):
         if index >= len(palette):
             continue
         name = palette[index]
-        if name in ('air', 'cave_air', 'void_air'):
+        if name[0] in ('air', 'cave_air', 'void_air'):
             continue
         y, rest = divmod(i, 256)
         z, x = divmod(rest, 16)
@@ -110,7 +115,7 @@ def section_blocks(section):
 
 
 def read_box(world, lo, hi):
-    """{(x, y, z): block name} for everything solid in the box, world coordinates."""
+    """{(x, y, z): (block name, properties)} for everything solid in the box."""
     found = {}
     cx0, cx1 = lo[0] >> 4, hi[0] >> 4
     cz0, cz1 = lo[2] >> 4, hi[2] >> 4
@@ -135,7 +140,11 @@ def read_box(world, lo, hi):
 
 
 def built(blocks):
-    return {p: n for p, n in blocks.items() if n not in NATURAL}
+    return {p: v for p, v in blocks.items() if v[0] not in NATURAL}
+
+
+def names(blocks):
+    return {p: v[0] for p, v in blocks.items()}
 
 
 def layers(blocks, glyphs=None):
@@ -146,10 +155,11 @@ def layers(blocks, glyphs=None):
     xs = [p[0] for p in blocks]
     ys = [p[1] for p in blocks]
     zs = [p[2] for p in blocks]
-    names = [n for n in Counter(blocks.values())]
+    flat = names(blocks) if blocks and isinstance(next(iter(blocks.values())), tuple) else blocks
+    blocks = flat
     glyphs = glyphs or OrderedDict(
         (n, '#=+*o%&@$xXvVnN^~-:;abcdefghijklmpqrstuwyz'[i % 43])
-        for i, n in enumerate(sorted(set(names))))
+        for i, n in enumerate(sorted(set(blocks.values()))))
     for y in range(min(ys), max(ys) + 1):
         rows = []
         for z in range(min(zs), max(zs) + 1):
@@ -183,7 +193,7 @@ def main():
     blocks = read_box(world, lo, hi)
     mine = built(blocks)
     print('%d solid blocks, %d of them placed by hand' % (len(blocks), len(mine)))
-    tally = Counter(mine.values())
+    tally = Counter(v[0] for v in mine.values())
     for name, n in tally.most_common(30):
         print('   %-28s %d' % (name, n))
     if mine:
