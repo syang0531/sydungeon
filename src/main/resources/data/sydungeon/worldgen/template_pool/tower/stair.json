@@ -2,6 +2,6 @@
   "fallback": "minecraft:empty",
   "elements": [
     { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
-        "location": "sydungeon:tower/shell", "projection": "rigid", "processors": "sydungeon:tower_weathering" } }
+        "location": "sydungeon:tower/stair", "projection": "rigid", "processors": "sydungeon:tower_weathering" } }
   ]
 }

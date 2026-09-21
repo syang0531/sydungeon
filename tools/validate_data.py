@@ -35,7 +35,7 @@ NS = 'sydungeon'
 # out of them, so they exist to be edited by hand rather than to be placed. `shaft_floor` is
 # one floor of the tower's wall, which `generate_tower.py` stacks seven times because a
 # structure block cannot save the forty-nine-block whole.
-SOURCE_PIECES = {'tower/shaft_floor'}
+SOURCE_PIECES = set()   # none at the moment; the tower's ring lives in tools/handmade/
 
 
 def game_jar():

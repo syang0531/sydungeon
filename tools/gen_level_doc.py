@@ -239,6 +239,32 @@ OPPOSITE = {'north': 'south', 'south': 'north', 'west': 'east', 'east': 'west',
             'up': 'down', 'down': 'up'}
 
 
+ROT = {'north': 'east', 'east': 'south', 'south': 'west', 'west': 'north'}
+
+
+def rotated(piece, k):
+    """The piece turned k quarter turns, the way vanilla turns a child to meet its parent.
+
+    Only positions and jigsaw facings are turned: the drawing colours by block name, which a
+    rotation does not change."""
+    grid, jigsaws, size = piece['grid'], piece['jigsaws'], piece['size']
+    for _ in range(k):
+        sx, sy, sz = size
+        grid = {(sz - 1 - z, y, x): v for (x, y, z), v in grid.items()}
+        turned = []
+        for j in jigsaws:
+            x, y, z = j['pos']
+            spin = dict(j)
+            spin['pos'] = (sz - 1 - z, y, x)
+            front, top = (j['orientation'].split('_') + ['up'])[:2]
+            spin['orientation'] = '%s_%s' % (ROT.get(front, front), ROT.get(top, top))
+            turned.append(spin)
+        jigsaws, size = turned, (sz, sy, sx)
+    out = dict(piece)
+    out['grid'], out['jigsaws'], out['size'] = grid, jigsaws, size
+    return out
+
+
 def assemble(pieces, pools, start_pool, limit=64):
     """Walk the chains that can only come out one way, and note where each piece lands.
 
@@ -269,8 +295,14 @@ def assemble(pieces, pools, start_pool, limit=64):
             if child is None or child_name == parent['name']:
                 continue                       # a cap that calls its own pool never ends
             front = facing(j['orientation'])
-            able = [c for c in child['jigsaws'] if c['name'] == j['target']
-                    and facing(c['orientation']) == OPPOSITE[front]]
+            able = []
+            for turn in range(4):              # vanilla turns the child until the two meet
+                spun = rotated(child, turn)
+                able = [c for c in spun['jigsaws'] if c['name'] == j['target']
+                        and facing(c['orientation']) == OPPOSITE[front]]
+                if able:
+                    child = spun
+                    break
             if len(able) != 1:
                 continue                       # ambiguous: vanilla would pick one at random
             step, mine = STEP[front], able[0]['pos']
@@ -278,7 +310,8 @@ def assemble(pieces, pools, start_pool, limit=64):
             if any(p['name'] == child_name and p['at'] == at for p in placed):
                 continue
             placed.append({'name': child_name, 'at': at, 'by': parent['name'],
-                           'via': '%s %s' % (FACE_KO[front], j['name'].split(':')[-1])})
+                           'via': '%s %s' % (FACE_KO[front], j['name'].split(':')[-1]),
+                           'piece': child})
             queue.append(len(placed) - 1)
     return placed
 
@@ -287,9 +320,8 @@ def composite(placed, pieces):
     """Lay the placed pieces down in order, a later one writing over an earlier one."""
     blocks, owner = {}, {}
     for spot in placed:
-        piece = pieces[spot['name']]
+        piece = spot.get('piece') or pieces[spot['name']]
         ox, oy, oz = spot['at']
-        sx, sy, sz = piece['size']
         for (x, y, z), state in piece['grid'].items():
             name = piece['palette'][state][0]
             if name == 'structure_void':       # "leave whatever is already here"
