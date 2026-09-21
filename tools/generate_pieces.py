@@ -124,6 +124,11 @@ class Piece:
             self.set(x, y, z, 'minecraft:ladder', {'facing': facing, 'waterlogged': 'false'})
 
     def write(self, path):
+        """Write the piece out. `structure_void` is left out of the list entirely rather than
+        written as a block: a template places what it lists and touches nothing else, so an
+        omitted position is the only way to mean "leave the world alone". Written out it is
+        placed - an invisible, walk-through block that replaced the turf round the tower's
+        foot with something you can see straight through to the dirt below."""
         palette_index = {}
         palette = nbt.List(nbt.COMPOUND)
         blocks = nbt.List(nbt.COMPOUND)
@@ -132,6 +137,8 @@ class Piece:
             for y in range(sy):
                 for z in range(sz):
                     key = self.grid[(x, y, z)]
+                    if key[0] == 'minecraft:structure_void':
+                        continue
                     if key not in palette_index:
                         palette_index[key] = len(palette)
                         entry = {'Name': key[0]}
