@@ -349,8 +349,12 @@ def build_pieces():
             out['corner_right'] = as_piece(flipped, flipped_size)
     out['corner_left'] = out.pop('corner')
     out['sealed'] = sealed()
-    out['library'] = out.pop('room4')      # one drawing, two rooms until each is furnished
-    out['sanctum'] = out['library']
+    big = load('room4')
+    shape, shape_size = canonical('room4', big)
+    shape = normalise_doors(shape, shape_size)
+    out.pop('room4', None)
+    out['library'] = furnish_library(shape, shape_size)
+    out['sanctum'] = furnish_sanctum(shape, shape_size)
     return out
 
 
@@ -555,6 +559,104 @@ def verify(pieces, placements, plan, big):
         raise SystemExit('탑이 이어지지 않는다')
     print('검사 통과: 현관에서 %d칸이 이어지고, 72칸 전부 도달 가능하다 '
           '(곁방을 전부 비밀방으로 바꿔도 꼭대기까지 간다)' % len(reached))
+
+
+
+
+# ---------------------------------------------------------------- what goes in the big rooms
+DEEP = 'minecraft:deepslate_bricks'
+POLISHED = 'minecraft:polished_deepslate'
+BOOKSHELF = 'minecraft:bookshelf'
+TRIAL_STATE = {'trial_spawner_state': 'inactive', 'ominous': 'false'}
+INNER = 1, 12                      # the walkable ring inside a big room
+MID = 6                            # where its middle is
+
+
+def trial_spawner(config):
+    """Clearing a room is the trial spawner's job: a chest can be opened without a fight, and
+    telling whether everything is dead would take Java. It pays each player who fought."""
+    return {'id': 'minecraft:trial_spawner',
+            'normal_config': NS + ':tower/' + config,
+            'ominous_config': NS + ':tower/' + config,
+            'target_cooldown_length': nbt.Int(2_000_000_000),
+            'required_player_range': nbt.Int(14)}
+
+
+def doorways(piece):
+    """The block in front of every doorway, which must stay clear of furniture."""
+    sx, sy, sz = piece.size
+    out = set()
+    for z in range(sz):
+        if piece.grid[(0, 2, z)][0] == AIR:
+            out |= {(1, y, z) for y in range(1, 5)}
+        if piece.grid[(sx - 1, 2, z)][0] == AIR:
+            out |= {(sx - 2, y, z) for y in range(1, 5)}
+    for x in range(sx):
+        if piece.grid[(x, 2, 0)][0] == AIR:
+            out |= {(x, y, 1) for y in range(1, 5)}
+        if piece.grid[(x, 2, sz - 1)][0] == AIR:
+            out |= {(x, y, sz - 2) for y in range(1, 5)}
+    return out
+
+
+def line_walls(p, block, height=3, skip=()):
+    lo, hi = INNER
+    for i in range(lo, hi + 1):
+        for x, z in ((lo, i), (hi, i), (i, lo), (i, hi)):
+            for y in range(1, height + 1):
+                if (x, y, z) not in skip:
+                    p.set(x, y, z, block)
+
+
+def furnish_library(blocks, size):
+    """Shelves to the ceiling and a table with the fifteen that level thirty needs.
+
+    The ring of shelves sits at the table's own height with air between, which is what the
+    game counts; one place in it is left out so there is a way in to stand at the table."""
+    p = as_piece(blocks, size)
+    clear = doorways(p)
+    line_walls(p, BOOKSHELF, 3, clear)
+    p.box(MID - 2, 1, MID - 2, MID + 2, 1, MID + 2, CHISELED)
+    p.set(MID, 2, MID, 'minecraft:enchanting_table')
+    shelves = 0
+    for dx in range(-2, 3):
+        for dz in range(-2, 3):
+            if max(abs(dx), abs(dz)) != 2 or (dx, dz) == (-2, 0):
+                continue               # the gap you walk in through
+            p.set(MID + dx, 2, MID + dz, BOOKSHELF)
+            shelves += 1
+    assert shelves == 15, shelves
+    p.set(MID, 1, MID - 4, 'minecraft:lectern',
+          {'facing': 'south', 'has_book': 'false', 'powered': 'false'})
+    p.set(MID, 1, MID + 4, 'minecraft:lectern',
+          {'facing': 'north', 'has_book': 'false', 'powered': 'false'})
+    p.set(INNER[1] - 1, 1, 3, *chest('tower_library', 'west'))
+    p.set(INNER[1] - 1, 1, 10, *chest('tower_study', 'west'))
+    for x, z in ((3, 3), (3, 10), (10, 3), (10, 10)):
+        p.set(x, 5, z, 'minecraft:lantern', {'hanging': 'true', 'waterlogged': 'false'})
+    return p
+
+
+def furnish_sanctum(blocks, size):
+    """The archmage's room. Same walls as the library, re-skinned in deepslate so it reads as
+    somewhere else the moment the door opens, and the gate he never lit on the far wall."""
+    skin = {STONE: DEEP, MOSSY: DEEP, CHISELED: POLISHED}
+    p = as_piece({pos: (skin.get(v[0], v[0]), v[1]) for pos, v in blocks.items()}, size,
+                 final=DEEP)
+    for x, z in ((2, 2), (2, 11), (11, 2), (11, 11)):
+        for y in range(1, 6):
+            p.set(x, y, z, POLISHED)
+    p.box(MID - 1, 1, MID - 1, MID + 1, 1, MID + 1, CHISELED)
+    p.set(MID, 2, MID, 'minecraft:trial_spawner', TRIAL_STATE, trial_spawner('archmage'))
+    for x, z in ((4, 4), (4, 9), (9, 4), (9, 9)):
+        p.set(x, 1, z, 'minecraft:trial_spawner', TRIAL_STATE, trial_spawner('tower_guards'))
+    for dx, dy in ((1, 0), (2, 0), (1, 4), (2, 4),
+                   (0, 1), (0, 2), (0, 3), (3, 1), (3, 2), (3, 3)):
+        p.set(4 + dx, 1 + dy, 11, 'minecraft:obsidian')
+    p.set(9, 1, 11, *chest('tower_portal', 'west'))
+    for x, z in ((3, 6), (10, 6), (6, 3), (6, 10)):
+        p.set(x, 5, z, 'minecraft:soul_lantern', {'hanging': 'true', 'waterlogged': 'false'})
+    return p
 
 
 if __name__ == '__main__':
