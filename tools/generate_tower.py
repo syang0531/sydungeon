@@ -47,6 +47,8 @@ STONE = 'minecraft:stone_bricks'
 CHISELED = 'minecraft:chiseled_stone_bricks'
 MOSSY = 'minecraft:mossy_stone_bricks'
 AIR = 'minecraft:air'
+VOID = 'minecraft:structure_void'      # "leave whatever is already here"
+
 
 
 def load(name):
@@ -83,8 +85,14 @@ def plan():
 
 def ring_floor(door=None):
     """One floor of the ring: the footprint stood up seven blocks, banded at the top so the
-    floors can be counted from outside. Deliberately plain - it is a starting point."""
-    p = Piece(WIDE, CELL, WIDE, AIR)
+    floors can be counted from outside. Deliberately plain - it is a starting point.
+
+    Everything that is not the ring is `structure_void`, not air. The piece is a square and
+    the tower is a circle, so the four corners fall outside it - and a `rigid` piece writes
+    its air, which would carve the turf off the ground and leave a squared-off apron of bare
+    dirt round the foot of a round tower. Void leaves the world alone. The middle is void too;
+    `core` fills it."""
+    p = Piece(WIDE, CELL, WIDE, VOID)
     for x, z in plan():
         for y in range(CELL):
             n = (x * 7 + z * 11 + y * 5) % 9
