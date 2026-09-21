@@ -119,3 +119,443 @@ def shell():
     return p
 
 
+
+
+# ------------------------------------------------------------------------ turning pieces
+# A piece is stored with its way in on the WEST face, because vanilla turns a child until
+# that jigsaw faces the one that placed it. So the stored piece is the north-up drawing and
+# every rotation of it comes free.
+TURN = {'west': 'north', 'north': 'east', 'east': 'south', 'south': 'west'}
+MIRROR = {'north': 'south', 'south': 'north', 'east': 'east', 'west': 'west'}
+FACE_PROPS = ('facing',)
+
+
+def turn_props(props, table):
+    if not props:
+        return props
+    out = dict(props)
+    for key in FACE_PROPS:
+        if out.get(key) in table:
+            out[key] = table[out[key]]
+    return out
+
+
+def rot_cw(blocks, size):
+    """One quarter turn: (x, z) -> (sz - 1 - z, x), so the west face becomes the north one."""
+    sx, sy, sz = size
+    out = {}
+    for (x, y, z), value in blocks.items():
+        out[(sz - 1 - z, y, x)] = (value[0], turn_props(value[1], TURN))
+    return out, (sz, sy, sx)
+
+
+def mirror_z(blocks, size):
+    """Reflect north to south, which turns a corridor that bends left into one that bends
+    right - the one shape the mock-up has only one handedness of."""
+    sx, sy, sz = size
+    return ({(x, y, sz - 1 - z): (v[0], turn_props(v[1], MIRROR))
+             for (x, y, z), v in blocks.items()}, size)
+
+
+def faces_open(blocks, size):
+    """Which faces have a doorway, by the hole rather than by anything written down."""
+    sx, sy, sz = size
+    out = set()
+    for side, cells in (('west', [(0, y, z) for y in range(1, 5) for z in range(sz)]),
+                        ('east', [(sx - 1, y, z) for y in range(1, 5) for z in range(sz)]),
+                        ('north', [(x, y, 0) for y in range(1, 5) for x in range(sx)]),
+                        ('south', [(x, y, sz - 1) for y in range(1, 5) for x in range(sx)])):
+        if sum(1 for c in cells if c not in blocks) >= 8:
+            out.add(side)
+    return out
+
+
+def orient(blocks, size, anchor_face):
+    """Turn a piece until the face its way in is on points west."""
+    while anchor_face != 'west':
+        blocks, size = rot_cw(blocks, size)
+        anchor_face = TURN[anchor_face]
+    return blocks, size
+
+
+# ------------------------------------------------------------------- wiring the seventy-two
+import round_layout as L  # noqa: E402
+
+NS = 'sydungeon'
+ANCHOR = NS + ':rnd_anchor'     # the one jigsaw a room piece has: its way in
+PLACER = NS + ':rnd_placer'     # core's side of it, one per cell
+EMPTY = 'minecraft:empty'
+PRIORITY = 20
+
+# where core's jigsaw stands to place a cell from a given side, and which way it looks
+PLACER_AT = {
+    'west': (lambda cx, cz: (cx * CELL - 1, cz * CELL + 3), 'east_up', lambda cx, cz: cx >= 1),
+    'east': (lambda cx, cz: (cx * CELL + CELL, cz * CELL + 3), 'west_up',
+             lambda cx, cz: cx <= GRID - 2),
+    'north': (lambda cx, cz: (cx * CELL + 3, cz * CELL - 1), 'south_up', lambda cx, cz: cz >= 1),
+    'south': (lambda cx, cz: (cx * CELL + 3, cz * CELL + CELL), 'north_up',
+              lambda cx, cz: cz <= GRID - 2),
+}
+
+
+def can_place(cell, side):
+    return PLACER_AT[side][2](cell[0], cell[1])
+
+
+def wire(plan, big):
+    """For every cell: which side core places it from, and which pool it draws from.
+
+    The side decides the piece's rotation, so it is chosen first - normally the way you came
+    in, so the piece's own doorway is the one you walk through. The pool is then whatever has
+    a door every way this cell has to open."""
+    out = []
+    for floor in sorted(plan):
+        info = plan[floor]
+        route, stair = info['route'], info['stair']
+        need = {cell: set() for cell in info['free']}
+        anchor = {}
+
+        for i, cell in enumerate(route):
+            if i:
+                back = L.side_between(cell, route[i - 1])
+            elif floor == 1:
+                back = 'west'                 # the ring's door, which is outside core
+            else:
+                back = L.side_between(cell, plan[floor - 1]['stair'])
+            ahead = (L.side_between(cell, route[i + 1]) if i + 1 < len(route)
+                     else (L.side_between(cell, stair) if stair else None))
+            need[cell] |= {s for s in (back, ahead) if s}
+            anchor[cell] = back if can_place(cell, back) else next(
+                s for s in L.DIRS if can_place(cell, s))
+
+        for cell in sorted(set(info['free']) - set(route)):
+            near = next(s for s in L.DIRS if L.step(cell, s) in set(route)
+                        and can_place(cell, s))
+            anchor[cell] = near
+            need[L.step(cell, near)].add(L.OPPOSITE[near])
+
+        if floor in big:
+            bx, bz = big[floor]
+            need[(bx - 1, bz)].add('east')
+
+        for cell in info['free']:
+            out.append({'floor': floor, 'cell': cell, 'side': anchor[cell],
+                        'pool': L.pool_for(anchor[cell], need[cell]),
+                        'kind': 'route' if cell in route else 'leaf'})
+
+        if stair:
+            back = L.side_between(stair, route[-1])
+            out.append({'floor': floor, 'cell': stair, 'side': back,
+                        'pool': 'stair', 'kind': 'stair'})
+        if floor in big:
+            bx, bz = big[floor]
+            # the big room opens east; pick the row whose neighbour is on the route, and
+            # make that neighbour open back
+            out.append({'floor': floor, 'cell': (bx, bz), 'side': 'west', 'row': 0,
+                        'pool': 'sanctum' if floor == L.FLOORS else 'library',
+                        'kind': 'big'})
+    return out
+
+
+# ---------------------------------------------------------------------------- the pieces
+DST = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon', 'structure', 'round')
+POOL_JSON = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon',
+                         'worldgen', 'template_pool', 'round')
+
+WANT = {'cross': {'west', 'east', 'north', 'south'},
+        'tee': {'west', 'north', 'south'},
+        'straight': {'west', 'east'},
+        'corner': {'west', 'north'},
+        'dead_end': {'west'}}
+
+
+def canonical(name, piece):
+    """Turn a piece so its way in is west, the way every stored piece is written.
+
+    Which face is the way in is not written down anywhere, so it is deduced: the one that
+    leaves the piece looking like what it is. A tee is entered through its stem, a corner
+    through the arm that makes the other arm point left."""
+    blocks, size = piece['blocks'], piece['size']
+    doors = faces_open(blocks, size)
+    for face in (sorted(doors) or ['west']):
+        turned, new_size = orient(dict(blocks), size, face)
+        if faces_open(turned, new_size) == WANT.get(name, faces_open(turned, new_size)):
+            return turned, new_size
+    return orient(dict(blocks), size, sorted(doors)[0] if doors else 'west')
+
+
+def normalise_doors(blocks, size, wall=STONE):
+    """Put a big room's doorways where the grid expects them.
+
+    The mock-up's two-by-two was drawn with its doors a block off the cell centre, which would
+    leave a two-wide slot where it meets a neighbour. Which faces have a door is the design and
+    is kept; where along the face is not, so each is walled up and cut again at the centre."""
+    sx, sy, sz = size
+    out = dict(blocks)
+    faces = {'west': (lambda i, y: (0, y, i), sz), 'east': (lambda i, y: (sx - 1, y, i), sz),
+             'north': (lambda i, y: (i, y, 0), sx), 'south': (lambda i, y: (i, y, sz - 1), sx)}
+    for side, (at, span) in faces.items():
+        for c in range(span // CELL):
+            reach = range(c * CELL, (c + 1) * CELL)
+            if not any(at(i, y) not in blocks for i in reach for y in range(1, 5)):
+                continue
+            for i in reach:
+                for y in range(1, 5):
+                    out[at(i, y)] = (wall, None)
+            for i in range(c * CELL + 2, c * CELL + 5):
+                for y in range(1, 5):
+                    out.pop(at(i, y), None)
+    return out
+
+
+def as_piece(blocks, size, anchor=True, final=STONE):
+    p = Piece(size[0], size[1], size[2], AIR)
+    for (x, y, z), (block, props) in blocks.items():
+        p.set(x, y, z, block, props)
+    if anchor:
+        p.jigsaw(0, 0, 3, 'west_up', EMPTY, final, name=ANCHOR, target=ANCHOR)
+    return p
+
+
+def chest(table, facing='south'):
+    return ('minecraft:chest', {'facing': facing, 'type': 'single', 'waterlogged': 'false'},
+            {'id': 'minecraft:chest', 'LootTable': NS + ':chests/' + table})
+
+
+def sealed():
+    """A room with no doors at all and a chest in it. Its jigsaw stands in the wall, so a
+    neighbour's doorway meets stone: what the player sees is a bricked-up door, and the only
+    way in is to notice the floor is a cell short and dig."""
+    p = Piece(CELL, CELL, CELL, STONE)
+    p.box(1, 1, 1, CELL - 2, CELL - 2, CELL - 2, AIR)
+    p.set(3, 1, 3, *chest('tower_library'))
+    p.jigsaw(0, 0, 3, 'west_up', EMPTY, STONE, name=ANCHOR, target=ANCHOR)
+    return p
+
+
+def build_pieces():
+    """Every room piece, turned to face west and given its one jigsaw."""
+    out = {}
+    for name in ('cross', 'tee', 'straight', 'corner', 'dead_end', 'room4', 'stair'):
+        piece = load(name)
+        if piece is None:
+            continue
+        blocks, size = canonical(name, piece)
+        if max(size[0], size[2]) > CELL:
+            blocks = normalise_doors(blocks, size)
+        out[name] = as_piece(blocks, size)
+        if name == 'corner':
+            flipped, flipped_size = mirror_z(blocks, size)
+            out['corner_right'] = as_piece(flipped, flipped_size)
+    out['corner_left'] = out.pop('corner')
+    out['sealed'] = sealed()
+    out['library'] = out.pop('room4')      # one drawing, two rooms until each is furnished
+    out['sanctum'] = out['library']
+    return out
+
+
+# ------------------------------------------------------------------------- core, and main
+def core(placements):
+    """Twenty-one by fifty-six by twenty-one of solid stone with a jigsaw for every cell.
+
+    Nothing grows here: core reaches every one of the seventy-two itself, so no cell can be
+    left unbuilt, and the pool a jigsaw names is the only thing left to chance."""
+    p = Piece(CORE, HEIGHT, CORE, STONE)
+    p.jigsaw(0, 0, CORE // 2, 'west_up', EMPTY, STONE, name=ANCHOR, target=ANCHOR)
+    for spot in placements:
+        cx, cz = spot['cell']
+        y = (spot['floor'] - 1) * CELL
+        if spot['kind'] == 'big':
+            x, z = cx * CELL - 1, cz * CELL + spot['row'] * CELL + 3
+            orientation = 'east_up'
+        else:
+            where, orientation, _ = PLACER_AT[spot['side']]
+            x, z = where(cx, cz)
+        p.jigsaw(x, y, z, orientation, NS + ':round/' + spot['pool'], STONE,
+                 priority=PRIORITY, name=PLACER, target=ANCHOR)
+    return p
+
+
+def element(location, weight):
+    return ('    { "weight": %d, "element": { "element_type": "minecraft:single_pool_element",'
+            '\n        "location": "%s:round/%s", "projection": "rigid", '
+            '"processors": "%s:tower_weathering" } }' % (weight, NS, location, NS))
+
+
+def write_pool(name, elements, fallback=EMPTY):
+    if not os.path.isdir(POOL_JSON):
+        os.makedirs(POOL_JSON)
+    text = ('{\n  "fallback": "%s",\n  "elements": [\n%s\n  ]\n}\n'
+            % (fallback, ',\n'.join(elements)))
+    with open(os.path.join(POOL_JSON, name + '.json'), 'w', encoding='utf-8', newline='\n') as f:
+        f.write(text)
+
+
+# which pieces may stand in a cell that must open a given way. Every one of them has the door
+# the pool promises; what differs is what else it has, and what is in it.
+POOL_PIECES = {
+    'link_through': [('straight', 10), ('cross', 4)],
+    'link_left': [('corner_left', 10), ('tee', 5), ('cross', 3)],
+    'link_right': [('corner_right', 10), ('tee', 5), ('cross', 3)],
+    'link_cross': [('cross', 1)],
+    'leaf': [('dead_end', 10), ('sealed', 4)],
+    'stair': [('stair', 1)],
+    'library': [('library', 1)],
+    'sanctum': [('sanctum', 1)],
+    'core': [('core', 1)],
+    'start': [('shell', 1)],
+}
+
+
+def main():
+    plan, big, _ = L.best_plan([4, L.FLOORS])
+    placements = wire(plan, big)
+    pieces = build_pieces()
+    pieces['shell'] = shell()
+    pieces['shell'].jigsaw(BAND - 1, 0, BAND + CORE // 2, 'east_up', NS + ':round/core',
+                           STONE, priority=PRIORITY, name=PLACER, target=ANCHOR)
+    pieces['core'] = core(placements)
+
+    if not os.path.isdir(DST):
+        os.makedirs(DST)
+    for name, piece in sorted(pieces.items()):
+        piece.write(os.path.join(DST, name + '.nbt'))
+    print('조각 %d개 -> %s' % (len(pieces), os.path.relpath(DST, ROOT)))
+    for name in sorted(pieces):
+        print('  %-13s %s' % (name, list(pieces[name].size)))
+
+    for name, members in POOL_PIECES.items():
+        write_pool(name, [element(n, w) for n, w in members])
+    print('풀 %d개 -> %s' % (len(POOL_PIECES), os.path.relpath(POOL_JSON, ROOT)))
+
+    verify(pieces, placements, plan, big)
+    kinds = {}
+    for spot in placements:
+        kinds[spot['kind']] = kinds.get(spot['kind'], 0) + 1
+    print('칸 %d개 = %s' % (sum(kinds.values()),
+                           ', '.join('%s %d' % kv for kv in sorted(kinds.items()))))
+    return plan, big, placements, pieces
+
+
+
+
+# --------------------------------------------------------------------------------- checks
+def rotate_piece(piece, k):
+    blocks = {p: (v[0], dict(v[1]) if v[1] else None) for p, v in piece.grid.items()}
+    size = piece.size
+    for _ in range(k):
+        blocks, size = rot_cw(blocks, size)
+    return blocks, size
+
+
+TURNS_TO = {'west': 0, 'north': 1, 'east': 2, 'south': 3}
+FACING = {'east_up': 'east', 'west_up': 'west', 'north_up': 'north', 'south_up': 'south'}
+OPP = {'north': 'south', 'south': 'north', 'east': 'west', 'west': 'east'}
+DELTA = {'north': (0, 0, -1), 'south': (0, 0, 1), 'east': (1, 0, 0), 'west': (-1, 0, 0)}
+
+
+def stamp(world, blocks, at):
+    for (x, y, z), value in blocks.items():
+        world[(at[0] + x, at[1] + y, at[2] + z)] = value[0]
+
+
+def assemble(pieces, placements, leaf='dead_end'):
+    """Put the tower together the way the game would, and hand back its blocks.
+
+    Every child sits where its own jigsaw meets its parent's, turned until the two face each
+    other - which is the whole of vanilla's placement, and enough to walk the result."""
+    world = {}
+    stamp(world, {p: (v[0], v[1]) for p, v in pieces['shell'].grid.items()}, (0, 0, 0))
+    core_at = (BAND, 0, BAND)
+    stamp(world, {p: (v[0], v[1]) for p, v in pieces['core'].grid.items()}, core_at)
+
+    choice = {'leaf': leaf, 'link_through': 'straight', 'link_left': 'corner_left',
+              'link_right': 'corner_right', 'link_cross': 'cross', 'stair': 'stair',
+              'library': 'library', 'sanctum': 'sanctum'}
+    for spot in placements:
+        cx, cz = spot['cell']
+        y = (spot['floor'] - 1) * CELL
+        if spot['kind'] == 'big':
+            px, pz, orientation = cx * CELL - 1, cz * CELL + 3, 'east_up'
+        else:
+            where, orientation, _ = PLACER_AT[spot['side']]
+            px, pz = where(cx, cz)
+        facing = FACING[orientation]
+        dx, dy, dz = DELTA[facing]
+        target = (core_at[0] + px + dx, core_at[1] + y + dy, core_at[2] + pz + dz)
+        piece = pieces[choice[spot['pool']]]
+        blocks, _size = rotate_piece(piece, TURNS_TO[OPP[facing]])
+        anchor = next(p for p, v in blocks.items() if v[0] == 'minecraft:jigsaw')
+        stamp(world, blocks, tuple(target[i] - anchor[i] for i in range(3)))
+    return world
+
+
+def walk(world, start):
+    """Everywhere a player could reach from the front door, inside the tower's own box.
+
+    Bounded on purpose: outside it is open sky, and a flood fill that escapes has nothing to
+    stop it."""
+    from collections import deque
+
+    def air(p):
+        return (0 <= p[0] < WIDE and 0 <= p[1] < HEIGHT and 0 <= p[2] < WIDE
+                and world.get(p, 'minecraft:air') == 'minecraft:air')
+
+    seen, queue = {start}, deque([start])
+    while queue:
+        x, y, z = queue.popleft()
+        for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1)):
+            n = (x + d[0], y + d[1], z + d[2])
+            if n not in seen and air(n):
+                seen.add(n)
+                queue.append(n)
+    return seen
+
+
+def verify(pieces, placements, plan, big):
+    problems = []
+    world = assemble(pieces, placements)
+    door = (1, 2, BAND + CORE // 2)
+    if world.get(door, 'minecraft:air') != 'minecraft:air':
+        problems.append('현관이 막혀 있다 %s' % (door,))
+    reached = walk(world, door)
+
+    def cell_seen(floor, cell, span=1):
+        y = (floor - 1) * CELL + 2
+        for dx in range(span):
+            for dz in range(span):
+                x = BAND + (cell[0] + dx) * CELL + 3
+                z = BAND + (cell[1] + dz) * CELL + 3
+                if (x, y, z) in reached:
+                    return True
+        return False
+
+    for floor in sorted(plan):
+        for cell in plan[floor]['route']:
+            if not cell_seen(floor, cell):
+                problems.append('%d층 경로 칸 %s에 못 간다' % (floor, cell))
+        for cell in sorted(set(plan[floor]['free']) - set(plan[floor]['route'])):
+            if not cell_seen(floor, cell):
+                problems.append('%d층 곁방 %s에 못 간다' % (floor, cell))
+        if plan[floor]['stair'] and not cell_seen(floor, plan[floor]['stair']):
+            problems.append('%d층 계단에 못 간다' % floor)
+        if floor in big and not cell_seen(floor, big[floor], 2):
+            problems.append('%d층 큰 방에 못 간다' % floor)
+
+    sealed_world = assemble(pieces, placements, leaf='sealed')
+    sealed_reached = walk(sealed_world, door)
+    if (BAND + plan[L.FLOORS]['route'][-1][0] * CELL + 3,
+            (L.FLOORS - 1) * CELL + 2,
+            BAND + plan[L.FLOORS]['route'][-1][1] * CELL + 3) not in sealed_reached:
+        problems.append('곁방이 전부 비밀방이면 꼭대기에 못 간다')
+
+    for line in problems:
+        print('  문제  ' + line)
+    if problems:
+        raise SystemExit('탑이 이어지지 않는다')
+    print('검사 통과: 현관에서 %d칸이 이어지고, 72칸 전부 도달 가능하다 '
+          '(곁방을 전부 비밀방으로 바꿔도 꼭대기까지 간다)' % len(reached))
+
+
+if __name__ == '__main__':
+    main()

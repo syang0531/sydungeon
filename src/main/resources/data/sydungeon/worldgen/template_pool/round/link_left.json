@@ -1,0 +1,11 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:round/corner_left", "projection": "rigid", "processors": "sydungeon:tower_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:round/tee", "projection": "rigid", "processors": "sydungeon:tower_weathering" } },
+    { "weight": 3, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:round/cross", "projection": "rigid", "processors": "sydungeon:tower_weathering" } }
+  ]
+}

@@ -191,6 +191,8 @@ def plan_floors(big):
                 path = pick_path(free, arrive, goal, target)
                 if not path:
                     continue
+                if floor in big and (big[floor][0] - 1, big[floor][1]) not in set(path):
+                    continue              # the big room's door must open on to the route
                 deeper, rest = (0, {}) if stair is None else best(floor + 1, goal, stair)
                 if rest is None:
                     continue
@@ -210,7 +212,7 @@ def plan_floors(big):
 def best_plan(big_floors):
     """Try every place the big rooms could sit and keep the plan that routes the most cells."""
     from itertools import product
-    corners = [(0, 0), (1, 0), (0, 1), (1, 1)]
+    corners = [(1, 0), (1, 1)]   # core places a big room from the west, so it needs a cell there
     winner, score, where = None, -1, None
     for spots in product(corners, repeat=len(big_floors)):
         big = dict(zip(big_floors, spots))
