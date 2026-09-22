@@ -29,7 +29,7 @@ DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
 FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
-            'grove', 'shrine', 'dwarf')
+            'grove', 'shrine', 'dwarf', 'light')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -102,6 +102,15 @@ STYLE = OrderedDict([
     ('red_mushroom',          ('e', '#c0392b', '붉은 버섯')),
     ('brown_mushroom',        ('n', '#9a7b5a', '갈색 버섯')),
     ('bone_block',            ('B', '#e0ddc7', '뼈 블록')),
+    ('prismarine',            ('P', '#63a29a', '프리즈머린')),
+    ('prismarine_bricks',     ('p', '#77b3a6', '프리즈머린 벽돌')),
+    ('dark_prismarine',       ('k', '#33574b', '어두운 프리즈머린')),
+    ('sea_lantern',           ('*', '#c8e7e0', '바다 랜턴')),
+    ('water',                 ('~', '#3a6fd8', '물')),
+    ('wet_sponge',            ('g', '#b0b04a', '젖은 해면')),
+    ('kelp_plant',            ('v', '#3f7a3a', '다시마')),
+    ('soul_sand',             ('u', '#54443a', '영혼 모래')),
+    ('weathered_copper',      ('C', '#6a9a82', '풍화된 구리')),
     ('granite',               ('G', '#9a6a55', '화강암')),
     ('tuff_bricks',           ('T', '#6f7169', '응회암 벽돌')),
     ('deepslate_tiles',       ('t', '#3b3b3e', '심층암 타일')),
@@ -766,7 +775,8 @@ def build(family):
             'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
             'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows',
             'shrine': 'shrines',
-            'dwarf': 'halls'}
+            'dwarf': 'halls',
+            'light': 'lighthouses'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

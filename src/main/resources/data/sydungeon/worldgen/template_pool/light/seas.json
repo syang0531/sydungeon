@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:light/sea_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/hall", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/bend", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/junction", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/guard", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/column", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/kelp", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/sponge", "projection": "rigid", "processors": "sydungeon:light_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:light/vault", "projection": "rigid", "processors": "sydungeon:light_weathering" } }
+  ]
+}

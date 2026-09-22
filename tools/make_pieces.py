@@ -3,7 +3,7 @@
 
     python tools/make_pieces.py
 
-Thirteen steps, each its own script:
+Fourteen steps, each its own script:
   1. convert_yame.py     the hand-built practice pieces, renamed and rewired, brought to 26.2
   2. generate_pieces.py  the prison's plugs and entrance shaft, described in code
   3. decorate.py         loot chests and spawners placed into the pieces above
@@ -17,6 +17,7 @@ Thirteen steps, each its own script:
  11. generate_grove.py   the mycelium hollow: the first small one, no boss at all
  12. generate_shrine.py  the mountain shrine: gates, a plinth, a sealed cellar
  13. generate_dwarf.py   the dwarven hall: one door above ground, the rest below
+ 14. generate_light.py   the sunken lighthouse: a dry shaft into a flooded fort
 
 Pieces saved from the dev client and brought in with import_piece.py are not touched by
 this - they are already ours. Note that step 1 overwrites the eight converted pieces, so a
@@ -41,6 +42,7 @@ import generate_grave  # noqa: E402
 import generate_grove  # noqa: E402
 import generate_shrine  # noqa: E402
 import generate_dwarf  # noqa: E402
+import generate_light  # noqa: E402
 
 if __name__ == '__main__':
     print('-- convert')
@@ -69,3 +71,5 @@ if __name__ == '__main__':
     generate_shrine.main()
     print('-- dwarf')
     generate_dwarf.main()
+    print('-- light')
+    generate_light.main()

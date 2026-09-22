@@ -16,6 +16,7 @@
 | [grove.md](grove.md) | 균사 동굴 | 14 | 감옥을 줄인 것. 보스도 시그니처도 없다 |
 | [shrine.md](shrine.md) | 산신의 사당 | 11 | 오르막을 지형에서 마당 안으로 들여왔다 |
 | [dwarf.md](dwarf.md) | 드워프의 전당 | 18 | 지상은 문 하나, 나머지는 42칸 아래 |
+| [light.md](light.md) | 침몰한 등대 | 18 | 마른 쪽과 젖은 쪽이 수면에서 만난다 |
 
 ```bash
 python tools/gen_level_doc.py          # 셋 다 다시 만든다
