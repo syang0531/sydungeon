@@ -1,0 +1,60 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 1.0,
+  "simultaneous_mobs": 1.0,
+  "total_mobs_added_per_player": 0.0,
+  "simultaneous_mobs_added_per_player": 0.0,
+  "ticks_between_spawn": 20,
+  "spawn_potentials": [
+    {
+      "weight": 1,
+      "data": {
+        "entity": {
+          "id": "minecraft:piglin_brute",
+          "CustomName": "금고지기",
+          "CustomNameVisible": true,
+          "PersistenceRequired": true,
+          "Health": 100.0,
+          "attributes": [
+            {
+              "id": "minecraft:max_health",
+              "base": 100.0
+            },
+            {
+              "id": "minecraft:armor",
+              "base": 10.0
+            },
+            {
+              "id": "minecraft:follow_range",
+              "base": 32.0
+            },
+            {
+              "id": "minecraft:knockback_resistance",
+              "base": 0.6
+            }
+          ],
+          "equipment": {
+            "mainhand": {
+              "id": "minecraft:golden_axe",
+              "count": 1,
+              "components": {
+                "minecraft:enchantments": {
+                  "minecraft:sharpness": 3
+                }
+              }
+            }
+          },
+          "drop_chances": {
+            "mainhand": 0.1
+          }
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    {
+      "weight": 1,
+      "data": "sydungeon:trial/vault_reward"
+    }
+  ]
+}

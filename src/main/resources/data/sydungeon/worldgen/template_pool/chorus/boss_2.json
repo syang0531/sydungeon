@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:chorus/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/approach_2", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } }
+  ]
+}

@@ -32,7 +32,9 @@ FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'gr
             'grove', 'shrine', 'dwarf', 'light',
             # the small ones, one machine and a skin each (generate_small.py)
             'well', 'tomb', 'cabin', 'cairn', 'dryw', 'canopy', 'lodge', 'mire',
-            'lush', 'drip')
+            'lush', 'drip',
+            # the nether and the end (generate_nether.py, generate_end.py)
+            'fort', 'vault', 'sanctum', 'spire', 'chorus')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -117,6 +119,30 @@ STYLE = OrderedDict([
     ('lightning_rod',         ('!', '#c4794a', '피뢰침')),
     ('deepslate_tile_slab',   ('_', '#37373b', '심층암 타일 반 블록')),
     ('cracked_deepslate_tiles', ('c', '#333338', '금 간 심층암 타일')),
+    ('netherrack',            ('n', '#6d3634', '네더랙')),
+    ('nether_bricks',         ('N', '#2d161a', '네더 벽돌')),
+    ('chiseled_nether_bricks', ('X', '#3a1e22', '조각한 네더 벽돌')),
+    ('basalt',                ('b', '#4b4b52', '현무암')),
+    ('polished_basalt',       ('B', '#5c5c63', '윤나는 현무암')),
+    ('blackstone',            ('k', '#2b2229', '블랙스톤')),
+    ('polished_blackstone_bricks', ('K', '#37303a', '윤나는 블랙스톤 벽돌')),
+    ('chiseled_polished_blackstone', ('C', '#413a45', '조각한 블랙스톤')),
+    ('gilded_blackstone',     ('g', '#4a3a2a', '금박 블랙스톤')),
+    ('soul_soil',             ('u', '#4a3a30', '영혼 흙')),
+    ('soul_fire',             ('!', '#3fb7c8', '영혼 불')),
+    ('soul_sand',             ('s', '#544438', '영혼 모래')),
+    ('shroomlight',           ('*', '#f19a4a', '버섯광체')),
+    ('glowstone',             ('o', '#e8c46a', '발광석')),
+    ('gold_block',            ('A', '#e9c552', '금 블록')),
+    ('end_stone',             ('e', '#dcdca0', '엔드 돌')),
+    ('end_stone_bricks',      ('E', '#d3d391', '엔드 돌 벽돌')),
+    ('purpur_block',          ('P', '#a97fa9', '퍼퍼 블록')),
+    ('purpur_pillar',         ('p', '#b98fb9', '퍼퍼 기둥')),
+    ('purpur_slab',           ('_', '#a97fa9', '퍼퍼 반 블록')),
+    ('sea_lantern',           ('*', '#c8e7e0', '바다 랜턴')),
+    ('chorus_plant',          ('c', '#6a4a6a', '코러스 줄기')),
+    ('chorus_flower',         ('f', '#c9b6c9', '코러스 꽃')),
+    ('obsidian',              ('O', '#17121f', '흑요석')),
     ('azalea',                ('z', '#5f8a3a', '진달래')),
     ('spruce_slab',           ('_', '#6b4f2a', '가문비 반 블록')),
     ('cut_red_sandstone',     ('R', '#a8542a', '깎은 붉은 사암')),
@@ -791,7 +817,9 @@ def build(family):
             'light': 'lighthouses',
             'well': 'wells', 'tomb': 'tombs', 'cabin': 'cabins', 'cairn': 'cairns',
             'dryw': 'dryws', 'canopy': 'canopys', 'lodge': 'lodges', 'mire': 'mires',
-            'lush': 'lushs', 'drip': 'drips'}
+            'lush': 'lushs', 'drip': 'drips',
+            'fort': 'forts', 'vault': 'vaults', 'sanctum': 'sanctums',
+            'spire': 'spires', 'chorus': 'choruss'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

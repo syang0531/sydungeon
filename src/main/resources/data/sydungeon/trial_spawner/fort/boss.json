@@ -1,0 +1,46 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 1.0,
+  "simultaneous_mobs": 1.0,
+  "total_mobs_added_per_player": 0.0,
+  "simultaneous_mobs_added_per_player": 0.0,
+  "ticks_between_spawn": 20,
+  "spawn_potentials": [
+    {
+      "weight": 1,
+      "data": {
+        "entity": {
+          "id": "minecraft:blaze",
+          "CustomName": "화염의 군주",
+          "CustomNameVisible": true,
+          "PersistenceRequired": true,
+          "Health": 60.0,
+          "attributes": [
+            {
+              "id": "minecraft:max_health",
+              "base": 60.0
+            },
+            {
+              "id": "minecraft:armor",
+              "base": 10.0
+            },
+            {
+              "id": "minecraft:follow_range",
+              "base": 32.0
+            },
+            {
+              "id": "minecraft:knockback_resistance",
+              "base": 0.6
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    {
+      "weight": 1,
+      "data": "sydungeon:trial/fort_reward"
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:sanctum/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/approach_3", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } }
+  ]
+}

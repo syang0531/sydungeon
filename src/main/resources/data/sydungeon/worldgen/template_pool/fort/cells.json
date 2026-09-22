@@ -1,0 +1,19 @@
+{
+  "fallback": "sydungeon:fort/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/passage", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/corner", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/cross", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/guard", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/span", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/store", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/special", "projection": "rigid", "processors": "sydungeon:fort_weathering" } }
+  ]
+}

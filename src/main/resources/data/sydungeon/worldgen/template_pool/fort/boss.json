@@ -1,0 +1,9 @@
+{
+  "fallback": "sydungeon:fort/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/hall", "projection": "rigid", "processors": "sydungeon:fort_weathering" } },
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:fort/approach_3", "projection": "rigid", "processors": "sydungeon:fort_weathering" } }
+  ]
+}

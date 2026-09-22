@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 36,
+    "separation": 12,
+    "salt": 54419956,
+    "exclusion_zone": {
+      "other_set": "minecraft:nether_complexes",
+      "chunk_count": 8
+    }
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:vault",
+      "weight": 1
+    }
+  ]
+}

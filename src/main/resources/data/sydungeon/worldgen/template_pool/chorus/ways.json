@@ -1,0 +1,17 @@
+{
+  "fallback": "sydungeon:chorus/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/run", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/bend", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/fork", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/grove", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/nest", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:chorus/vault", "projection": "rigid", "processors": "sydungeon:chorus_weathering" } }
+  ]
+}

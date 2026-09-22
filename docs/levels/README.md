@@ -34,6 +34,16 @@
 | [lush.md](lush.md) | 이끼 낀 굴 | 8 | 지표 입구 없음 |
 | [drip.md](drip.md) | 점적석 굴 | 8 | 지표 입구 없음 |
 
+## 네더와 엔드
+
+| 문서 | 던전 | 조각 | 원리 |
+|---|---|---|---|
+| [fort.md](fort.md) | 불꽃 요새 | 13 | 네더에는 지표가 없다: 높이를 직접 준다 |
+| [vault.md](vault.md) | 피글린 금고 | 13 | 같은 기계, 블랙스톤과 금 |
+| [sanctum.md](sanctum.md) | 영혼 성소 | 13 | 같은 기계, 뼈와 영혼 흙 |
+| [spire.md](spire.md) | 공허 첨탑 | 6 | 유일하게 **올라가는** 던전 |
+| [chorus.md](chorus.md) | 코러스 미궁 | 12 | 지붕이 없는 미로 |
+
 ```bash
 python tools/gen_level_doc.py          # 셋 다 다시 만든다
 python tools/gen_level_doc.py tower    # 하나만

@@ -1,0 +1,7 @@
+{
+  "fallback": "minecraft:empty",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:vault/cap", "projection": "rigid", "processors": "sydungeon:vault_weathering" } }
+  ]
+}

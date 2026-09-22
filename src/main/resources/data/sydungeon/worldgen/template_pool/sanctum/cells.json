@@ -1,0 +1,19 @@
+{
+  "fallback": "sydungeon:sanctum/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/passage", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/corner", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/cross", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/guard", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/span", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/store", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:sanctum/special", "projection": "rigid", "processors": "sydungeon:sanctum_weathering" } }
+  ]
+}
