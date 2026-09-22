@@ -1,4 +1,4 @@
-# 레벨 설계 — 불꽃 요소
+# 레벨 설계 — 불꽃 요새
 
 > 이 문서는 `python tools/gen_level_doc.py fort`가 만든다. 조각을 고치면 다시 돌린다. 그림과 표는 게임이 읽는 파일(`structure/fort/*.nbt`, `worldgen/**`)에서 그대로 읽어 온 것이라 모드와 어긋날 수 없다. 설명 문장만 사람이 쓴다 (`tools/gen_level_doc.py`의 `INTRO`·`NOTES`).
 

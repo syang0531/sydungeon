@@ -55,7 +55,7 @@ ANY_LIGHT = {'block_light_limit': {'min_inclusive': nbt.Int(0), 'max_inclusive':
 TRIAL_STATE = {'trial_spawner_state': 'inactive', 'ominous': 'false'}
 
 SKINS = [
-    dict(key='fort', title='불꽃 요소', boss='화염의 군주',
+    dict(key='fort', title='불꽃 요새', boss='화염의 군주',
          biomes=['nether_wastes', 'basalt_deltas'],
          rock='netherrack', band='basalt', brick='nether_bricks',
          trim='chiseled_nether_bricks', floor='blackstone', light='shroomlight',

@@ -263,6 +263,10 @@ def main():
     import check_shafts
     if check_shafts.main():
         sys.exit('the way down does not hold together.')
+    # and what the dungeons promise, read out of the loot tables rather than the docs (2.2)
+    import check_rewards
+    if check_rewards.main():
+        sys.exit('the dungeons do not give what they promise.')
     print('ok: %d pieces, %d pools, %d loot tables, %d spawner configs%s' % (
         len(mine['structure']), len(mine['worldgen/template_pool']), len(mine['loot_table']),
         len(mine['trial_spawner']),

@@ -212,7 +212,9 @@ def dumps(root):
 def write(path, root, compress=True):
     data = dumps(root)
     if compress:
-        data = gzip.compress(data)
+        # mtime=0, or the gzip header carries the clock and every regeneration rewrites all
+        # 390 pieces with identical contents - a diff that hides the one piece that changed
+        data = gzip.compress(data, mtime=0)
     with open(path, 'wb') as f:
         f.write(data)
 
