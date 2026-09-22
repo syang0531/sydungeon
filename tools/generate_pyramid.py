@@ -94,15 +94,16 @@ GATE_CELL = (4, 0)
 WELL_CELL = (4, 4)
 SPINE_STEPS = 3
 
-# The shaft from the well up into the tomb, in pyramid coordinates, and the ladder in it.
-SHAFT = (44, 46, 44, 46)
-LADDER_X, LADDER_Z = 45, 44
+# The shaft from the well up into the tomb, in pyramid coordinates: ONE column, in the middle
+# of the well cell, with the ladder in it and the block behind it solid. Three wide was worse
+# than it looked - you stepped into it and fell past the ladder (section 33).
+SHAFT = (45, 45, 45, 45)
+LADDER_X, LADDER_Z = 45, 45
 
-# The hatch from the tomb up into the crypt, and the ladder up to it. The ladder runs one
-# block in from the tomb's south wall and the crypt's south wall, so both halves hang on a
-# wall that is solid the whole way up and neither needs a buttress built for it.
-HATCH = (49, 51, 52, 54)
-CLIMB_X, CLIMB_Z = 50, 54
+# The hatch from the tomb up into the crypt, and the ladder up to it: the same, in the middle
+# of the crypt.
+HATCH = (50, 50, 52, 52)
+CLIMB_X, CLIMB_Z = 50, 52
 
 POOL = {k: NS + ':pyramid/' + k for k in (
     'passages', 'caps', 'well', 'core', 'tomb', 'crypt', 'skin_mid', 'skin_top',
@@ -333,7 +334,8 @@ def well():
     ox = AT['core'][0] + WELL_CELL[0] * CELL
     oz = AT['core'][2] + WELL_CELL[1] * CELL
     x0, x1, z0, z1 = SHAFT
-    p.box(2, 1, 1, 4, 5, 1, CUT)                              # what the ladder hangs on
+    p.box(LADDER_X - ox, 1, LADDER_Z - oz - 1,                # what the ladder hangs on
+          LADDER_X - ox, 5, LADDER_Z - oz - 1, CUT)
     p.box(x0 - ox, 6, z0 - oz, x1 - ox, 6, z1 - oz, AIR)      # the hole in the ceiling
     for y in range(1, CELL):
         p.set(LADDER_X - ox, y, LADDER_Z - oz, 'minecraft:ladder',
@@ -424,8 +426,9 @@ def tomb():
     hx0, hx1, hz0, hz1 = HATCH
     p.box(hx0 - ox, n - 1, hz0 - oz, hx1 - ox, n - 1, hz1 - oz, AIR)
     for y in range(1, n):
-        p.set(CLIMB_X - ox, y, CLIMB_Z - oz, 'minecraft:ladder',
-              {'facing': 'north', 'waterlogged': 'false'})
+        p.set(CLIMB_X - ox, y, CLIMB_Z - oz + 1, CHISELED)     # the post it hangs on: one
+        p.set(CLIMB_X - ox, y, CLIMB_Z - oz, 'minecraft:ladder',   # column, so the wall it
+              {'facing': 'north', 'waterlogged': 'false'})         # used to need is gone
 
     for x, z in ((c, 4), (4, c), (n - 5, c), (c, n - 5)):
         p.set(x, n - 5, z, 'minecraft:lantern', {'hanging': 'true', 'waterlogged': 'false'})
@@ -441,7 +444,8 @@ def crypt():
     hx0, hx1, hz0, hz1 = HATCH
     p.box(hx0 - ox, 0, hz0 - oz, hx1 - ox, 0, hz1 - oz, AIR)
     for y in (0, 1):     # one rung through the floor and one to step off onto it
-        p.set(CLIMB_X - ox, y, CLIMB_Z - oz, 'minecraft:ladder',
+        p.set(CLIMB_X - ox, y, CLIMB_Z - oz + 1, SANDSTONE)    # the post, carried up from
+        p.set(CLIMB_X - ox, y, CLIMB_Z - oz, 'minecraft:ladder',   # the tomb below
               {'facing': 'north', 'waterlogged': 'false'})
     p.box(1, 1, 1, 5, 1, 1, CHISELED)
     p.set(3, 2, 1, 'minecraft:chest', {'facing': 'south', 'type': 'single', 'waterlogged': 'false'},

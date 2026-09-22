@@ -74,9 +74,9 @@ TOWER_TOP = 15
 # wall rather than in the hole, because a jigsaw becomes a block. SHAFT_AT is where the shaft
 # hangs under the keep, and it is chosen so the hole lands in the middle of that piece too.
 SHAFT_AT = CELL
-HOLE = (KEEP // 2 - 1, KEEP // 2 + 1, KEEP // 2 - 1, KEEP // 2 + 1)      # x0 x1 z0 z1
-RUNG = (KEEP // 2 + 1, KEEP // 2)
-JIG = (KEEP // 2 + 2, KEEP // 2)
+HOLE = (KEEP // 2, KEEP // 2)    # one column, dead centre of the piece (section 33)
+RUNG = HOLE                      # the ladder is the hole
+JIG = (HOLE[0] + 1, HOLE[1])     # the post it hangs on, one out of the hole
 
 # Above ground the fortress is white, because the ground is: polished diorite is speckled
 # enough that a wall of it does not read flat, and quartz bricks are the crisper white for
@@ -151,15 +151,13 @@ def sink(p, y0, y1, off=0, fill=BRICK):
     The frame round the hole is only written where the piece had nothing, so a hand-built
     floor keeps its own blocks. Carve before writing the jigsaws: the other way round the
     hole erases them, which is the order trap CLAUDE.md section 11 records."""
-    x0, x1, z0, z1 = (v - off for v in HOLE)
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+    cx, cz = (v - off for v in HOLE)
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    p.box(x0, y0, z0, x1, y1, z1, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
+        p.set(cx, y, cz, *ladder('west'))
 
 
 def keep():
@@ -236,10 +234,10 @@ def floor_and_hole(p):
     Run over the hand-built keep as well as the code's, which is how the first pass's hole -
     cut in a corner, before it moved to the middle of the hall - gets filled in without anyone
     having to remember it."""
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(KEEP):
         for z in range(KEEP):
-            if x0 <= x <= x1 and z0 <= z <= z1:
+            if (x, z) == (cx, cz):
                 continue
             if p.grid.get((x, 0, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, 0, z, BRICK)
@@ -474,7 +472,7 @@ def hub_wiring(p):
     The ceiling is closed first, so a hand-built hub that still carries the first pass's hole
     does not end up with two. Then the hole, then the jigsaw - the other way round the hole
     erases it (section 11)."""
-    x0, x1, z0, z1 = (v - SHAFT_AT for v in HOLE)
+    cx, cz = (v - SHAFT_AT for v in HOLE)
     jx, jz = JIG[0] - SHAFT_AT, JIG[1] - SHAFT_AT
     for x in range(CELL):
         for z in range(CELL):
@@ -482,11 +480,10 @@ def hub_wiring(p):
                 p.set(x, CELL - 1, z, BRICK)
     for y in range(1, CELL):                      # the post
         p.set(jx, y, jz, BRICK)
-    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder('west'))         # the climb, ceiling course included
     p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, BRICK, joint='aligned',
              name=CELLAR, target=CELLAR)
-    for y in range(1, CELL):
-        p.set(RUNG[0] - SHAFT_AT, y, RUNG[1] - SHAFT_AT, *ladder())
 
 
 def cellar(kind):
@@ -646,11 +643,15 @@ def ladder_problems(pieces):
     column. A jigsaw is a block, so one standing in the hole is a rung missing."""
     at = {'keep': (0, 0, 0), 'shaft': (SHAFT_AT, -SHAFT_H, SHAFT_AT),
           'cellar_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
+    cased = at['cellar_hub'][1] + CELL - 1
     problems = []
     for y in range(at['cellar_hub'][1] + 1, 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue               # inside the hub the ring is the room itself
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -659,11 +660,14 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to be '
+                                    'solid the whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 
@@ -917,7 +921,7 @@ def walk_problems():
             'the walkway, east': (far, WALL_TOP + 1, KEEP // 2),
             'a tower top': (-CELL - 4, TOWER_TOP + 1, -CELL - 4),
             'a tower floor': (far, 1, far),
-            'the cellar': (RUNG[0] - 1, -SHAFT_H - CELL + 1, RUNG[1])}
+            'the cellar': (RUNG[0], -SHAFT_H - CELL + 1, RUNG[1])}
     problems = []
     for label, spot in want.items():
         if not any((spot[0], spot[1] + dy, spot[2]) in seen for dy in (-1, 0, 1)):

@@ -114,21 +114,24 @@ SIDES = ('west', 'east', 'north', 'south')
 # The way down, in the great hut's coordinates. The hole is three by three; the ladder hangs
 # in the middle of its east wall (not in a corner of it), and a casing one block thick keeps
 # the swamp out - without it the water beside the hole simply pours down into the cellar.
-HOLE = (GREAT // 2 - 1, GREAT // 2 + 1, GREAT // 2 - 2, GREAT // 2)      # x0 x1 z0 z1
-RUNG = (GREAT // 2 + 1, GREAT // 2 - 1)                                  # x, z of the ladder
+HOLE = (GREAT // 2, GREAT // 2)   # one column, dead centre of the piece (section 33)
+RUNG = HOLE                       # the ladder is the hole
 
 
 def sink(p, y0, y1):
-    """The hole and its casing, cut into a piece that shares the great hut's coordinates:
-    air through the middle, planks all round it, and the ladder up the east wall. The post
-    that carries the jigsaws is part of that wall and stays a log."""
-    x0, x1, z0, z1 = HOLE
-    p.box(x0 - 1, y0, z0 - 1, x1 + 1, y1, z1 + 1, PLANK)
-    p.box(x0, y0, z0, x1, y1, z1, AIR)
+    """The way down, cut into a piece that shares the great hut's coordinates: one column of
+    ladder with a ring of planks round it, and the post the jigsaws stand in on its east.
+
+    Three wide with a five-wide casing was the first try. The casing is what keeps the swamp
+    out, and one column needs only the eight blocks round it (section 33)."""
+    cx, cz = HOLE
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
+            for y in range(y0, y1 + 1):
+                p.set(x, y, z, PLANK)
     for y in range(y0, y1 + 1):
-        p.set(x1 + 1, y, RUNG[1], LOG, {'axis': 'y'})
-        p.set(RUNG[0], y, RUNG[1], 'minecraft:ladder', {'facing': 'west',
-                                                        'waterlogged': 'false'})
+        p.set(cx + 1, y, cz, LOG, {'axis': 'y'})
+        p.set(cx, y, cz, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
 
 
 def deck_door(size, deck_y=DECK_Y):
@@ -273,13 +276,12 @@ def great_hut():
     # jigsaw sits in the post that holds the casing's east wall up - a jigsaw is a block, it
     # becomes its final_state when the piece is placed, and one standing in the hole reads as
     # a stray block to climb round.
-    sink(p, 0, DECK_Y - 1)
-    p.box(mid - 1, DECK_Y, mid - 2, mid + 1, DECK_Y, mid, AIR)       # through the deck itself
+    sink(p, 0, DECK_Y)                                               # the deck course too
     p.set(RUNG[0], DECK_Y, RUNG[1], 'minecraft:ladder', {'facing': 'west',
                                                          'waterlogged': 'false'})
-    for x, z in ((mid - 2, mid - 1), (mid + 2, mid - 1)):
+    for x, z in ((mid - 2, mid), (mid + 2, mid)):
         p.set(x, DECK_Y + 1, z, FENCE, RAIL)
-    p.jigsaw(mid + 2, 0, mid - 1, 'down_east', POOL['pilings'], LOG, joint='aligned',
+    p.jigsaw(mid + 1, 0, mid, 'down_east', POOL['pilings'], LOG, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     return p
 
@@ -334,12 +336,13 @@ def shaft():
     """From under the great hut, through the water, into the mud. Its air is written on
     purpose: it has to push the swamp out of the way."""
     p = Piece(CELL, SHAFT_H, CELL, MUD)
-    p.box(2, 0, 1, 4, SHAFT_H - 1, 3, AIR)
+    cx, cz = HOLE[0] - CELL, HOLE[1] - CELL
     for y in range(SHAFT_H):
-        p.set(4, y, 2, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
+        p.set(cx, y, cz, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
     # both in the wall, clear of the ladder, for the same reason
-    p.jigsaw(5, SHAFT_H - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=DOWN, target=DOWN)
-    p.jigsaw(5, 0, 2, 'down_east', POOL['cellar_first'], MUD, joint='aligned',
+    p.jigsaw(cx + 1, SHAFT_H - 1, cz, 'up_east', EMPTY, MUD, joint='aligned',
+             name=DOWN, target=DOWN)
+    p.jigsaw(cx + 1, 0, cz, 'down_east', POOL['cellar_first'], MUD, joint='aligned',
              priority=PRIORITY, name=CELLAR, target=CELLAR)
     return p
 
@@ -348,12 +351,14 @@ def cellar_hub():
     """Where the ladder lands. Three ways into the brewery and one, on its own connector and
     placed first, to the mother."""
     p = cellar_room(['west', 'east', 'south'])
-    # the hole first, then the jigsaw: the other way round the hole erases it, which is the
-    # same order trap CLAUDE.md section 11 records for the pyramid's ladder
-    p.box(2, CELL - 1, 1, 4, CELL - 1, 3, AIR)
-    p.jigsaw(5, CELL - 1, 2, 'up_east', EMPTY, MUD, joint='aligned', name=CELLAR, target=CELLAR)
+    # the climb comes down the middle of the room on a post of mud brick, and the ceiling is
+    # left solid round it: one column, so there is no hole to fall down (section 33)
+    cx, cz = HOLE[0] - CELL, HOLE[1] - CELL
     for y in range(1, CELL):
-        p.set(4, y, 2, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
+        p.set(cx + 1, y, cz, MUD)
+        p.set(cx, y, cz, 'minecraft:ladder', {'facing': 'west', 'waterlogged': 'false'})
+    p.jigsaw(cx + 1, CELL - 1, cz, 'up_east', EMPTY, MUD, joint='aligned',
+             name=CELLAR, target=CELLAR)
     cellar_door(p, 'west', POOL['cellar'])
     cellar_door(p, 'east', POOL['cellar'])
     cellar_door(p, 'south', POOL['mother_approach_1'], name=CELLAR, target=MOTHER,
@@ -468,11 +473,15 @@ def ladder_problems(pieces):
           'shaft': (CELL, -DROP - SHAFT_H, CELL),
           'cellar_hub': (CELL, -DROP - SHAFT_H - CELL, CELL)}
     bottom = at['cellar_hub'][1] + 1                        # the cellar floor is course 0
-    problems, rungs = [], RUNG
-    x0, x1, z0, z1 = HOLE
+    problems = []
+    cx, cz = RUNG
+    cased = at['cellar_hub'][1] + CELL - 1
     for y in range(bottom, DECK_Y + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue               # inside the hub the ring is the room itself
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     local = (x - ox, y - oy, z - oz)
@@ -482,11 +491,15 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == rungs else AIR
-                if block != want and not (block == AIR and (x, z) == rungs and y > DECK_Y):
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to be '
+                                    'solid the whole way down, and here it is what keeps the '
+                                    'swamp out (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 
@@ -519,11 +532,11 @@ def verify(pieces):
             allowed = ('minecraft:structure_void', 'minecraft:dark_oak_log', AIR,
                        'minecraft:jigsaw', 'minecraft:ladder')
             floor = getattr(piece, 'deck_y', piece.size[1])
-            x0, x1, z0, z1 = HOLE                 # the casing round the way down may be built
+            cx, cz = HOLE                         # the casing round the way down may be built
             below = [p for p in piece.grid
                      if p[1] < floor and piece.grid[p][0] not in allowed
-                     and not (piece.grid[p][0] == PLANK and x0 - 1 <= p[0] <= x1 + 1
-                              and z0 - 1 <= p[2] <= z1 + 1)]
+                     and not (piece.grid[p][0] == PLANK and cx - 1 <= p[0] <= cx + 1
+                              and cz - 1 <= p[2] <= cz + 1)]
             if below:
                 problems.append('%s writes %s under its deck; the swamp should keep what it '
                                 'had there' % (name, piece.grid[below[0]][0]))

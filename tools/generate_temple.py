@@ -106,10 +106,12 @@ GATE_CELL = (3, 0)               # the middle of the core's north edge
 WELL_CELL = (3, 3)               # its middle, where the three floors meet
 SPINE_STEPS = 3                  # spine_1 .. spine_3, and the well is the cell after them
 
-# The one column the three floors share: a three by three hole and a ladder against its south
-# wall, one block clear of the doorway lane so every course has something to hang on.
-SHAFT = (29, 31, 31, 33)         # x0 x1 z0 z1
-CLIMB_X, CLIMB_Z = 29, 33
+# The one column the three floors share: a single ladder in the middle of the well cell, and
+# the post it hangs on beside it. Three wide was worse than it looked - you stepped into it
+# and fell past the ladder, and every floor course had to keep a landing to step off onto
+# (section 33).
+CLIMB_X, CLIMB_Z = 31, 31        # the middle of the well cell
+POST_X, POST_Z = 32, 31          # the post, one east of it: the ladder faces west
 
 POOL = {k: NS + ':temple/' + k for k in (
     'start', 'core', 'core_deep', 'skin_mid', 'shrine', 'vault', 'cistern',
@@ -383,30 +385,18 @@ def spine(step):
     return p
 
 
-def shaft_hole(p, origin, y0, y1, rim=None):
-    """The column the three floors share, cut into a piece that knows where it stands.
-    `origin` is that piece's position in temple coordinates."""
-    x0, x1, z0, z1 = SHAFT
+def shaft_hole(p, origin, y0, y1, rim=MOSS):
+    """The column the three floors share, cut into a piece that knows where it stands: one
+    ladder, and the post it hangs on. `origin` is that piece's position in temple
+    coordinates, so the three cannot drift apart (section 11)."""
     ox, oy, oz = origin
-    if rim:
-        for x in range(x0 - 1, x1 + 2):
-            for z in range(z0 - 1, z1 + 2):
-                for y in range(y0, y1 + 1):
-                    at = (x - ox, y - oy, z - oz)
-                    if at in p.grid and p.grid[at][0] in (AIR, VOID):
-                        p.set(at[0], at[1], at[2], rim)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                # The ladder's own row stays in at the first course: a landing to walk out
-                # along and step onto the climb. One block beside the ladder is not enough -
-                # it would be an island in the middle of the hole, reachable only from the
-                # ladder it is there to reach.
-                if z == CLIMB_Z and x != CLIMB_X and y == y0:
-                    continue
-                p.set(x - ox, y - oy, z - oz, AIR)
     for y in range(y0, y1 + 1):
-        p.set(CLIMB_X - ox, y - oy, CLIMB_Z - oz, *ladder())
+        post = (POST_X - ox, y - oy, POST_Z - oz)
+        if post in p.grid:
+            p.set(post[0], post[1], post[2], rim)
+        climb = (CLIMB_X - ox, y - oy, CLIMB_Z - oz)
+        if climb in p.grid:
+            p.set(climb[0], climb[1], climb[2], *ladder('west'))
 
 
 def well():
@@ -594,44 +584,40 @@ def verify(pieces):
     if WELL_CELL != (GATE_CELL[0], GATE_CELL[1] + SPINE_STEPS):
         problems.append('the spine is %d cells long but the well is at %s: the chain would '
                         'not land on it' % (SPINE_STEPS, (WELL_CELL,)))
-    x0, x1, z0, z1 = SHAFT
-    if not (x0 <= CLIMB_X <= x1 and z0 <= CLIMB_Z <= z1):
-        problems.append('the ladder is not in the shaft')
     well_o = (AT['core'][0] + WELL_CELL[0] * CELL, AT['core'][2] + WELL_CELL[1] * CELL)
-    for axis, lo, hi, o in ((0, x0, x1, well_o[0]), (2, z0, z1, well_o[1])):
-        if not (o < lo and hi < o + CELL - 1):
-            problems.append('the shaft is not inside the well cell, clear of its walls, on '
-                            'axis %d' % axis)
-        if not (AT['vault'][axis] <= lo and hi < AT['vault'][axis] + SIZE['vault'][axis]):
-            problems.append('the shaft misses the vault on axis %d' % axis)
-    if CLIMB_Z != z1 or not (well_o[1] + CELL - 1 == z1 + 1):
-        problems.append('the ladder does not hang on the well cell\'s south wall')
-    lane = (well_o[0] + 2, well_o[0] + 4)
-    if lane[0] <= CLIMB_X <= lane[1]:
-        problems.append('the ladder hangs on the doorway, which is a hole: move it aside')
+    middle = (well_o[0] + CELL // 2, well_o[1] + CELL // 2)
+    if (CLIMB_X, CLIMB_Z) != middle:
+        problems.append('the climb is at %s; one column belongs in the middle of the well '
+                        'cell, which is %s' % ((CLIMB_X, CLIMB_Z), middle))
+    if (POST_X, POST_Z) != (CLIMB_X + 1, CLIMB_Z):
+        problems.append('the post is at %s; a west-facing ladder hangs on the block east of '
+                        'it' % ((POST_X, POST_Z),))
+    for axis, here in ((0, CLIMB_X), (2, CLIMB_Z)):
+        if not (AT['vault'][axis] < here < AT['vault'][axis] + SIZE['vault'][axis] - 1):
+            problems.append('the climb misses the vault on axis %d' % axis)
 
     # the climb, floor by floor, as the game stacks the three pieces
     at = {'vault': AT['vault'], 'well': (well_o[0], 0, well_o[1]),
           'cistern': (AT['core_deep'][0] + WELL_CELL[0] * CELL, -FOOT,
                       AT['core_deep'][2] + WELL_CELL[1] * CELL)}
     for y in range(-FOOT + 1, STEP + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == CLIMB_Z and x != CLIMB_X:
-                    continue          # the landing: solid on purpose, at every floor course
-                for name, (ox, oy, oz) in at.items():
-                    piece = pieces[name]
-                    if 0 <= y - oy < piece.size[1]:
-                        block = piece.grid[(x - ox, y - oy, z - oz)][0]
-                        break
-                else:
-                    problems.append('nothing covers %s in the shaft' % ((x, y, z),))
-                    continue
-                want = 'minecraft:ladder' if (x, z) == (CLIMB_X, CLIMB_Z) else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+        for x, z, want in ((CLIMB_X, CLIMB_Z, 'minecraft:ladder'), (POST_X, POST_Z, 'solid')):
+            for name, (ox, oy, oz) in at.items():
+                piece = pieces[name]
+                if 0 <= y - oy < piece.size[1]:
+                    block = piece.grid[(x - ox, y - oy, z - oz)][0]
+                    break
+            else:
+                problems.append('nothing covers %s in the shaft' % ((x, y, z),))
+                continue
+            if want == 'solid':
+                if block in (AIR, VOID, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ladder hangs on that column the '
+                                    'whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
+            elif block != want:
+                problems.append('%s has %s at %s, where the climb needs a ladder'
+                                % (name, block.split(':')[-1], (x, y, z)))
     for name, piece in pieces.items():
         if max(piece.size) > 48 and not name.startswith(('skin', 'core')):
             problems.append('%s is %s: too big to rebuild by hand' % (name, piece.size))

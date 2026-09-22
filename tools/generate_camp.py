@@ -71,9 +71,10 @@ TOWER_TOP = 13
 
 # the way down, in the longhouse's coordinates: the middle of the floor, the ladder against
 # the south wall of the hole with its own row kept solid as a landing (section 24)
-HOLE = (HOUSE // 2 - 1, HOUSE // 2 + 1, HOUSE // 2 - 1, HOUSE // 2 + 1)
-RUNG = (HOUSE // 2 - 1, HOUSE // 2 + 1)
-JIG = (RUNG[0], RUNG[1] + 1)     # in the post the ladder hangs on, one out of the hole
+HOLE = (HOUSE // 2, HOUSE // 2) # one column, dead centre of the piece
+RUNG = HOLE                      # the ladder is the hole (section 33)
+JIG = (HOLE[0], HOLE[1] + 1)     # the post it hangs on, one out of the hole
+
 SHAFT_AT = CELL                  # where the shaft hangs under the longhouse
 
 LOG = 'minecraft:acacia_log'
@@ -140,27 +141,21 @@ def ladder(facing='north'):
 
 
 # ------------------------------------------------------------------------- the way down
-def sink(p, y0, y1, off=0, fill=PLANK, landing=None):
-    """The hole and the ladder in it. `off` converts the longhouse's coordinates into this
-    piece's, so the three pieces that share the column cannot drift apart.
+def sink(p, y0, y1, off=0, fill=PLANK):
+    """The way down: one column of ladder, and a ring of solid block round it.
 
-    The ladder's own row stays solid at the first course: a landing to walk out along and step
-    onto the climb, because a ladder in the middle of a hole has nothing to reach it from
-    (CLAUDE.md section 24)."""
-    x0, x1, z0, z1 = (v - off for v in HOLE)
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+    Three wide was worse than it looked - you stepped in and fell past the ladder, and every
+    piece the column ran through had to keep a landing to step off onto (section 24). One
+    column is a ladder you simply walk into. The ring is written whatever was there before,
+    because a gap in it is where the water gets in (section 33)."""
+    cx, cz = (v - off for v in HOLE)
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] - off and x != RUNG[0] - off and y == landing:
-                    continue
-                p.set(x, y, z, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
+        p.set(cx, y, cz, *ladder())
+
 
 
 # -------------------------------------------------------------------------- the longhouse
@@ -226,17 +221,17 @@ def floor_and_hole(p):
     """The hall's floor is solid except for the one way down. Run over a hand-built longhouse
     as well as the code's, so a hole left anywhere else in it gets closed."""
     g = GROUND
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(HOUSE):
         for z in range(HOUSE):
-            if x0 <= x <= x1 and z0 <= z <= z1:
+            if (x, z) == (cx, cz):
                 continue
             if p.grid.get((x, g, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, g, z, PLANK)
     # through the floor and the foundation both, and out of the bottom of the box: the
     # shaft hangs below the piece, not inside it. The landing is the floor course, which is
     # the one people stand on (section 24).
-    sink(p, 0, g, landing=g)
+    sink(p, 0, g)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], DIRT, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
 
@@ -472,7 +467,7 @@ def hub_wiring(p):
     """The hole in the ceiling and the post the ladder hangs on. The ceiling is closed first,
     so a hand-built hub that still carries an older hole does not end up with two; then the
     hole, then the jigsaw - the other way round the hole erases it (section 11)."""
-    x0, x1, z0, z1 = (v - SHAFT_AT for v in HOLE)
+    cx, cz = (v - SHAFT_AT for v in HOLE)
     jx, jz = JIG[0] - SHAFT_AT, JIG[1] - SHAFT_AT
     for x in range(CELL):
         for z in range(CELL):
@@ -484,11 +479,10 @@ def hub_wiring(p):
                                                # jigsaw stands in it
     # through the ceiling boards as well as the ceiling: the drift is roofed with planks and
     # a hole cut only in the top course lands you on them
-    p.box(x0, CELL - 2, z0, x1, CELL - 1, z1, AIR)
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder())            # the climb, up through the ceiling boards
     p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, LOG, joint='aligned',
              name=DRIFT, target=DRIFT)
-    for y in range(1, CELL):
-        p.set(RUNG[0] - SHAFT_AT, y, RUNG[1] - SHAFT_AT, *ladder())
 
 
 def drift(kind):
@@ -641,17 +635,20 @@ def surface_problems(pieces):
 
 
 def ladder_problems(pieces):
-    """Climb from the mine floor to the hall's, through the three pieces that share the
-    column. A jigsaw is a block, so one standing in the hole is a rung missing."""
+    """Climb the column through whichever piece covers each course: a ladder the whole way
+    down the middle, and nothing but solid block in the eight round it - except inside the
+    landing piece itself, where the ring is the room you step out into."""
     at = {'longhouse': (0, 0, 0), 'shaft': (SHAFT_AT, -SHAFT_H, SHAFT_AT),
           'mine_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
+    cased = at['mine_hub'][1] + CELL - 1
     problems = []
     for y in range(at['mine_hub'][1] + 1, GROUND + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0]:
-                    continue                  # the landing: solid on purpose
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -660,11 +657,14 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to '
+                                    'be solid the whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 

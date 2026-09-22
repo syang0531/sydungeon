@@ -57,9 +57,9 @@ MIN_BOSS_STEPS = 3
 # the way down, in the gatehouse's coordinates, shared by the four pieces the column runs
 # through (section 11). The ladder is against the south wall of the hole and its own row is
 # left solid at each floor, so there is somewhere to step off (section 24)
-HOLE = (GATE // 2 - 1, GATE // 2 + 1, GATE // 2 - 1, GATE // 2 + 1)
-RUNG = (HOLE[0], HOLE[3])
-JIG = (RUNG[0], RUNG[1] + 1)
+HOLE = (GATE // 2, GATE // 2)    # one column, dead centre of the piece
+RUNG = HOLE                      # the ladder is the hole (section 33)
+JIG = (HOLE[0], HOLE[1] + 1)     # the post it hangs on, one out of the hole
 SHAFT_AT = CELL
 
 ROCK = 'minecraft:stone'          # what the hall is cut out of, and therefore what shows
@@ -138,23 +138,20 @@ def bedrock(p, sx, sy, sz, at=0):
 
 
 # ------------------------------------------------------------------------- the way down
-def sink(p, y0, y1, off=0, fill=DEEP, landing=None):
-    """The hole and the ladder in it. `off` turns the gatehouse's coordinates into this
-    piece's, so the four pieces the column runs through cannot drift apart (section 11)."""
-    x0, x1, z0, z1 = (v - off for v in HOLE)
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+def sink(p, y0, y1, off=0, fill=DEEP):
+    """The way down: one column of ladder, and a ring of solid block round it.
+
+    Three wide was worse than it looked - you stepped in and fell past the ladder, and every
+    piece the column ran through had to keep a landing to step off onto (section 24). One
+    column is a ladder you simply walk into. The ring is written whatever was there before,
+    because a gap in it is where the water gets in (section 33)."""
+    cx, cz = (v - off for v in HOLE)
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] - off and x != RUNG[0] - off and y == landing:
-                    continue
-                p.set(x, y, z, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
+        p.set(cx, y, cz, *ladder())
 
 
 # ------------------------------------------------------------------------- the gatehouse
@@ -223,18 +220,18 @@ def gatehouse():
 def floor_and_hole(p):
     """The gatehouse floor is solid except for the one way down."""
     g = GROUND
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(GATE):
         for z in range(GATE):
-            if x0 <= x <= x1 and z0 <= z <= z1:
+            if (x, z) == (cx, cz):
                 continue
             if p.grid.get((x, g, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, g, z, POLISH)
-    for x in range(x0 - 1, x1 + 2):                                # a kerb round the hole
-        for z in range(z0 - 1, z1 + 2):
-            if not (x0 <= x <= x1 and z0 <= z <= z1):
+    sink(p, 0, g)
+    for x in range(cx - 1, cx + 2):                                # a kerb round the hole
+        for z in range(cz - 1, cz + 2):
+            if (x, z) != (cx, cz):
                 p.set(x, g, z, CHISEL)
-    sink(p, 0, g, landing=g)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], POLISH, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
 
@@ -299,19 +296,18 @@ def hall_door(p, side, pool, y=0, name=HALL, target=HALL, priority=0):
 def hall_hub():
     """Where the ladder lands. Three doors, and the pillar the ladder hangs on (section 24)."""
     p = rock_room(['west', 'north', 'south'])
-    x0, x1, z0, z1 = (v - SHAFT_AT for v in HOLE)
+    cx, cz = (v - SHAFT_AT for v in HOLE)
     jx, jz = JIG[0] - SHAFT_AT, JIG[1] - SHAFT_AT
     for x in range(CELL):
         for z in range(CELL):
             if p.grid.get((x, CELL - 1, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, CELL - 1, z, ROCK)
     for y in range(1, CELL):
-        p.set(jx, y, jz, DEEP)
-    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)
+        p.set(jx, y, jz, DEEP)                       # the post the ladder hangs on
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder())                  # and the climb, ceiling included
     p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, DEEP, joint='aligned',
              name=HALL, target=HALL)
-    for y in range(1, CELL):
-        p.set(RUNG[0] - SHAFT_AT, y, RUNG[1] - SHAFT_AT, *ladder())
     hall_door(p, 'west', POOL['halls'])
     hall_door(p, 'north', POOL['halls'])
     hall_door(p, 'south', POOL['king_approach_1'], name=HALL, target=KING, priority=PRIORITY)
@@ -568,16 +564,22 @@ def lava_problems(pieces):
 
 
 def ladder_problems(pieces):
+    """Climb the column, block by block, through whichever piece covers each course: a ladder
+    all the way down the middle and nothing but solid block in the eight round it."""
     at = {'gatehouse': (0, 0, 0), 'shaft_1': (SHAFT_AT, -SHAFT_H, SHAFT_AT),
           'shaft_2': (SHAFT_AT, -2 * SHAFT_H, SHAFT_AT),
           'hall_hub': (SHAFT_AT, -2 * SHAFT_H - CELL, SHAFT_AT)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     problems = []
-    for y in range(at['hall_hub'][1] + 2, GROUND + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0]:
-                    continue                    # the landing: solid on purpose
+    # the ring has to be solid from the top down to the last piece above the landing; inside
+    # the hub itself it must not be, or there would be no stepping off the ladder
+    cased = at['hall_hub'][1] + CELL - 1
+    for y in range(at['hall_hub'][1] + 1, GROUND + 1):
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -586,11 +588,14 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to '
+                                    'be solid the whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 

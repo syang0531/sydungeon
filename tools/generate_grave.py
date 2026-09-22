@@ -57,9 +57,10 @@ MIN_BOSS_STEPS = 3
 
 # the way down, in the chapel's coordinates: the middle of the floor, the ladder against the
 # south wall of the hole with its own row left solid as a landing (section 24)
-HOLE = (CHAPEL // 2 - 1, CHAPEL // 2 + 1, CHAPEL // 2 - 1, CHAPEL // 2 + 1)
-RUNG = (CHAPEL // 2 - 1, CHAPEL // 2 + 1)
-JIG = (RUNG[0], RUNG[1] + 1)
+HOLE = (CHAPEL // 2, CHAPEL // 2) # one column, dead centre of the piece
+RUNG = HOLE                      # the ladder is the hole (section 33)
+JIG = (HOLE[0], HOLE[1] + 1)     # the post it hangs on, one out of the hole
+
 SHAFT_AT = CELL
 
 BRICK = 'minecraft:stone_bricks'
@@ -139,23 +140,21 @@ def bedrock(p, sx, sy, sz):
 
 
 # ------------------------------------------------------------------------- the way down
-def sink(p, y0, y1, off=0, fill=BRICK, landing=None):
-    """The hole and the ladder in it. `off` converts the chapel's coordinates into this
-    piece's, so the three pieces that share the column cannot drift apart."""
-    x0, x1, z0, z1 = (v - off for v in HOLE)
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+def sink(p, y0, y1, off=0, fill=BRICK):
+    """The way down: one column of ladder, and a ring of solid block round it.
+
+    Three wide was worse than it looked - you stepped in and fell past the ladder, and every
+    piece the column ran through had to keep a landing to step off onto (section 24). One
+    column is a ladder you simply walk into. The ring is written whatever was there before,
+    because a gap in it is where the water gets in (section 33)."""
+    cx, cz = (v - off for v in HOLE)
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] - off and x != RUNG[0] - off and y == landing:
-                    continue
-                p.set(x, y, z, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
+        p.set(cx, y, cz, *ladder())
+
 
 
 # ---------------------------------------------------------------------------- the surface
@@ -332,14 +331,14 @@ def chapel():
 def floor_and_hole(p):
     """The chapel's floor is solid except for the one way down."""
     g = GROUND
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(CHAPEL):
         for z in range(CHAPEL):
-            if x0 <= x <= x1 and z0 <= z <= z1:
+            if (x, z) == (cx, cz):
                 continue
             if p.grid.get((x, g, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, g, z, BRICK)
-    sink(p, 0, g, landing=g)
+    sink(p, 0, g)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], MOSSY, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
 
@@ -412,7 +411,7 @@ def crypt_hub():
 
 def hub_wiring(p):
     """The hole in the ceiling and the pillar the ladder hangs on (section 24)."""
-    x0, x1, z0, z1 = (v - SHAFT_AT for v in HOLE)
+    cx, cz = (v - SHAFT_AT for v in HOLE)
     jx, jz = JIG[0] - SHAFT_AT, JIG[1] - SHAFT_AT
     for x in range(CELL):
         for z in range(CELL):
@@ -420,11 +419,10 @@ def hub_wiring(p):
                 p.set(x, CELL - 1, z, ROCK)
     for y in range(1, CELL):
         p.set(jx, y, jz, BRICK)                    # the pillar the ladder hangs on
-    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder())            # the climb, ceiling course included
     p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, BRICK, joint='aligned',
              name=CRYPT, target=CRYPT)
-    for y in range(1, CELL):
-        p.set(RUNG[0] - SHAFT_AT, y, RUNG[1] - SHAFT_AT, *ladder())
 
 
 def crypt(kind):
@@ -576,15 +574,20 @@ def fitting_problems(pieces):
 
 
 def ladder_problems(pieces):
+    """Climb the column through whichever piece covers each course: a ladder the whole way
+    down the middle, and nothing but solid block in the eight round it - except inside the
+    landing piece itself, where the ring is the room you step out into."""
     at = {'chapel': (0, 0, 0), 'shaft': (SHAFT_AT, -SHAFT_H, SHAFT_AT),
           'crypt_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
+    cased = at['crypt_hub'][1] + CELL - 1
     problems = []
-    for y in range(at['crypt_hub'][1] + 2, GROUND + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0]:
-                    continue                    # the landing: solid on purpose
+    for y in range(at['crypt_hub'][1] + 1, GROUND + 1):
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -593,11 +596,14 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to '
+                                    'be solid the whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 

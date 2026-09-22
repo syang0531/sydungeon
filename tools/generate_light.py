@@ -60,9 +60,9 @@ MIN_BOSS_STEPS = 3
 # the column, shared by every piece it runs through (section 11). The dry part has a ladder
 # with its own row left solid as a landing (section 24); below the sump the same three by
 # three is full of sea and you swim it
-HOLE = (2, 4, 2, 4)
-RUNG = (HOLE[0], HOLE[3])
-JIG = (RUNG[0], RUNG[1] + 1)
+HOLE = (CELL // 2, CELL // 2)    # one column, dead centre of the piece (section 33)
+RUNG = HOLE                      # the ladder is the hole; below the sump, the sea is
+JIG = (HOLE[0], HOLE[1] + 1)     # the pillar it hangs on, one out of the hole
 
 ROCK = 'minecraft:stone'          # what the fortress is cut out of, and therefore what shows
 BAND = 'minecraft:andesite'       # a course every few, so an exposed face reads as ground
@@ -149,22 +149,18 @@ def flood(p, x0, y0, z0, x1, y1, z1):
 
 
 # ------------------------------------------------------------------------- the way down
-def sink(p, y0, y1, fill=BRICK, landing=None):
-    """The hole and the ladder in it, in the column every piece shares (section 11)."""
-    x0, x1, z0, z1 = HOLE
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+def sink(p, y0, y1, fill=BRICK):
+    """The way down: one column of ladder, and a ring of solid block round it.
+
+    On a beach the ring is the whole point - three wide, patched only where the piece
+    happened to have air, it let the sea in (section 33)."""
+    cx, cz = HOLE
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0] and y == landing:
-                    continue
-                p.set(x, y, z, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0], y, RUNG[1], *ladder())
+        p.set(cx, y, cz, *ladder())
 
 
 # ------------------------------------------------------------------------ the lighthouse
@@ -220,13 +216,13 @@ def lighthouse():
     p.set(CELL - 2, g + 1, 1, LANTERN, STANDING)
     p.set(1, g + 1, 1, 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
 
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(CELL):                                          # the floor, and the hole
         for z in range(CELL):
-            if not (x0 <= x <= x1 and z0 <= z <= z1):
+            if (x, z) != (cx, cz):
                 if p.grid.get((x, g, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                     p.set(x, g, z, BRICK)
-    sink(p, 0, g, landing=g)
+    sink(p, 0, g)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], BRICK, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     return p
@@ -260,20 +256,18 @@ def sump():
     p.box(1, 1, 1, CELL - 2, CELL - 2, CELL - 2, AIR)
     p.box(0, 0, 0, CELL - 1, 0, CELL - 1, BRICK)
     mid = CELL // 2
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(CELL):                                          # the ceiling and its hole
         for z in range(CELL):
             if p.grid.get((x, CELL - 1, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, CELL - 1, z, ROCK)
     for y in range(1, CELL):
         p.set(JIG[0], y, JIG[1], BRICK)                            # the ladder's pillar
-    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder())                                # the climb, ceiling too
     p.jigsaw(JIG[0], CELL - 1, JIG[1], 'up_east', EMPTY, BRICK, joint='aligned',
              name=DOWN, target=DOWN)
-    for y in range(1, CELL):
-        p.set(RUNG[0], y, RUNG[1], *ladder())
-    p.box(x0, 0, z0, x1, 0, z1, AIR)                               # the hole into the sea
-    p.set(JIG[0], 0, JIG[1], BRICK)
+    p.set(cx, 0, cz, AIR)                                          # the hole into the sea
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['dive'], BRICK, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     p.set(1, 1, 1, *chest('light_tower', 'east'))
@@ -290,9 +284,9 @@ def dive():
     p.ports = set()
     bedrock(p, CELL, DIVE_H, CELL, at=2)
     top = DIVE_H - 1
-    x0, x1, z0, z1 = HOLE
-    p.box(x0, 0, z0, x1, top, z1, AIR)
-    flood(p, x0, 0, z0, x1, top - 1, z1)
+    cx, cz = HOLE
+    p.box(cx, 0, cz, cx, top, cz, AIR)
+    flood(p, cx, 0, cz, cx, top - 1, cz)
     for y in range(0, top + 1):
         p.set(JIG[0], y, JIG[1], PRIS_BRICK)                       # the jigsaw's own column
     p.jigsaw(JIG[0], top, JIG[1], 'up_east', EMPTY, PRIS_BRICK, joint='aligned',
@@ -342,15 +336,14 @@ def sea_door(p, side, pool, y=0, name=SEA, target=SEA, priority=0):
 def sea_hub():
     """Where the dive lands. Three doors, and the hole in the ceiling it came through."""
     p = sea_room(['west', 'north', 'south'])
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(CELL):
         for z in range(CELL):
             if p.grid.get((x, CELL - 1, z), (AIR,))[0] in (AIR, WATER):
                 p.set(x, CELL - 1, z, ROCK)
     for y in range(1, CELL - 1):
         p.set(JIG[0], y, JIG[1], PRIS_BRICK)
-    flood(p, x0, CELL - 1, z0, x1, CELL - 1, z1)
-    p.set(JIG[0], CELL - 1, JIG[1], PRIS_BRICK)
+    flood(p, cx, CELL - 1, cz, cx, CELL - 1, cz)        # the one column of sea in the roof
     p.jigsaw(JIG[0], CELL - 1, JIG[1], 'up_east', EMPTY, PRIS_BRICK, joint='aligned',
              name=SEA, target=SEA)
     sea_door(p, 'west', POOL['seas'])
@@ -601,13 +594,15 @@ def door_problems(pieces):
 def ladder_problems(pieces):
     at = {'lighthouse': (0, 0, 0), 'shaft': (0, -SHAFT_H, 0),
           'sump': (0, -SHAFT_H - CELL, 0)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
+    cased = at['sump'][1] + CELL - 1
     problems = []
     for y in range(at['sump'][1] + 1, GROUND + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0]:
-                    continue                    # the landing: solid on purpose
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue               # inside the sump the ring is the room itself
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -616,11 +611,15 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, WATER, 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to be '
+                                    'solid the whole way down, and on a beach that is what '
+                                    'keeps the sea out (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 

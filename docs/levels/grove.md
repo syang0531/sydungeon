@@ -147,11 +147,11 @@ flowchart LR
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
-| (2, 0, 5) | ◇ 아래 | `grv_shaft` | `grv_shaft` | `grove/down` |
+| (3, 0, 4) | ◇ 아래 | `grv_shaft` | `grv_shaft` | `grove/down` |
 
-**뚫린 면** — 서: z 0–6, y 1–7 (39칸) / 동: z 0–6, y 1–7 (39칸) / 북: x 0–6, y 1–7 (39칸) / 남: x 0–6, y 1–7 (39칸) / 아래: x 2–4, z 2–3 (6칸) / 위: x 0–6, z 0–6 (49칸)
+**뚫린 면** — 서: z 0–6, y 1–7 (39칸) / 동: z 0–6, y 1–7 (39칸) / 북: x 0–6, y 1–7 (39칸) / 남: x 0–6, y 1–7 (39칸) / 위: x 0–6, z 0–6 (49칸)
 
-**블록** — 균사체 41, 버섯 줄기 12, 갈색 버섯 8, 갈색 버섯 블록 4, 사다리 1, 직소 1, 이끼 카펫 1
+**블록** — 균사체 47, 버섯 줄기 12, 갈색 버섯 8, 갈색 버섯 블록 4, 사다리 1, 직소 1, 이끼 카펫 1
 
 ![mouth](img/grove/mouth.svg)
 
@@ -161,10 +161,10 @@ flowchart LR
 y = 0   x →동, z ↓남
   mmmmmmm
   mmmmmmm
-  mm...mm
-  mm...mm
-  mmHmmmm
-  mmJmmmm
+  mmmmmmm
+  mmmHmmm
+  mmmJmmm
+  mmmmmmm
   mmmmmmm
 y = 1   x →동, z ↓남
   Sn...nS
@@ -213,7 +213,7 @@ y = 5–7   x →동, z ↓남
   .......
   .......
   .......
-  mm...mm
+  mmmHmmm
 단면 x = 3   z →남, y ↑하늘
   .......
   .......
@@ -222,7 +222,7 @@ y = 5–7   x →동, z ↓남
   .......
   .......
   .......
-  mm..mmm
+  mmmHJmm
 ```
 
 </details>
@@ -236,12 +236,10 @@ y = 5–7   x →동, z ↓남
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
-| (2, 0, 5) | ◇ 아래 | `grv_burrow` | `grv_burrow` | `grove/first` |
-| (2, 13, 5) | ◆ 위 | `grv_shaft` | `grv_shaft` | `—` |
+| (3, 0, 4) | ◇ 아래 | `grv_burrow` | `grv_burrow` | `grove/first` |
+| (3, 13, 4) | ◆ 위 | `grv_shaft` | `grv_shaft` | `—` |
 
-**뚫린 면** — 아래: x 2–4, z 2–4 (8칸) / 위: x 2–4, z 2–4 (8칸)
-
-**블록** — 뿌리내린 흙 359, 돌 199, 사다리 14, 직소 2
+**블록** — 뿌리내린 흙 470, 돌 200, 사다리 14, 직소 2
 
 ![shaft](img/grove/shaft.svg)
 
@@ -251,82 +249,82 @@ y = 5–7   x →동, z ↓남
 y = 0   x →동, z ↓남
   .......
   .......
+  ..ddd..
+  ..dHd..
+  ..dJd..
   .......
-  .......
-  ..H....
-  ..J....
   .......
 y = 1–2   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
+  ddddddd
+  dddHddd
+  ddddddd
   ddddddd
   ddddddd
 y = 3   x →동, z ↓남
   .......
   .......
-  .......
-  .......
-  ..H....
+  ..ddd..
+  ..dHd..
+  ..ddd..
   .......
   .......
 y = 4–5   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
+  ddddddd
+  dddHddd
+  ddddddd
   ddddddd
   ddddddd
 y = 6   x →동, z ↓남
   .......
   .......
-  .......
-  .......
-  ..H....
+  ..ddd..
+  ..dHd..
+  ..ddd..
   .......
   .......
 y = 7–8   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
+  ddddddd
+  dddHddd
+  ddddddd
   ddddddd
   ddddddd
 y = 9   x →동, z ↓남
   .......
   .......
-  .......
-  .......
-  ..H....
+  ..ddd..
+  ..dHd..
+  ..ddd..
   .......
   .......
 y = 10–11   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
+  ddddddd
+  dddHddd
+  ddddddd
   ddddddd
   ddddddd
 y = 12   x →동, z ↓남
   .......
   .......
-  .......
-  .......
-  ..H....
+  ..ddd..
+  ..dHd..
+  ..ddd..
   .......
   .......
 y = 13   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
-  ddJdddd
+  ddddddd
+  dddHddd
+  dddJddd
+  ddddddd
   ddddddd
 ```
 
@@ -336,35 +334,35 @@ y = 13   x →동, z ↓남
 
 ```
 단면 z = 3   x →동, y ↑하늘
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
 단면 x = 3   z →남, y ↑하늘
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
-  dd...dd
-  dd...dd
-  .......
+  dddHJdd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHd..
+  dddHddd
+  dddHddd
+  ..dHJ..
 ```
 
 </details>
@@ -385,11 +383,11 @@ y = 13   x →동, z ↓남
 | (0, 0, 3) | ◀ 서 | `grv_burrow` | `grv_burrow` | `grove/burrows` |
 | (6, 0, 3) | ▶ 동 | `grv_burrow` | `grv_burrow` | `grove/burrows` |
 | (3, 0, 6) | ▼ 남 | `grv_burrow` | `grv_camp` | `grove/camp` |
-| (2, 6, 5) | ◆ 위 | `grv_burrow` | `grv_burrow` | `—` |
+| (3, 6, 4) | ◆ 위 | `grv_burrow` | `grv_burrow` | `—` |
 
-**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 위: x 2–4, z 2–4 (8칸)
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
 
-**블록** — 뿌리내린 흙 87, 균사체 45, 돌 24, 사다리 6, 직소 5, 버섯 줄기 5, 발광 지의류 4, 홀씨 꽃 1
+**블록** — 뿌리내린 흙 95, 균사체 45, 돌 24, 발광 지의류 6, 사다리 6, 직소 5, 버섯 줄기 5, 홀씨 꽃 1
 
 ![hollow](img/grove/hollow.svg)
 
@@ -408,41 +406,41 @@ y = 1   x →동, z ↓남
   .......
   .o.....
   .......
+  ...H...
+  ...S...
   .......
-  ..H....
-  ..S....
   .......
 y = 2–3   x →동, z ↓남
   dd...dd
   d.....d
   .......
-  .......
-  ..H....
-  d.S...d
+  ...H...
+  ...S...
+  d.....d
   dd...dd
 y = 4   x →동, z ↓남
   .......
   .......
   .......
+  ...H...
+  ...S...
   .......
-  ..H....
-  ..S....
   .......
 y = 5   x →동, z ↓남
   ddddddd
   dg...gd
-  d.....d
-  d.....d
-  d.H...d
-  dgS..gd
+  d.g...d
+  d..H..d
+  d..Sg.d
+  dg...gd
   ddddddd
 y = 6   x →동, z ↓남
   ddddddd
   ddddddd
-  dd...dd
-  dd...dd
-  ddH..dd
-  ddJdddd
+  ddddddd
+  dddHddd
+  dddJddd
+  ddddddd
   ddddddd
 ```
 

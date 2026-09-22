@@ -49,9 +49,9 @@ GROUND = 0                       # the start piece's floor: a start is moved so 
                                  # minY + 1 is the first free block, so y=0 is the
                                  # terrain's own top block (section 30)
 
-HOLE = (2, 4, 2, 4)              # the way down, in the mouth's coordinates
-RUNG = (2, 4)
-JIG = (RUNG[0], RUNG[1] + 1)
+HOLE = (MOUTH // 2, MOUTH // 2)  # one column, dead centre of the mouth (section 33)
+RUNG = HOLE                      # the ladder is the hole
+JIG = (HOLE[0], HOLE[1] + 1)     # the stalk it hangs on, one out of the hole
 
 MYC = 'minecraft:mycelium'
 STEM = 'minecraft:mushroom_stem'
@@ -111,21 +111,15 @@ def bed(p, x, y, z, facing='south', colour='white'):
     p.set(x, y, z + dz, 'minecraft:%s_bed' % colour, {'facing': facing, 'part': 'head'})
 
 
-def sink(p, y0, y1, off=0, fill=MYC, landing=None):
-    x0, x1, z0, z1 = (v - off for v in HOLE)
-    for x in range(x0 - 1, x1 + 2):
-        for z in range(z0 - 1, z1 + 2):
+def sink(p, y0, y1, off=0, fill=MYC):
+    """The way down: one column of ladder, and a ring of solid block round it (section 33)."""
+    cx, cz = (v - off for v in HOLE)
+    for x in range(cx - 1, cx + 2):
+        for z in range(cz - 1, cz + 2):
             for y in range(y0, y1 + 1):
-                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
-                    p.set(x, y, z, fill)
-    for x in range(x0, x1 + 1):
-        for y in range(y0, y1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] - off and x != RUNG[0] - off and y == landing:
-                    continue
-                p.set(x, y, z, AIR)
+                p.set(x, y, z, fill)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
+        p.set(cx, y, cz, *ladder())
 
 
 # --------------------------------------------------------------------------- the surface
@@ -154,14 +148,14 @@ def mouth():
 
 def floor_and_hole(p):
     g = GROUND
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     for x in range(MOUTH):
         for z in range(MOUTH):
-            if x0 <= x <= x1 and z0 <= z <= z1:
+            if (x, z) == (cx, cz):
                 continue
             if p.grid.get((x, g, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
                 p.set(x, g, z, MYC)
-    sink(p, 0, g, landing=g)
+    sink(p, 0, g)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], ROOTED, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
 
@@ -227,7 +221,7 @@ def hollow():
 
 
 def hub_wiring(p):
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
     jx, jz = JIG
     for x in range(CELL):
         for z in range(CELL):
@@ -235,13 +229,10 @@ def hub_wiring(p):
                 p.set(x, CELL - 1, z, ROOTED)
     for y in range(1, CELL):
         p.set(jx, y, jz, STEM, ALL_SIDES)            # the stalk the ladder hangs on
-    # the course below the ceiling too: the lichen is written across it, and a lichen in the
-    # shaft is something to knock your head on
-    p.box(x0, CELL - 2, z0, x1, CELL - 1, z1, AIR)
+    for y in range(1, CELL):
+        p.set(cx, y, cz, *ladder())                  # the climb, ceiling course included
     p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, STEM, joint='aligned',
              name=BURROW, target=BURROW)
-    for y in range(1, CELL):
-        p.set(RUNG[0], y, RUNG[1], *ladder())
 
 
 def burrow(kind):
@@ -399,13 +390,15 @@ def fitting_problems(pieces):
 def ladder_problems(pieces):
     at = {'mouth': (0, 0, 0), 'shaft': (0, -SHAFT_H, 0),
           'hollow': (0, -SHAFT_H - CELL, 0)}
-    x0, x1, z0, z1 = HOLE
+    cx, cz = HOLE
+    cased = at['hollow'][1] + CELL - 1
     problems = []
     for y in range(at['hollow'][1] + 1, GROUND + 1):
-        for x in range(x0, x1 + 1):
-            for z in range(z0, z1 + 1):
-                if z == RUNG[1] and x != RUNG[0]:
-                    continue
+        for dx in (-1, 0, 1):
+            for dz in (-1, 0, 1):
+                if (dx, dz) != (0, 0) and y < cased:
+                    continue               # inside the hollow the ring is the room itself
+                x, z = cx + dx, cz + dz
                 for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
@@ -414,11 +407,14 @@ def ladder_problems(pieces):
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
                     continue
-                want = 'minecraft:ladder' if (x, z) == RUNG else AIR
-                if block != want:
-                    problems.append('%s has %s at %s in the shaft, where the climb needs %s'
-                                    % (name, block.split(':')[-1], (x, y, z),
-                                       want.split(':')[-1]))
+                if (dx, dz) == (0, 0):
+                    if block != 'minecraft:ladder':
+                        problems.append('%s has %s at %s, where the climb needs a ladder'
+                                        % (name, block.split(':')[-1], (x, y, z)))
+                elif block in (AIR, 'minecraft:water', 'minecraft:ladder'):
+                    problems.append('%s leaves %s at %s: the ring round the shaft has to be '
+                                    'solid the whole way down (section 33)'
+                                    % (name, block.split(':')[-1], (x, y, z)))
     return problems
 
 

@@ -179,11 +179,13 @@ def entrance():
     p.box(0, 1, 0, 6, 4, 0, STONE)                 # north wall, the ladder hangs on it
     for x, z in ((0, 6), (6, 6)):                  # south corner pillars
         p.box(x, 1, z, x, 4, z, STONE)
-    p.box(2, 0, 1, 4, 0, 3, AIR)                   # the hole
-    p.ladder(3, 1, 4, 1, 'south')
+    # one column: the hole IS the ladder, so you walk into it instead of falling past it,
+    # and the post it hangs on stands beside it (section 33)
+    p.box(3, 1, 2, 3, 4, 2, STONE)
+    p.ladder(3, 0, 4, 3, 'south')
     p.set(3, 4, 4, 'minecraft:lantern', {'hanging': 'true', 'waterlogged': 'false'})
     # shaft_first holds only the shaft, so the maze is never right under the surface
-    p.jigsaw(3, 0, 2, 'down_east', POOL['shaft_first'], AIR, joint='aligned')
+    p.jigsaw(3, 0, 2, 'down_east', POOL['shaft_first'], STONE, joint='aligned')
     return p
 
 
@@ -197,10 +199,9 @@ def shaft(down=None):
     came out of the grass and stood there in the open (2026-09-22 screenshot). Forty-two is a
     cliff, and rare."""
     p = Piece(7, 21, 7, STONE)
-    p.box(2, 0, 1, 4, 20, 3, AIR)
-    p.ladder(3, 0, 20, 1, 'south')
-    p.jigsaw(3, 20, 2, 'up_east', POOL['shafts'], AIR, joint='aligned')
-    p.jigsaw(3, 0, 2, 'down_east', down or POOL['shafts'], AIR, joint='aligned')
+    p.ladder(3, 0, 20, 3, 'south')                 # one column of ladder in solid stone
+    p.jigsaw(3, 20, 2, 'up_east', POOL['shafts'], STONE, joint='aligned')
+    p.jigsaw(3, 0, 2, 'down_east', down or POOL['shafts'], STONE, joint='aligned')
     return p
 
 
@@ -215,11 +216,11 @@ def shaft_2():
 def hub():
     p = Piece(7, 7, 7, STONE)
     p.box(1, 1, 1, 5, 5, 5, AIR)                   # room
-    p.box(2, 6, 1, 4, 6, 3, AIR)                   # hole in the ceiling, under the shaft
-    p.ladder(3, 1, 6, 1, 'south')
+    p.box(3, 1, 2, 3, 6, 2, STONE)                 # the post the ladder hangs on
+    p.ladder(3, 1, 6, 3, 'south')                  # the climb, ceiling course included
     for x0, x1, z0, z1 in ((0, 0, 2, 4), (6, 6, 2, 4), (2, 4, 6, 6)):
         p.box(x0, 1, z0, x1, 4, z1, AIR)           # doors W, E, S
-    p.jigsaw(3, 6, 2, 'up_east', POOL['shafts'], AIR, joint='aligned')
+    p.jigsaw(3, 6, 2, 'up_east', POOL['shafts'], STONE, joint='aligned')
     p.jigsaw(0, 0, 3, 'west_up', POOL['passages'], STONE)
     p.jigsaw(6, 0, 3, 'east_up', POOL['passages'], STONE)
     # the south door starts the boss branch, and is expanded before anything else

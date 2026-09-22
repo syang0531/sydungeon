@@ -222,13 +222,13 @@ flowchart LR
 |---|---|---|---|---|
 | (10, 0, 0) | ▲ 북 | `ice_wall` | `ice_wall` | `ice/panels_end` |
 | (0, 0, 10) | ◀ 서 | `ice_wall` | `ice_wall` | `ice/gate` |
-| (12, 0, 10) | ◇ 아래 | `ice_down` | `ice_down` | `ice/down` |
+| (11, 0, 10) | ◇ 아래 | `ice_down` | `ice_down` | `ice/down` |
 | (20, 0, 10) | ▶ 동 | `ice_wall` | `ice_wall` | `ice/panels` |
 | (10, 0, 20) | ▼ 남 | `ice_wall` | `ice_wall` | `ice/panels_end` |
 
-**뚫린 면** — 서: z 1–19, y 1–20 (22칸) / 동: z 1–19, y 1–20 (22칸) / 북: x 1–19, y 20–20 (10칸) / 남: x 1–19, y 1–20 (22칸) / 아래: x 9–11, z 9–11 (8칸) / 위: x 0–20, z 0–20 (401칸)
+**뚫린 면** — 서: z 1–19, y 1–20 (22칸) / 동: z 1–19, y 1–20 (22칸) / 북: x 1–19, y 20–20 (10칸) / 남: x 1–19, y 1–20 (22칸) / 위: x 0–20, z 0–20 (401칸)
 
-**블록** — 윤나는 섬록암 1839, 가문비 판자 778, 가문비나무 울타리 143, 가문비 원목 72, 가문비나무 계단 72, 푸른 얼음 40, 랜턴 8, 직소 5
+**블록** — 윤나는 섬록암 1847, 가문비 판자 778, 가문비나무 울타리 143, 가문비 원목 72, 가문비나무 계단 72, 푸른 얼음 40, 랜턴 8, 직소 5
 
 ![keep](img/ice/keep.svg)
 
@@ -245,9 +245,9 @@ y = 0   x →동, z ↓남
   #####################
   #####################
   #####################
-  #########...#########
-  J########..HJ#######J
-  #########...#########
+  #####################
+  J#########HJ########J
+  #####################
   #####################
   #####################
   #####################
@@ -681,7 +681,7 @@ y = 20   x →동, z ↓남
   .....................
   .....................
   .....................
-  J########..HJ#######J
+  J#########HJ########J
 단면 x = 10   z →남, y ↑하늘
   #...................#
   #...................#
@@ -703,7 +703,7 @@ y = 20   x →동, z ↓남
   #....................
   #qqq/................
   #qqqq/...............
-  J########...########J
+  J#########H#########J
 ```
 
 </details>
@@ -2155,12 +2155,10 @@ y = 24   x →동, z ↓남
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
-| (5, 0, 3) | ◇ 아래 | `ice_door` | `ice_door` | `ice/cellar_first` |
-| (5, 41, 3) | ◆ 위 | `ice_down` | `ice_down` | `—` |
+| (4, 0, 3) | ◇ 아래 | `ice_door` | `ice_door` | `ice/cellar_first` |
+| (4, 41, 3) | ◆ 위 | `ice_down` | `ice_down` | `—` |
 
-**뚫린 면** — 아래: x 2–4, z 2–4 (8칸) / 위: x 2–4, z 2–4 (8칸)
-
-**블록** — 심층암 타일 1678, 사다리 42, 직소 2
+**블록** — 심층암 타일 1680, 윤나는 섬록암 334, 사다리 42, 직소 2
 
 ![shaft](img/ice/shaft.svg)
 
@@ -2170,25 +2168,25 @@ y = 24   x →동, z ↓남
 y = 0   x →동, z ↓남
   VVVVVVV
   VVVVVVV
-  VV...VV
-  VV..HJV
-  VV...VV
+  VV###VV
+  VV#HJVV
+  VV###VV
   VVVVVVV
   VVVVVVV
 y = 1–40   x →동, z ↓남
   VVVVVVV
   VVVVVVV
-  VV...VV
-  VV..HVV
-  VV...VV
+  VV###VV
+  VV#H#VV
+  VV###VV
   VVVVVVV
   VVVVVVV
 y = 41   x →동, z ↓남
   VVVVVVV
   VVVVVVV
-  VV...VV
-  VV..HJV
-  VV...VV
+  VV###VV
+  VV#HJVV
+  VV###VV
   VVVVVVV
   VVVVVVV
 ```
@@ -2199,91 +2197,91 @@ y = 41   x →동, z ↓남
 
 ```
 단면 z = 3   x →동, y ↑하늘
-  VV..HJV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HVV
-  VV..HJV
+  VV#HJVV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#HJVV
 단면 x = 3   z →남, y ↑하늘
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
-  VV...VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
+  VV#H#VV
 ```
 
 </details>
@@ -2303,11 +2301,11 @@ y = 41   x →동, z ↓남
 | (3, 0, 0) | ▲ 북 | `ice_door` | `ice_door` | `ice/cellars` |
 | (0, 0, 3) | ◀ 서 | `ice_door` | `ice_door` | `ice/cellars` |
 | (3, 0, 6) | ▼ 남 | `ice_door` | `ice_lord` | `ice/lord_approach_1` |
-| (5, 6, 3) | ◆ 위 | `ice_door` | `ice_door` | `—` |
+| (4, 6, 3) | ◆ 위 | `ice_door` | `ice_door` | `—` |
 
-**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 0–4 (13칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 아래: x 6–6, z 3–3 (1칸) / 위: x 2–4, z 2–4 (8칸)
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 0–4 (13칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 아래: x 6–6, z 3–3 (1칸)
 
-**블록** — 심층암 타일 106, 다진 얼음 45, 윤나는 섬록암 10, 사다리 7, 직소 4
+**블록** — 심층암 타일 111, 다진 얼음 45, 윤나는 섬록암 13, 사다리 7, 직소 4
 
 ![cellar_hub](img/ice/cellar_hub.svg)
 
@@ -2326,7 +2324,7 @@ y = 1–4   x →동, z ↓남
   VV...VV
   V.....V
   .......
-  ....H#.
+  ...H#..
   .......
   V.....V
   VV...VV
@@ -2334,16 +2332,16 @@ y = 5   x →동, z ↓남
   VVVVVVV
   V.....V
   V.....V
-  V...H#V
+  V..H#.V
   V....HV
   V.....V
   VVVVVVV
 y = 6   x →동, z ↓남
   VVVVVVV
   VVVVVVV
-  VV...VV
-  VV..HJV
-  VV...##
+  VVVVVVV
+  VVVHJ#V
+  VVV####
   VVV###V
   VVVVVVV
 ```
