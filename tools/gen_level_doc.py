@@ -28,7 +28,8 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
+            'grove')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -81,6 +82,25 @@ STYLE = OrderedDict([
     ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
     ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
     ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
+    ('oak_planks',            ('w', '#b8945f', '참나무 판자')),
+    ('oak_log',               ('L', '#6b5230', '참나무 원목')),
+    ('oak_fence',             ('f', '#a8874f', '참나무 울타리')),
+    ('crafting_table',        ('T', '#8a6134', '작업대')),
+    ('composter',             ('p', '#8a6a3a', '퇴비통')),
+    ('pointed_dripstone',     ('!', '#9a7f6c', '점적석 고드름')),
+    ('mycelium',              ('m', '#6f6265', '균사체')),
+    ('mushroom_stem',         ('S', '#c8c2b4', '버섯 줄기')),
+    ('brown_mushroom_block',  ('b', '#977254', '갈색 버섯 블록')),
+    ('red_mushroom_block',    ('r', '#b83a34', '붉은 버섯 블록')),
+    ('rooted_dirt',           ('d', '#8b6b4a', '뿌리내린 흙')),
+    ('glow_lichen',           ('g', '#7ba05b', '발광 지의류')),
+    ('moss_block',            ('M', '#5a7040', '이끼 블록')),
+    ('moss_carpet',           ('~', '#63764a', '이끼 카펫')),
+    ('spore_blossom',         ('o', '#d15b9a', '홀씨 꽃')),
+    ('hanging_roots',         ('h', '#a98a5e', '늘어진 뿌리')),
+    ('dripstone_block',       ('D', '#8a6f5e', '점적석')),
+    ('red_mushroom',          ('e', '#c0392b', '붉은 버섯')),
+    ('brown_mushroom',        ('n', '#9a7b5a', '갈색 버섯')),
     ('bone_block',            ('B', '#e0ddc7', '뼈 블록')),
     ('soul_soil',             ('s', '#4a3a30', '영혼 흙')),
     ('soul_lantern',          ('*', '#5fd8f0', '영혼 랜턴')),
@@ -710,7 +730,7 @@ def build(family):
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
             'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
-            'camp': 'camps', 'grave': 'graveyards'}
+            'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:grove/burrow_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/tunnel", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/bend", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/cross", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/garden", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/grove", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/spring", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/larder", "projection": "rigid", "processors": "sydungeon:grove_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grove/drip", "projection": "rigid", "processors": "sydungeon:grove_weathering" } }
+  ]
+}
