@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 14,
+    "salt": 58204117
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:dwarf",
+      "weight": 1
+    }
+  ]
+}

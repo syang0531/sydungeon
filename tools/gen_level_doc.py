@@ -29,7 +29,7 @@ DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
 FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
-            'grove', 'shrine')
+            'grove', 'shrine', 'dwarf')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -102,6 +102,26 @@ STYLE = OrderedDict([
     ('red_mushroom',          ('e', '#c0392b', '붉은 버섯')),
     ('brown_mushroom',        ('n', '#9a7b5a', '갈색 버섯')),
     ('bone_block',            ('B', '#e0ddc7', '뼈 블록')),
+    ('granite',               ('G', '#9a6a55', '화강암')),
+    ('tuff_bricks',           ('T', '#6f7169', '응회암 벽돌')),
+    ('deepslate_tiles',       ('t', '#3b3b3e', '심층암 타일')),
+    ('chiseled_deepslate',    ('X', '#42424a', '조각한 심층암')),
+    ('iron_block',            ('I', '#d8d8d8', '철 블록')),
+    ('gold_block',            ('A', '#e9c552', '금 블록')),
+    ('iron_ore',              ('i', '#b0a08e', '철광석')),
+    ('gold_ore',              ('a', '#c8ad63', '금광석')),
+    ('diamond_ore',           ('j', '#7fd3cd', '다이아 광석')),
+    ('coal_ore',              ('k', '#5a5a5a', '석탄 광석')),
+    ('lava',                  ('!', '#e2732a', '용암')),
+    ('blast_furnace',         ('F', '#5f5f63', '용광로')),
+    ('anvil',                 ('N', '#4a4a4f', '모루')),
+    ('smithing_table',        ('W', '#3f3a38', '대장장이 작업대')),
+    ('grindstone',            ('R', '#8a7a68', '연마기')),
+    ('barrel',                ('l', '#8a6a3f', '통')),
+    ('lava_cauldron',         ('U', '#c2571f', '용암 가마솥')),
+    ('rail',                  ('=', '#9a8f7a', '레일')),
+    ('spruce_log',            ('p', '#4a3a26', '가문비 원목')),
+    ('spruce_planks',         ('q', '#7a5c3a', '가문비 판자')),
     ('cherry_log',            ('L', '#5b4544', '벚나무 원목')),
     ('stripped_cherry_log',   ('l', '#e3a0a0', '껍질 벗긴 벚나무')),
     ('cherry_planks',         ('w', '#e3b7b2', '벚나무 판자')),
@@ -745,7 +765,8 @@ def build(family):
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
             'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
             'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows',
-            'shrine': 'shrines'}
+            'shrine': 'shrines',
+            'dwarf': 'halls'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

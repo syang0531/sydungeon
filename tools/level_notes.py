@@ -412,6 +412,7 @@ from level_notes_camp import install as _install_camp    # noqa: E402
 from level_notes_grave import install as _install_grave  # noqa: E402
 from level_notes_grove import install as _install_grove  # noqa: E402
 from level_notes_shrine import install as _install_shrine  # noqa: E402
+from level_notes_dwarf import install as _install_dwarf  # noqa: E402
 
 _install_tower(INTRO, NOTES)
 _install_swamp(INTRO, NOTES)
@@ -421,3 +422,4 @@ _install_camp(INTRO, NOTES)
 _install_grave(INTRO, NOTES)
 _install_grove(INTRO, NOTES)
 _install_shrine(INTRO, NOTES)
+_install_dwarf(INTRO, NOTES)

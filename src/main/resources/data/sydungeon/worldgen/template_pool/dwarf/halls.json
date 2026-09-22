@@ -1,0 +1,23 @@
+{
+  "fallback": "sydungeon:dwarf/hall_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/passage", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/corner", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/cross", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/guard", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/forge", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/drift", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/vein", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/store", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:dwarf/chasm", "projection": "rigid", "processors": "sydungeon:dwarf_weathering" } }
+  ]
+}
