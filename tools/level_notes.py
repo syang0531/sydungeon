@@ -409,9 +409,11 @@ from level_notes_swamp import install as _install_swamp   # noqa: E402
 from level_notes_ice import install as _install_ice       # noqa: E402
 from level_notes_temple import install as _install_temple  # noqa: E402
 from level_notes_camp import install as _install_camp    # noqa: E402
+from level_notes_grave import install as _install_grave  # noqa: E402
 
 _install_tower(INTRO, NOTES)
 _install_swamp(INTRO, NOTES)
 _install_ice(INTRO, NOTES)
 _install_temple(INTRO, NOTES)
 _install_camp(INTRO, NOTES)
+_install_grave(INTRO, NOTES)

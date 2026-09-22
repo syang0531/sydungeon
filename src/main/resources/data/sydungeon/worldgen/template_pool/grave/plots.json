@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:grave/plot_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/row", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/plot_corner", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/plot_cross", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/open_grave", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/tomb", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/tree", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/shrine", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/watch", "projection": "rigid", "processors": "sydungeon:grave_weathering" } }
+  ]
+}

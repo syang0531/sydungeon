@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 40,
+    "separation": 12,
+    "salt": 55820417
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:grave",
+      "weight": 1
+    }
+  ]
+}

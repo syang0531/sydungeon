@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:grave/crypt_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/approach_3", "projection": "rigid", "processors": "sydungeon:grave_weathering" } }
+  ]
+}

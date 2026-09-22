@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:grave/crypt_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/passage", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/corner", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/cross", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/guard", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/niche", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/coffin", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/ossuary", "projection": "rigid", "processors": "sydungeon:grave_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:grave/soul", "projection": "rigid", "processors": "sydungeon:grave_weathering" } }
+  ]
+}

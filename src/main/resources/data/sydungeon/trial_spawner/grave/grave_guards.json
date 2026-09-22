@@ -1,0 +1,75 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 6.0,
+  "simultaneous_mobs": 2.0,
+  "total_mobs_added_per_player": 2.0,
+  "simultaneous_mobs_added_per_player": 1.0,
+  "ticks_between_spawn": 40,
+  "spawn_potentials": [
+    {
+      "weight": 5,
+      "data": {
+        "entity": {
+          "id": "minecraft:skeleton",
+          "PersistenceRequired": true,
+          "equipment": {
+            "mainhand": {
+              "id": "minecraft:bow",
+              "count": 1
+            }
+          },
+          "attributes": [
+            {
+              "id": "minecraft:follow_range",
+              "base": 24.0
+            }
+          ]
+        }
+      }
+    },
+    {
+      "weight": 3,
+      "data": {
+        "entity": {
+          "id": "minecraft:zombie",
+          "PersistenceRequired": true
+        }
+      }
+    },
+    {
+      "weight": 2,
+      "data": {
+        "entity": {
+          "id": "minecraft:skeleton_horse",
+          "PersistenceRequired": true,
+          "Tame": 1,
+          "attributes": [
+            {
+              "id": "minecraft:max_health",
+              "base": 30.0
+            }
+          ],
+          "Health": 30.0,
+          "Passengers": [
+            {
+              "id": "minecraft:skeleton",
+              "PersistenceRequired": true,
+              "equipment": {
+                "mainhand": {
+                  "id": "minecraft:bow",
+                  "count": 1
+                }
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    {
+      "weight": 1,
+      "data": "sydungeon:trial/grave_guard_reward"
+    }
+  ]
+}

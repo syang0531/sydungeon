@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -81,6 +81,19 @@ STYLE = OrderedDict([
     ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
     ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
     ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
+    ('bone_block',            ('B', '#e0ddc7', '뼈 블록')),
+    ('soul_soil',             ('s', '#4a3a30', '영혼 흙')),
+    ('soul_lantern',          ('*', '#5fd8f0', '영혼 랜턴')),
+    ('soul_torch',            ('i', '#69e0f2', '영혼 횃불')),
+    ('black_candle',          ('c', '#2a2a2a', '검은 양초')),
+    ('skeleton_skull',        ('u', '#d6d3c4', '스켈레톤 머리')),
+    ('mossy_cobblestone_wall', ('n', '#6f7c66', '이끼 조약돌 담장')),
+    ('pale_oak_log',          ('P', '#b9b3a5', '창백한 참나무 원목')),
+    ('pale_hanging_moss',     ('h', '#9aa37e', '창백한 이끼')),
+    ('creaking_heart',        ('H', '#5c4a3a', '삐걱 심장')),
+    ('podzol',                ('d', '#6b4b2a', '포드졸')),
+    ('andesite',              ('.', '#848484', '안산암')),
+    ('dead_bush',             ('y', '#96703a', '죽은 나무')),
     ('acacia_log',            ('L', '#96613a', '아카시아 원목')),
     ('stripped_acacia_log',   ('l', '#b4744a', '껍질 벗긴 아카시아')),
     ('acacia_planks',         ('w', '#b06437', '아카시아 판자')),
@@ -697,7 +710,7 @@ def build(family):
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
             'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
-            'camp': 'camps'}
+            'camp': 'camps', 'grave': 'graveyards'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 
