@@ -195,7 +195,7 @@ flowchart LR
 
 그림은 조각 하나를 **층마다 한 장씩** 블록 단위로 그린 것이다. 같은 층이 이어지면 `y = 2–5`처럼 묶었고, 마지막 두 장은 가운데를 자른 세로 단면이다. 분홍 점이 직소, 화살표가 그 직소가 보는 방향이다 — **마주 본 직소끼리만 붙는다.**
 
-### `chapel` — 21×21×21 — 3×3×3 셀
+### `chapel` — 21×16×21
 
 시작 조각. 21칸짜리 예배당 폐허고 사방에 문이 있어 **그 넷이 묘역을 부른다.** 바닥의 3×3
 구멍이 납골당으로 가는 유일한 길이고, 사다리가 걸린 줄은 바닥 켜에서 남겨 두어 걸어 나가
@@ -207,15 +207,15 @@ flowchart LR
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
+| (10, 0, 0) | ▲ 북 | `grv_path` | `grv_path` | `grave/plots` |
+| (0, 0, 10) | ◀ 서 | `grv_path` | `grv_path` | `grave/plots` |
+| (20, 0, 10) | ▶ 동 | `grv_path` | `grv_path` | `grave/plots` |
 | (9, 0, 12) | ◇ 아래 | `grv_down` | `grv_down` | `grave/down` |
-| (10, 5, 0) | ▲ 북 | `grv_path` | `grv_path` | `grave/plots` |
-| (0, 5, 10) | ◀ 서 | `grv_path` | `grv_path` | `grave/plots` |
-| (20, 5, 10) | ▶ 동 | `grv_path` | `grv_path` | `grave/plots` |
-| (10, 5, 20) | ▼ 남 | `grv_path` | `grv_path` | `grave/plots` |
+| (10, 0, 20) | ▼ 남 | `grv_path` | `grv_path` | `grave/plots` |
 
-**뚫린 면** — 서: z 0–20, y 6–20 (132칸) / 동: z 0–20, y 6–20 (132칸) / 북: x 0–20, y 6–20 (132칸) / 남: x 0–20, y 6–20 (132칸) / 아래: x 9–11, z 9–11 (8칸) / 위: x 0–20, z 0–20 (441칸)
+**뚫린 면** — 서: z 0–20, y 1–15 (132칸) / 동: z 0–20, y 1–15 (132칸) / 북: x 0–20, y 1–15 (132칸) / 남: x 0–20, y 1–15 (132칸) / 아래: x 9–11, z 9–10 (6칸) / 위: x 0–20, z 0–20 (441칸)
 
-**블록** — 거친 흙 2159, 돌벽돌 692, 조약돌 604, 이끼 낀 돌벽돌 36, 철창 8, 사다리 6, 직소 5, 영혼 랜턴 4
+**블록** — 돌벽돌 691, 조약돌 604, 이끼 낀 돌벽돌 36, 철창 8, 직소 5, 영혼 랜턴 4, 검은 양초 3, 거미줄 2
 
 ![chapel](img/grave/chapel.svg)
 
@@ -223,50 +223,6 @@ flowchart LR
 
 ```
 y = 0   x →동, z ↓남
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  dddddddddH..ddddddddd
-  dddddddddJddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-y = 1–4   x →동, z ↓남
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  dddddddddH..ddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-y = 5   x →동, z ↓남
   ##########J##########
   #####################
   #####################
@@ -279,7 +235,7 @@ y = 5   x →동, z ↓남
   #########...#########
   J########...########J
   #########H###########
-  #####################
+  #########J###########
   #####################
   #####################
   #####################
@@ -288,7 +244,7 @@ y = 5   x →동, z ↓남
   #####################
   #####################
   ##########J##########
-y = 6   x →동, z ↓남
+y = 1   x →동, z ↓남
   m,,,,,,,,...,,,,,,,,m
   ,...................,
   ,.c.....#####.......,
@@ -310,7 +266,7 @@ y = 6   x →동, z ↓남
   ,.L...............c.,
   ,...................,
   m,,,,,,,,...,,,,,,,,m
-y = 7   x →동, z ↓남
+y = 2   x →동, z ↓남
   m,,,,,,,,...,,,,,,,,m
   ,...................,
   ,.........%.........,
@@ -332,7 +288,7 @@ y = 7   x →동, z ↓남
   ,...................,
   ,...................,
   m,,,,,,,,...,,,,,,,,m
-y = 8   x →동, z ↓남
+y = 3   x →동, z ↓남
   m,,,,,,,,...,,,,,,,,m
   ,...................,
   ,.........c.........,
@@ -354,7 +310,7 @@ y = 8   x →동, z ↓남
   ,...................,
   ,...................,
   m,,,,,,,,...,,,,,,,,m
-y = 9   x →동, z ↓남
+y = 4   x →동, z ↓남
   m,,,,|,,,...,,,|,,,,m
   ,...................,
   ,...................,
@@ -376,7 +332,7 @@ y = 9   x →동, z ↓남
   ,...................,
   ,...................,
   m,,,,|,,,...,,,|,,,,m
-y = 10–11   x →동, z ↓남
+y = 5–6   x →동, z ↓남
   m,,,,.,,,,.,,,,.,,,,m
   ,...................,
   ,...................,
@@ -398,7 +354,7 @@ y = 10–11   x →동, z ↓남
   ,...................,
   ,...................,
   m,,,,.,,,,.,,,,.,,,,m
-y = 12–14   x →동, z ↓남
+y = 7–9   x →동, z ↓남
   m,,,,,,,,,,,,,,,,,,,m
   ,...................,
   ,...................,
@@ -420,7 +376,7 @@ y = 12–14   x →동, z ↓남
   ,...................,
   ,...................,
   m,,,,,,,,,,,,,,,,,,,m
-y = 15   x →동, z ↓남
+y = 10   x →동, z ↓남
   ##.#.#.##.#.#.##.#.#.
   .#.##.#.#.##.#.#.##.#
   #.#.#.##.#.#.##.#.#.#
@@ -442,7 +398,7 @@ y = 15   x →동, z ↓남
   .#.#.##.#.#.##.#.#.##
   .##.#.#.##.#.#.##.#.#
   #.#.##.#.#.##.#.#.##.
-y = 16–20   x →동, z ↓남
+y = 11–15   x →동, z ↓남
   .....................
   .....................
   .....................
@@ -488,11 +444,6 @@ y = 16–20   x →동, z ↓남
   .....................
   .....................
   J########...########J
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
 단면 x = 10   z →남, y ↑하늘
   .....................
   .....................
@@ -510,11 +461,6 @@ y = 16–20   x →동, z ↓남
   ..%..................
   ..##.................
   J########..#########J
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
 ```
 
 </details>

@@ -48,7 +48,10 @@ PRIORITY = 10
 
 CELL = 7
 COURT = 21                       # the compound is three cells across
-FOOT = 5                         # footing under everything, so a path does not stand on stumps
+FOOT = 5                         # footing under the paths, so one does not stand on stumps
+GROUND = 0                       # the start piece's floor: a start is moved so that
+                                 # minY + 1 is the first free block, so y=0 is the
+                                 # terrain's own top block (section 30)
 PLINTH = 7                       # how high the altar stands above the court
 
 CHERRY = 'minecraft:cherry_log'
@@ -90,12 +93,16 @@ def stairs(facing, half='bottom'):
     return {'facing': facing, 'half': half, 'shape': 'straight', 'waterlogged': 'false'}
 
 
-def ground(sx, sz, top=STONE, height=14):
-    """Footing that reaches down, a surface at the start's level, and air carved out above."""
+def ground(sx, sz, top=STONE, height=14, foot=FOOT):
+    """Footing that reaches down, a surface at the court's level, and air carved out above.
+
+    `foot` is 0 for the court, which is the start piece and therefore sits on the ground
+    itself (section 30), and FOOT for the paths, which hang from their jigsaws and need
+    something under them where the grove falls away."""
     p = Piece(sx, height, sz, AIR)
-    p.box(0, 0, 0, sx - 1, FOOT - 1, sz - 1, STONE)
-    p.box(0, FOOT, 0, sx - 1, FOOT, sz - 1, top)
-    p.box(0, FOOT + 1, 0, sx - 1, height - 1, sz - 1, AIR)
+    p.box(0, 0, 0, sx - 1, foot - 1, sz - 1, STONE)
+    p.box(0, foot, 0, sx - 1, foot, sz - 1, top)
+    p.box(0, foot + 1, 0, sx - 1, height - 1, sz - 1, AIR)
     return p
 
 
@@ -108,19 +115,20 @@ def way(p, side, pool, name=PATH, target=PATH, priority=0):
     p.jigsaw(x, y, z, orientation, pool, STONE, priority=priority, name=name, target=target)
 
 
-def torii(p, x, z, axis='x', height=4):
+def torii(p, x, z, axis='x', height=4, g=FOOT):
     """A gate: two posts, a lintel over them and a second beam under it. The path runs
-    through, so nothing is written in the two blocks between the posts."""
+    through, so nothing is written in the two blocks between the posts. `g` is the piece's
+    own ground: 0 in the court, FOOT out on the paths."""
     dx, dz = (1, 0) if axis == 'x' else (0, 1)
     for s in (-2, 2):
-        for y in range(FOOT + 1, FOOT + height):
+        for y in range(g + 1, g + height):
             p.set(x + dx * s, y, z + dz * s, CHERRY, {'axis': 'y'})
     for s in range(-3, 4):
-        p.set(x + dx * s, FOOT + height, z + dz * s, STRIP, {'axis': axis})
+        p.set(x + dx * s, g + height, z + dz * s, STRIP, {'axis': axis})
     for s in range(-2, 3):
-        p.set(x + dx * s, FOOT + height - 1, z + dz * s, PLANK)
+        p.set(x + dx * s, g + height - 1, z + dz * s, PLANK)
     for s in (-3, 3):
-        p.set(x + dx * s, FOOT + height + 1, z + dz * s, SLAB,
+        p.set(x + dx * s, g + height + 1, z + dz * s, SLAB,
               {'type': 'bottom', 'waterlogged': 'false'})
 
 
@@ -201,8 +209,8 @@ def court():
     """The start: a walled compound with the altar on a plinth in the middle of it, and the
     paths leaving by all four gates."""
     n = COURT
-    p = ground(n, n, top=STONE, height=FOOT + 18)
-    g, mid = FOOT, n // 2
+    p = ground(n, n, top=STONE, height=GROUND + 18, foot=GROUND)
+    g, mid = GROUND, n // 2
     for i in range(n):                                            # the compound wall
         for x, z in ((0, i), (n - 1, i), (i, 0), (i, n - 1)):
             if not (mid - 1 <= (z if x in (0, n - 1) else x) <= mid + 1):
@@ -371,7 +379,7 @@ def cellar_problems(pieces):
     which is the only place it can be: the plinth is what hides it."""
     problems = []
     court, hollow = pieces['court'], pieces['cellar']
-    n, g, mid = COURT, FOOT, COURT // 2
+    n, g, mid = COURT, GROUND, COURT // 2
     src = [(pos, o) for pos, o, e in jigsaws(court) if e['target'] == SEALED]
     dst = [(pos, o) for pos, o, e in jigsaws(hollow) if e['name'] == SEALED]
     if len(src) != 1 or len(dst) != 1:
@@ -384,11 +392,11 @@ def cellar_problems(pieces):
     front = tuple(a + b for a, b in zip(sp, FRONT[so]))
     lo = tuple(f - l for f, l in zip(front, dp))
     hi = tuple(a + b - 1 for a, b in zip(lo, hollow.size))
-    for axis, size in zip(range(3), (n, FOOT + 18, n)):
+    for axis, size in zip(range(3), (n, GROUND + 18, n)):
         if lo[axis] < 0 or hi[axis] > size - 1:
             problems.append('the cellar lands at %s..%s, which is outside the court %s: the '
                             'game would drop it and nobody would ever find it'
-                            % (lo, hi, (n, FOOT + 18, n)))
+                            % (lo, hi, (n, GROUND + 18, n)))
             return problems
     want_lo, want_hi = (mid - 4, g, mid - 4), (mid + 4, g + PLINTH - 1, mid + 4)
     if any(lo[i] < want_lo[i] or hi[i] > want_hi[i] for i in range(3)):
@@ -406,7 +414,7 @@ def walk_problems(pieces):
     short of the floor it lands on. So this steps through it the way a player does: stand on
     something solid, two blocks of room for your head, and up one or down two at a time."""
     court = pieces['court']
-    n, g, mid = COURT, FOOT, COURT // 2
+    n, g, mid = COURT, GROUND, COURT // 2
     grid = court.grid
 
     def block(pos):
@@ -424,7 +432,7 @@ def walk_problems(pieces):
             for dx, dz in ((1, 0), (-1, 0), (0, 1), (0, -1)):
                 for dy in (1, 0, -1, -2):
                     nxt = (x + dx, y + dy, z + dz)
-                    if nxt in seen or not 0 <= nxt[1] < FOOT + 18:
+                    if nxt in seen or not 0 <= nxt[1] < GROUND + 18:
                         continue
                     if stands(nxt):
                         seen.add(nxt)

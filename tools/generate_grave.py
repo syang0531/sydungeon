@@ -47,7 +47,10 @@ PRIORITY = 10
 
 CELL = 7
 CHAPEL = 21                      # the chapel is three cells across
-FOOT = 5                         # courses of footing under the chapel and the plots
+FOOT = 5                         # courses of footing under the plots
+GROUND = 0                       # the start piece's floor: a start is moved so that
+                                 # minY + 1 is the first free block, so y=0 is the
+                                 # terrain's own top block (section 30)
 SHAFT_H = 28
 BOSS = (21, 14, 21)
 MIN_BOSS_STEPS = 3
@@ -271,10 +274,9 @@ def chapel():
     """The start: what is left of the chapel. Three walls, a fallen roof, an altar, and the
     hole in the floor that is the only way into the ossuary."""
     n = CHAPEL
-    p = Piece(n, FOOT + 16, n, AIR)
-    g, mid = FOOT, n // 2
-    p.box(0, 0, 0, n - 1, g - 1, n - 1, DIRT)                      # footing
-    p.box(0, g, 0, n - 1, g, n - 1, BRICK)                         # the floor
+    p = Piece(n, GROUND + 16, n, AIR)
+    g, mid = GROUND, n // 2
+    p.box(0, g, 0, n - 1, g, n - 1, BRICK)                         # the floor, on the ground
     p.box(0, g + 1, 0, n - 1, g + 9, n - 1, COBBLE)                # walls
     p.box(1, g + 1, 1, n - 2, g + 9, n - 2, AIR)
     for x in range(n):                                             # the roof, half fallen
@@ -329,7 +331,7 @@ def chapel():
 
 def floor_and_hole(p):
     """The chapel's floor is solid except for the one way down."""
-    g = FOOT
+    g = GROUND
     x0, x1, z0, z1 = HOLE
     for x in range(CHAPEL):
         for z in range(CHAPEL):
@@ -578,7 +580,7 @@ def ladder_problems(pieces):
           'crypt_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
     x0, x1, z0, z1 = HOLE
     problems = []
-    for y in range(at['crypt_hub'][1] + 2, FOOT + 1):
+    for y in range(at['crypt_hub'][1] + 2, GROUND + 1):
         for x in range(x0, x1 + 1):
             for z in range(z0, z1 + 1):
                 if z == RUNG[1] and x != RUNG[0]:
@@ -671,7 +673,7 @@ def walk_problems():
         x, y, z = p
         return open_at(p) and open_at((x, y + 1, z)) and not open_at((x, y - 1, z))
 
-    g = FOOT
+    g = GROUND
     seen, queue = {(CHAPEL // 2, g + 1, 4)}, [(CHAPEL // 2, g + 1, 4)]
     while queue:
         x, y, z = queue.pop()

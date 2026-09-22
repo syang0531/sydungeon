@@ -51,7 +51,10 @@ PRIORITY = 10
 
 CELL = 7
 HOUSE = 21                       # the longhouse is three cells across
-FOOT = 7                         # foundation courses below the yard
+FOOT = 7                         # foundation courses below the yard, on the children
+GROUND = 0                       # the start piece's floor: a start is moved so that
+                                 # minY + 1 is the first free block, so y=0 is the
+                                 # terrain's own top block (section 30)
 HIGH = 14                        # box height above it
 FENCE_DEPTH = 2                  # how thick the palisade itself is
 YARD = 2 * CELL - FENCE_DEPTH    # the yard a panel carries in front of it, so a panel is
@@ -165,10 +168,9 @@ def longhouse():
     """The start: the warlord's hall in the middle of the camp. Four doors call the palisade
     and the hole in its floor is the only way into the mine."""
     n = HOUSE
-    p = Piece(n, FOOT + HIGH, n, AIR)
-    g, mid = FOOT, n // 2
-    p.box(0, 0, 0, n - 1, g - 1, n - 1, DIRT)                     # foundation
-    p.box(0, g, 0, n - 1, g, n - 1, PLANK)                        # the floor
+    p = Piece(n, GROUND + HIGH, n, AIR)
+    g, mid = GROUND, n // 2
+    p.box(0, g, 0, n - 1, g, n - 1, PLANK)                        # the floor, on the ground
     p.box(0, g + 1, 0, n - 1, g + 6, n - 1, PLANK)                # walls
     p.box(1, g + 1, 1, n - 2, g + 6, n - 2, AIR)
     for x, z in ((0, 0), (0, n - 1), (n - 1, 0), (n - 1, n - 1)):  # corner posts
@@ -223,7 +225,7 @@ def longhouse():
 def floor_and_hole(p):
     """The hall's floor is solid except for the one way down. Run over a hand-built longhouse
     as well as the code's, so a hole left anywhere else in it gets closed."""
-    g = FOOT
+    g = GROUND
     x0, x1, z0, z1 = HOLE
     for x in range(HOUSE):
         for z in range(HOUSE):
@@ -645,7 +647,7 @@ def ladder_problems(pieces):
           'mine_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
     x0, x1, z0, z1 = HOLE
     problems = []
-    for y in range(at['mine_hub'][1] + 1, FOOT + 1):
+    for y in range(at['mine_hub'][1] + 1, GROUND + 1):
         for x in range(x0, x1 + 1):
             for z in range(z0, z1 + 1):
                 if z == RUNG[1] and x != RUNG[0]:
@@ -776,7 +778,7 @@ def walk_problems():
         x, y, z = p
         return open_at(p) and open_at((x, y + 1, z)) and not open_at((x, y - 1, z))
 
-    g = FOOT
+    g = GROUND
     seen, queue = {(HOUSE // 2, g + 1, 3)}, [(HOUSE // 2, g + 1, 3)]
     while queue:
         x, y, z = queue.pop()

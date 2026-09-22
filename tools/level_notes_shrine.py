@@ -63,7 +63,7 @@ def install(INTRO, NOTES):
 마당과 그 단상 속 지하실. 네 문에서 나가는 길은 판마다 다르다.
 """,
 
-        'floors': [('마당', 6), ('지하실', 7), ('단상 위', 13)],
+        'floors': [('마당', 1), ('지하실', 2), ('단상 위', 8)],
 
         'order': ['court', 'cellar', 'gate', 'run', 'bend', 'cross',
                   'rest', 'garden', 'spring', 'lantern', 'path_cap'],

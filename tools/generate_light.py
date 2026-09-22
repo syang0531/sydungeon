@@ -48,7 +48,9 @@ EMPTY = 'minecraft:empty'
 PRIORITY = 10
 
 CELL = 7
-FOOT = 3                         # courses of footing: a beach is flat
+GROUND = 0                       # the start piece's floor: a start is moved so that
+                                 # minY + 1 is the first free block, so y=0 is the
+                                 # terrain's own top block (section 30)
 TOWER = 26                       # how much lighthouse stands above its floor
 SHAFT_H = 21
 DIVE_H = 14
@@ -172,11 +174,10 @@ def lighthouse():
 
     The lamp room at the top is broken open on the north side, and the ladder inside runs the
     whole way up, because a lighthouse you cannot climb is only a chimney."""
-    p = Piece(CELL, FOOT + TOWER + 1, CELL, AIR)
+    p = Piece(CELL, GROUND + TOWER + 1, CELL, AIR)
     p.ports = set()
-    g, mid = FOOT, CELL // 2
-    bedrock(p, CELL, g, CELL)                                      # footing, banded
-    p.box(0, g, 0, CELL - 1, g, CELL - 1, BRICK)                   # the floor
+    g, mid = GROUND, CELL // 2
+    p.box(0, g, 0, CELL - 1, g, CELL - 1, BRICK)                   # the floor, on the ground
     for y in range(g + 1, g + TOWER):                              # the wall of the tower
         for x in range(CELL):
             for z in range(CELL):
@@ -602,7 +603,7 @@ def ladder_problems(pieces):
           'sump': (0, -SHAFT_H - CELL, 0)}
     x0, x1, z0, z1 = HOLE
     problems = []
-    for y in range(at['sump'][1] + 1, FOOT + 1):
+    for y in range(at['sump'][1] + 1, GROUND + 1):
         for x in range(x0, x1 + 1):
             for z in range(z0, z1 + 1):
                 if z == RUNG[1] and x != RUNG[0]:
@@ -703,7 +704,7 @@ def walk_problems():
         return (not open_at((x, y - 1, z)) or world.get(p) in ('water', 'ladder')
                 or world.get((x, y - 1, z)) in ('water', 'ladder'))
 
-    g = FOOT
+    g = GROUND
     door = (1, g + 1, CELL // 2)
     seen, queue = {door}, [door]
     while queue:

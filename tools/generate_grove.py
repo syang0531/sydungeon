@@ -45,7 +45,9 @@ PRIORITY = 10
 CELL = 7
 MOUTH = 7
 SHAFT_H = 14
-FOOT = 4
+GROUND = 0                       # the start piece's floor: a start is moved so that
+                                 # minY + 1 is the first free block, so y=0 is the
+                                 # terrain's own top block (section 30)
 
 HOLE = (2, 4, 2, 4)              # the way down, in the mouth's coordinates
 RUNG = (2, 4)
@@ -131,10 +133,9 @@ def mouth():
     """The start: a ring of huge mushrooms round a hole in the mycelium, and a ladder. Eight
     blocks tall and that is all there is above ground - the hollow is the dungeon."""
     n = MOUTH
-    p = Piece(n, FOOT + 8, n, AIR)
-    g, mid = FOOT, n // 2
-    p.box(0, 0, 0, n - 1, g - 1, n - 1, ROOTED)
-    p.box(0, g, 0, n - 1, g, n - 1, MYC)
+    p = Piece(n, GROUND + 8, n, AIR)
+    g, mid = GROUND, n // 2
+    p.box(0, g, 0, n - 1, g, n - 1, MYC)                              # the floor, on the
     p.box(0, g + 1, 0, n - 1, g + 7, n - 1, AIR)
     for x, z in ((0, 0), (0, n - 1), (n - 1, 0), (n - 1, n - 1)):      # the four caps
         for y in range(g + 1, g + 4):
@@ -152,7 +153,7 @@ def mouth():
 
 
 def floor_and_hole(p):
-    g = FOOT
+    g = GROUND
     x0, x1, z0, z1 = HOLE
     for x in range(MOUTH):
         for z in range(MOUTH):
@@ -400,7 +401,7 @@ def ladder_problems(pieces):
           'hollow': (0, -SHAFT_H - CELL, 0)}
     x0, x1, z0, z1 = HOLE
     problems = []
-    for y in range(at['hollow'][1] + 1, FOOT + 1):
+    for y in range(at['hollow'][1] + 1, GROUND + 1):
         for x in range(x0, x1 + 1):
             for z in range(z0, z1 + 1):
                 if z == RUNG[1] and x != RUNG[0]:

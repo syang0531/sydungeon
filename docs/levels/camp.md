@@ -172,16 +172,16 @@ flowchart LR
 | 조각 | 놓이는 자리 (시작 조각 기준) | 누가 놓나 |
 |---|---|---|
 | `longhouse` | (0, 0, 0) | 시작 풀 |
-| `gate` | (-14, 0, 0) | longhouse의 서 cmp_wall 직소 |
+| `gate` | (-14, -7, 0) | longhouse의 서 cmp_wall 직소 |
 | `shaft` | (7, -35, 7) | longhouse의 아래 cmp_down 직소 |
-| `panel_end` | (0, 0, -14) | longhouse의 북 cmp_wall 직소 |
-| `panel_end` | (0, 0, 21) | longhouse의 남 cmp_wall 직소 |
-| `panel` | (21, 0, 0) | longhouse의 동 cmp_wall 직소 |
+| `panel_end` | (0, -7, -14) | longhouse의 북 cmp_wall 직소 |
+| `panel_end` | (0, -7, 21) | longhouse의 남 cmp_wall 직소 |
+| `panel` | (21, -7, 0) | longhouse의 동 cmp_wall 직소 |
 | `mine_hub` | (7, -42, 7) | shaft의 아래 cmp_drift 직소 |
-| `tower_a` | (-14, 0, -14) | panel_end의 서 cmp_corner_a 직소 |
-| `tower_b` | (21, 0, -14) | panel_end의 동 cmp_corner_b 직소 |
-| `tower_a` | (-14, 0, 21) | panel_end의 서 cmp_corner_a 직소 |
-| `tower_b` | (21, 0, 21) | panel_end의 동 cmp_corner_b 직소 |
+| `tower_a` | (-14, -7, -14) | panel_end의 서 cmp_corner_a 직소 |
+| `tower_b` | (21, -7, -14) | panel_end의 동 cmp_corner_b 직소 |
+| `tower_a` | (-14, -7, 21) | panel_end의 서 cmp_corner_a 직소 |
+| `tower_b` | (21, -7, 21) | panel_end의 동 cmp_corner_b 직소 |
 | `approach_1` | (7, -42, 14) | mine_hub의 남 cmp_drift 직소 |
 | `approach_2` | (14, -42, 14) | approach_1의 동 cmp_drift 직소 |
 | `approach_3` | (21, -42, 14) | approach_2의 동 cmp_drift 직소 |
@@ -195,7 +195,7 @@ flowchart LR
 
 그림은 조각 하나를 **층마다 한 장씩** 블록 단위로 그린 것이다. 같은 층이 이어지면 `y = 2–5`처럼 묶었고, 마지막 두 장은 가운데를 자른 세로 단면이다. 분홍 점이 직소, 화살표가 그 직소가 보는 방향이다 — **마주 본 직소끼리만 붙는다.**
 
-### `longhouse` — 21×21×21 — 3×3×3 셀
+### `longhouse` — 21×14×21 — 3×2×3 셀
 
 시작 조각. 21×21의 대말움집이고 사방에 문이 있어 **그 넷이 목책을 부른다.** 바닥의 3×3 구멍이
 갱도로 가는 유일한 길이고, 사다리가 있는 줄은 바닥 켜에서 남겨 두어 걸어 나가 올라탈 수 있다.
@@ -206,15 +206,15 @@ flowchart LR
 
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
+| (10, 0, 0) | ▲ 북 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
+| (0, 0, 10) | ◀ 서 | `cmp_wall` | `cmp_wall` | `camp/gate` |
+| (20, 0, 10) | ▶ 동 | `cmp_wall` | `cmp_wall` | `camp/panels` |
 | (9, 0, 12) | ◇ 아래 | `cmp_down` | `cmp_down` | `camp/down` |
-| (10, 7, 0) | ▲ 북 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
-| (0, 7, 10) | ◀ 서 | `cmp_wall` | `cmp_wall` | `camp/gate` |
-| (20, 7, 10) | ▶ 동 | `cmp_wall` | `cmp_wall` | `camp/panels` |
-| (10, 7, 20) | ▼ 남 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
+| (10, 0, 20) | ▼ 남 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
 
-**뚫린 면** — 서: z 0–20, y 8–20 (138칸) / 동: z 0–20, y 8–20 (138칸) / 북: x 0–20, y 8–20 (138칸) / 남: x 0–20, y 8–20 (138칸) / 아래: x 9–11, z 9–11 (8칸) / 위: x 0–20, z 0–20 (441칸)
+**뚫린 면** — 서: z 0–20, y 1–13 (138칸) / 동: z 0–20, y 1–13 (138칸) / 북: x 0–20, y 1–13 (138칸) / 남: x 0–20, y 1–13 (138칸) / 아래: x 9–11, z 9–10 (6칸) / 위: x 0–20, z 0–20 (441칸)
 
-**블록** — 거친 흙 3023, 아카시아 판자 830, 아카시아 반 블록 441, 아카시아 원목 34, 아카시아 다락문 8, 사다리 8, 직소 5, 랜턴 4
+**블록** — 아카시아 판자 829, 아카시아 반 블록 441, 아카시아 원목 34, 아카시아 다락문 8, 직소 5, 랜턴 4, 굳은 진흙 2, 통 1
 
 ![longhouse](img/camp/longhouse.svg)
 
@@ -222,50 +222,6 @@ flowchart LR
 
 ```
 y = 0   x →동, z ↓남
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  dddddddddH..ddddddddd
-  dddddddddJddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-y = 1–6   x →동, z ↓남
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  dddddddddH..ddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-  ddddddddddddddddddddd
-y = 7   x →동, z ↓남
   wwwwwwwwwwJwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
@@ -278,7 +234,7 @@ y = 7   x →동, z ↓남
   wwwwwwwww...wwwwwwwww
   Jwwwwwwww...wwwwwwwwJ
   wwwwwwwwwHwwwwwwwwwww
-  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwJwwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
@@ -287,7 +243,7 @@ y = 7   x →동, z ↓남
   wwwwwwwwwwwwwwwwwwwww
   wwwwwwwwwwwwwwwwwwwww
   wwwwwwwwwwJwwwwwwwwww
-y = 8   x →동, z ↓남
+y = 1   x →동, z ↓남
   Lwwwwwwww...wwwwwwwwL
   w...................w
   w.........S.....mmG.w
@@ -309,7 +265,7 @@ y = 8   x →동, z ↓남
   w.a...............c.w
   w...................w
   Lwwwwwwww...wwwwwwwwL
-y = 9   x →동, z ↓남
+y = 2   x →동, z ↓남
   Lwwwwwwww...wwwwwwwwL
   w...................w
   w................P..w
@@ -331,7 +287,7 @@ y = 9   x →동, z ↓남
   w...................w
   w...................w
   Lwwwwwwww...wwwwwwwwL
-y = 10   x →동, z ↓남
+y = 3   x →동, z ↓남
   Lwww=wwww...wwww=wwwL
   w...................w
   w...................w
@@ -353,7 +309,7 @@ y = 10   x →동, z ↓남
   w...................w
   w...................w
   Lwww=wwww...wwww=wwwL
-y = 11   x →동, z ↓남
+y = 4   x →동, z ↓남
   Lwwwwwwww...wwwwwwwwL
   w...................w
   w...................w
@@ -375,7 +331,7 @@ y = 11   x →동, z ↓남
   w...................w
   w...................w
   Lwwwwwwww...wwwwwwwwL
-y = 12   x →동, z ↓남
+y = 5   x →동, z ↓남
   LwwwwwwwwwwwwwwwwwwwL
   w...................w
   w...................w
@@ -397,7 +353,7 @@ y = 12   x →동, z ↓남
   w...................w
   w...................w
   LwwwwwwwwwwwwwwwwwwwL
-y = 13   x →동, z ↓남
+y = 6   x →동, z ↓남
   LwwwwwwwwwwwwwwwwwwwL
   w...................w
   w...................w
@@ -419,7 +375,7 @@ y = 13   x →동, z ↓남
   w...................w
   w...................w
   LwwwwwwwwwwwwwwwwwwwL
-y = 14   x →동, z ↓남
+y = 7   x →동, z ↓남
   _____________________
   _____________________
   _____________________
@@ -441,7 +397,7 @@ y = 14   x →동, z ↓남
   _____________________
   _____________________
   _____________________
-y = 15   x →동, z ↓남
+y = 8   x →동, z ↓남
   .....................
   .....................
   .....................
@@ -463,7 +419,7 @@ y = 15   x →동, z ↓남
   .....................
   .....................
   .....................
-y = 16–20   x →동, z ↓남
+y = 9–13   x →동, z ↓남
   .....................
   .....................
   .....................
@@ -507,13 +463,6 @@ y = 16–20   x →동, z ↓남
   .....................
   .....................
   Jwwwwwwww...wwwwwwwwJ
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
 단면 x = 10   z →남, y ↑하늘
   .....................
   .....................
@@ -529,13 +478,6 @@ y = 16–20   x →동, z ↓남
   .....................
   ..S..................
   Jwwwwwwww..wwwwwwwwwJ
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
-  ddddddddd...ddddddddd
 ```
 
 </details>

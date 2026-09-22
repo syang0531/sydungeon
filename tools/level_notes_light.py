@@ -61,7 +61,7 @@ def install(INTRO, NOTES):
 등대와 수직통로, 마른 집수실, 물기둥, 그리고 헤엄쳐 닿는 요새 허브.
 """,
 
-        'floors': [('등대 바닥', 4), ('요새', -46)],
+        'floors': [('등대 바닥', 1), ('요새', -46)],
 
         'order': ['lighthouse', 'shaft', 'sump', 'dive', 'sea_hub',
                   'hall', 'bend', 'junction', 'guard', 'column', 'kelp', 'sponge',

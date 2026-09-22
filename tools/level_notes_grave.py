@@ -57,7 +57,7 @@ def install(INTRO, NOTES):
 판마다 다르다. 사다리가 예배당 바닥에서 납골당까지 한 줄로 이어지는 것이 단면에 보인다.
 """,
 
-        'floors': [('묘역', 6), ('예배당 안', 8), ('납골당', -24)],
+        'floors': [('묘역', 1), ('예배당 안', 3), ('납골당', -24)],
 
         'order': ['chapel', 'row', 'plot_corner', 'plot_cross', 'open_grave', 'tomb',
                   'tree', 'shrine', 'watch', 'plot_cap',

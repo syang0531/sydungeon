@@ -47,7 +47,7 @@ spacing 20 / separation 8. 대규모가 30~48인 데 비해 촘촘하다. 중소
 입구와 수직통로, 굴, 그리고 굴이 반드시 부르는 목장과 야영지. 균사 미로는 판마다 다르다.
 """,
 
-        'floors': [('지표', 5), ('수직통로', -4), ('굴', -18)],
+        'floors': [('지표', 1), ('수직통로', -4), ('굴', -18)],
 
         'order': ['mouth', 'shaft', 'hollow', 'pen', 'camp',
                   'tunnel', 'bend', 'cross', 'garden', 'grove', 'spring', 'larder',

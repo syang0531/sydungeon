@@ -56,7 +56,7 @@ def install(INTRO, NOTES):
 것만** 그렸다. 갱도는 판마다 다르다. 지상 조각 여덟이 49×49를 빈틈없이 덮는다.
 """,
 
-        'floors': [('마당과 목책', 8), ('기초', 3), ('갱도', -24)],
+        'floors': [('마당과 목책', 1), ('기초', -4), ('갱도', -24)],
 
         'order': ['longhouse', 'gate', 'panel', 'panel_end', 'tower_a', 'tower_b',
                   'shaft', 'mine_hub', 'drift', 'drift_corner', 'drift_cross',
