@@ -46,6 +46,12 @@ SPAN = [BAND, CELL, CELL, CELL, BAND]
 STONE = 'minecraft:stone_bricks'
 CHISELED = 'minecraft:chiseled_stone_bricks'
 MOSSY = 'minecraft:mossy_stone_bricks'
+SLATE = 'minecraft:deepslate_tiles'                # the roof, and the sanctum's own stone
+SLATE_CRACK = 'minecraft:cracked_deepslate_tiles'
+SLAB = 'minecraft:deepslate_tile_slab'
+ROD = 'minecraft:lightning_rod'
+LANTERN = 'minecraft:lantern'
+ROOF = 14                              # courses of spire above the eighth floor's ceiling
 AIR = 'minecraft:air'
 VOID = 'minecraft:structure_void'      # "leave whatever is already here"
 
@@ -115,16 +121,61 @@ def ring_floor(door=None):
     return p
 
 
+def roof(p):
+    """A first draft of the spire, because the eighth floor's ceiling was the end of the
+    tower and a wizard's tower with a flat top reads as unfinished.
+
+    A slate cone on an overhanging eave, narrowing about a block per course, with a lightning
+    rod at the point and four lanterns hung under the eave. It is code-pushed like the ring
+    below it, which means it is a starting point and not the answer: it is inside the
+    structure block's 48 (29 x 14 x 29), so it can be rebuilt by hand into
+    `tools/handmade/tower/` the way the rooms were (CLAUDE.md section 16)."""
+    mid = (WIDE - 1) / 2.0
+    for k in range(ROOF):
+        y = HEIGHT + k
+        radius = mid + 0.7 - 1.12 * k               # the eave hangs a little past the ring
+        for x in range(WIDE):
+            for z in range(WIDE):
+                far = ((x - mid) ** 2 + (z - mid) ** 2) ** 0.5
+                if far > radius:
+                    p.set(x, y, z, VOID)            # outside the cone the world is its own
+                    continue
+                edge = far > radius - 1
+                if k == 0 and edge:
+                    p.set(x, y, z, CHISELED)        # the eave's lip, one band all round
+                elif edge and (x * 5 + z * 3 + k) % 7 == 0:
+                    p.set(x, y, z, SLATE_CRACK)
+                else:
+                    p.set(x, y, z, SLATE)
+    top = HEIGHT + ROOF
+    p.set(int(mid), top, int(mid), SLAB, {'type': 'bottom', 'waterlogged': 'false'})
+    p.set(int(mid), top + 1, int(mid), ROD, {'facing': 'up', 'powered': 'false'})
+    # lanterns under the overhang, in the corners the ring never reaches: the eave is solid
+    # over them and the ring below is void, so they hang in the open air off the tower's side
+    for dx, dz in ((-1, -1), (-1, 1), (1, -1), (1, 1)):
+        for step in range(int(mid), 2, -1):
+            x, z = int(mid) + dx * step, int(mid) + dz * step
+            if (p.grid[(x, HEIGHT - 1, z)][0] == VOID
+                    and p.grid[(x, HEIGHT, z)][0] not in (VOID, AIR)):
+                p.set(x, HEIGHT - 1, z, LANTERN, {'hanging': 'true', 'waterlogged': 'false'})
+                break
+    return p
+
+
 def shell():
-    """The ring for all eight floors, with the door on the ground one. Its inside is left
-    solid: `core` claims it and the rooms carve it (CLAUDE.md section 10)."""
-    p = Piece(WIDE, HEIGHT, WIDE, STONE)
+    """The ring for all eight floors, with the door on the ground one, and the spire over it.
+    Its inside is left solid: `core` claims it and the rooms carve it (CLAUDE.md section 10)."""
+    p = Piece(WIDE, HEIGHT + ROOF + 2, WIDE, STONE)
     ground, upper = ring_floor(load('ring_02')), ring_floor()
     for floor in range(FLOORS):
         source = ground if floor == 0 else upper
         for (x, y, z), (block, props) in source.grid.items():
             p.set(x, floor * CELL + y, z, block, dict(props) if props else None)
-    return p
+    for y in range(HEIGHT, HEIGHT + ROOF + 2):      # nothing above the ring until the roof
+        for x in range(WIDE):
+            for z in range(WIDE):
+                p.set(x, y, z, VOID)
+    return roof(p)
 
 
 

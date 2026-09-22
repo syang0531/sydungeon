@@ -196,16 +196,21 @@ def entrance_cut(x, y, z):
 
 
 def stair_cut(x, y, z):
-    """The grand stair up the north face, one terrace at a time: each flight is cut into the
+    """The grand stair up the south face, one terrace at a time: each flight is cut into the
     slope so the summit can be walked to from outside. This is what a ziggurat is for."""
-    if not (CX - 2 <= x <= CX + 2):
-        return False
+    if not (CX - 2 <= x <= CX + 2) or y < 1:
+        return False       # nothing at or below the jungle floor: the first tread IS the
+                           # ground course, and the foundation under it is not a stair.
     # One flight per terrace, cut into its SOUTH face - the way in is on the north, and the
     # two would carve each other. The tread climbs a block for every block it moves inward,
     # so each terrace's flight carries straight on from the one below and the last of them
     # lands at the shrine's door on the summit.
+    #
+    # Four deep, not three. Three leaves exactly two blocks of air over each tread, which is
+    # enough to walk under and not enough to jump under - you crack your head on the ceiling
+    # the whole way up.
     tread = (CZ + half(y)) - (y % STEP)
-    return tread <= z <= tread + 2
+    return tread <= z <= tread + 3
 
 
 def skin(name, keep=None):

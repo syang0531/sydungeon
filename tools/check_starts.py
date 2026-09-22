@@ -93,19 +93,26 @@ def main():
                                      pool_name + '.json'))['elements']
         location = elements[0]['element']['location']
         size, grid = load(location)
-        rows.append((family, location.split('/')[-1], size, lowest_stand(size, grid)))
+        # start_height is added to the heightmap before the piece is moved, so a structure
+        # can deliberately sink itself: the temple does, by its foundation, so that the
+        # foundation is underground and the door is on the jungle floor.
+        offset = structure.get('start_height', {}).get('absolute', 0)
+        rows.append((family, location.split('/')[-1], size, lowest_stand(size, grid), offset))
 
     bad = []
     print('%-9s %-12s %-14s %s' % ('family', 'start', 'size', 'lowest place to stand'))
-    for family, piece, size, stand in rows:
+    for family, piece, size, stand, offset in rows:
+        want = 1 - offset
         note = ''
         if stand is None:
             note = '(solid: nothing to stand in)'
-        elif stand > 1 and family in EXCEPT:
-            note = '+%d on purpose: %s' % (stand - 1, EXCEPT[family])
-        elif stand > 1:
-            note = '<- stands %d above the ground' % (stand - 1)
+        elif stand != want and family in EXCEPT:
+            note = '%+d on purpose: %s' % (stand - want, EXCEPT[family])
+        elif stand > want:
+            note = '<- stands %d above the ground' % (stand - want)
             bad.append((family, piece, stand))
+        elif offset:
+            note = 'sunk %d by start_height' % -offset
         print('%-9s %-12s %-14s %-4s %s'
               % (family, piece, 'x'.join(str(v) for v in size), stand, note))
     if bad:
