@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -81,6 +81,16 @@ STYLE = OrderedDict([
     ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
     ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
     ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
+    ('snow_block',            ('o', '#f0f5f9', '눈 블록')),
+    ('packed_ice',            ('I', '#a6c9e8', '다진 얼음')),
+    ('blue_ice',              ('b', '#74a7e0', '푸른 얼음')),
+    ('ice',                   ('i', '#c4ddf2', '얼음')),
+    ('powder_snow',           ('p', '#e4eef6', '가루눈')),
+    ('stone',                 ('.', '#7a7a7a', '돌')),
+    ('cracked_stone_bricks',  ('x', '#82827f', '금 간 돌벽돌')),
+    ('stone_brick_slab',      ('_', '#9a9a9a', '돌벽돌 반 블록')),
+    ('campfire',              ('^', '#c86a2b', '모닥불')),
+    ('barrel',                ('a', '#a07743', '통')),
     ('jigsaw',                ('J', '#ff2fa0', '직소')),
     ('structure_void',        (' ', '#ffffff', '구조물 공백')),
     ('air',                   ('.', None, '공기')),
@@ -623,7 +633,7 @@ def build(family):
     pools = load_pools(family)
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
-            'swamp': 'swamps'}
+            'swamp': 'swamps', 'ice': 'fortresses'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

@@ -1,0 +1,9 @@
+{
+  "fallback": "sydungeon:ice/cellar_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/frost_hall", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/approach_3", "projection": "rigid", "processors": "sydungeon:ice_weathering" } }
+  ]
+}

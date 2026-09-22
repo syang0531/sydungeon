@@ -1,0 +1,25 @@
+{
+  "fallback": "sydungeon:ice/cellar_caps",
+  "elements": [
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/passage", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/passage_guard", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/corner", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/cross", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 3, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/cross_guard", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/store", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/larder", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/powder", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/slick", "projection": "rigid", "processors": "sydungeon:ice_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:ice/bear_den", "projection": "rigid", "processors": "sydungeon:ice_weathering" } }
+  ]
+}
