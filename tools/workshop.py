@@ -92,12 +92,27 @@ def commands(family):
     return out
 
 
+def data_pack_format():
+    """Ask the game which data pack format it speaks rather than remembering a number.
+
+    This was hard-coded to 88 - the *resource* pack major, which is a different number from
+    the data one (107 in 26.2). The pack was quietly incompatible, the world never loaded it,
+    and /function workshop:<family> answered "unknown function"."""
+    try:
+        import validate_data
+        _, jar = validate_data.game_jar()
+        return int(json.loads(jar.read('version.json'))['pack_version']['data_major'])
+    except Exception:
+        return 107
+
+
 def write(world, wanted):
+    fmt = data_pack_format()
     root = os.path.join(world, 'datapacks', PACK)
     os.makedirs(os.path.join(root, 'data', 'workshop', 'function'), exist_ok=True)
     with io.open(os.path.join(root, 'pack.mcmeta'), 'w', encoding='utf-8', newline='\n') as fh:
-        json.dump({'pack': {'pack_format': 88, 'description': 'SY Dungeon piece workshop'}},
-                  fh, indent=2)
+        json.dump({'pack': {'description': 'SY Dungeon piece workshop',
+                            'min_format': fmt, 'max_format': fmt}}, fh, indent=2)
     every = []
     for family in wanted:
         path = os.path.join(root, 'data', 'workshop', 'function', family + '.mcfunction')
