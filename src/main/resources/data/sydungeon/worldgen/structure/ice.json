@@ -18,5 +18,7 @@
     "horizontal": 56,
     "vertical": 80
   },
-  "use_expansion_hack": false
+  "use_expansion_hack": false,
+  "level_ground_drop": 14,
+  "level_ground_radius": 24
 }

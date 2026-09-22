@@ -298,9 +298,14 @@ def pilings():
         for y in range(DROP):
             p.set(x, y, z, LOG, {'axis': 'y'})
     sink(p, 0, DROP - 1)
-    p.jigsaw(mid + 2, DROP - 1, mid - 1, 'up_east', EMPTY, LOG, joint='aligned',
+    # both jigsaws stand in the post east of the climb, which is where every other piece in
+    # the chain puts them. They were left at the old three-wide shaft's coordinates once and
+    # the whole stack below hung a block out of line: solid plank where the ladder should
+    # have been, and the climb picking up again one over (section 33)
+    jx, jz = HOLE[0] + 1, HOLE[1]
+    p.jigsaw(jx, DROP - 1, jz, 'up_east', EMPTY, LOG, joint='aligned',
              name=DOWN, target=DOWN)
-    p.jigsaw(mid + 2, 0, mid - 1, 'down_east', POOL['down'], LOG, joint='aligned',
+    p.jigsaw(jx, 0, jz, 'down_east', POOL['down'], LOG, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
     return p
 

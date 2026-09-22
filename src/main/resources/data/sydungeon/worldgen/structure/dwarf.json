@@ -23,5 +23,7 @@
   "dimension_padding": {
     "bottom": 8,
     "top": 0
-  }
+  },
+  "level_ground_drop": 16,
+  "level_ground_radius": 10
 }

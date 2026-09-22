@@ -259,6 +259,10 @@ def main():
     import check_starts
     if check_starts.main():
         sys.exit('the start pieces do not sit on the ground.')
+    # and the way down, assembled from the jigsaws rather than from anyone's table (33)
+    import check_shafts
+    if check_shafts.main():
+        sys.exit('the way down does not hold together.')
     print('ok: %d pieces, %d pools, %d loot tables, %d spawner configs%s' % (
         len(mine['structure']), len(mine['worldgen/template_pool']), len(mine['loot_table']),
         len(mine['trial_spawner']),

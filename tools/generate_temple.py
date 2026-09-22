@@ -334,6 +334,21 @@ def door(p, side, pool, name=DOOR, target=DOOR, priority=0):
     p.jigsaw(x, y, z, orientation, pool, MOSS, priority=priority, name=name, target=target)
 
 
+def flood_doors(p, doors, y=1):
+    """Fill each doorway's bottom course with the channel's own water.
+
+    Two wet cells meet at a face, and a template writes air there unless it is told not to -
+    so the channel ran to the doorway and stopped, and the join read as a dry seam right
+    through the water (2026-09-22). This is the lighthouse's rule arriving in the jungle:
+    a flooded doorway is flooded on both sides or it is a leak (section 29)."""
+    mid = CELL // 2
+    for side in doors:
+        for a in (mid - 1, mid, mid + 1):
+            at = {'west': (0, y, a), 'east': (CELL - 1, y, a),
+                  'north': (a, y, 0), 'south': (a, y, CELL - 1)}[side]
+            p.set(at[0], at[1], at[2], WATER, FLOWING)
+
+
 def core(name, pool, anchor_pool=None):
     """Solid rock with one way in. The maze carves it and, because that way in points inside
     this box, nothing the maze places can leave it (section 10)."""
@@ -426,6 +441,7 @@ def cistern():
     origin = (AT['core_deep'][0] + WELL_CELL[0] * CELL, -FOOT,
               AT['core_deep'][2] + WELL_CELL[1] * CELL)
     p.box(1, 1, 1, CELL - 2, 1, CELL - 2, WATER, FLOWING)
+    flood_doors(p, ('east', 'north', 'south'))
     # the hole last: it carves the water back out of the column, so the ladder's foot lands
     # on dry brick with the pool round it rather than in it
     shaft_hole(p, origin, -FOOT + 1, -1, rim=COBBLE)
@@ -506,6 +522,7 @@ def wet(kind):
     p = cell(doors, fill=COBBLE, floor=BRICK)
     for side in doors:
         door(p, side, POOL['channels'], name=FLOW, target=FLOW)
+    flood_doors(p, doors)
     mid = CELL // 2
     if kind in ('flow', 'flow_corner', 'flow_cross'):
         # a channel with the water moving in it: no trigger, and it takes mobs along too
@@ -560,8 +577,32 @@ def write_pool(name, elements, fallback):
 
 
 # ---------------------------------------------------------------------------------- checks
-def verify(pieces):
+def channel_problems(pieces):
+    """Every flooded doorway full of water, so two channel cells meet water to water."""
     problems = []
+    mid = CELL // 2
+    for name, piece in sorted(pieces.items()):
+        sx, sy, sz = piece.size
+        if sx != CELL or sz != CELL:
+            continue
+        for pos, entry in sorted(piece.extra.items()):
+            if (entry or {}).get('id') != 'minecraft:jigsaw' or entry.get('name') != FLOW:
+                continue
+            face = dict(piece.grid[pos][1] or ()).get('orientation', '').split('_')[0]
+            if face not in ('west', 'east', 'north', 'south'):
+                continue
+            for a in (mid - 1, mid, mid + 1):
+                at = {'west': (0, 1, a), 'east': (CELL - 1, 1, a),
+                      'north': (a, 1, 0), 'south': (a, 1, CELL - 1)}[face]
+                if piece.grid[at][0] != WATER:
+                    problems.append('%s: the %s doorway is %s at %s; a flooded cell meets its '
+                                    'neighbour water to water (section 29)'
+                                    % (name, face, piece.grid[at][0].split(':')[-1], at))
+    return problems
+
+
+def verify(pieces):
+    problems = channel_problems(pieces)
     for child, parent in (('core', 'skin_base'), ('core_deep', 'skin_base'),
                           ('vault', 'skin_mid')):
         for axis in range(3):
