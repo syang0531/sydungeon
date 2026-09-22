@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:temple/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/passage", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/corner", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/cross", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/guard_post", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/niche", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/shrine_room", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/infested", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/dig_site", "projection": "rigid", "processors": "sydungeon:temple_weathering" } }
+  ]
+}

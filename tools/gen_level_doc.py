@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -81,6 +81,23 @@ STYLE = OrderedDict([
     ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
     ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
     ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
+    ('mossy_cobblestone',     ('#', '#6f7c66', '이끼 낀 조약돌')),
+    ('cobblestone',           (',', '#828282', '조약돌')),
+    ('moss_block',            ('m', '#5a7040', '이끼 블록')),
+    ('vine',                  ('v', '#3f6b2a', '덩굴')),
+    ('jungle_planks',         ('w', '#9a6b43', '정글 판자')),
+    ('jungle_log',            ('L', '#5a4322', '정글 원목')),
+    ('jungle_fence',          ('f', '#8a5f3c', '정글 울타리')),
+    ('jungle_leaves',         ('l', '#2e6b1e', '정글 잎')),
+    ('jungle_sapling',        ('Y', '#3f8a2a', '정글 묘목')),
+    ('infested_stone_bricks', ('X', '#7a7a6a', '좀벌레 돌벽돌')),
+    ('gravel',                ('g', '#8d8888', '자갈')),
+    ('suspicious_gravel',     ('?', '#a39a8c', '수상한 자갈')),
+    ('cobweb',                ('*', '#d8dde2', '거미줄')),
+    ('iron_door',             ('D', '#c8c8c8', '철문')),
+    ('lever',                 ('!', '#8a7a5e', '레버')),
+    ('mossy_cobblestone_stairs', ('<', '#788566', '이끼 조약돌 계단')),
+    ('mossy_cobblestone_slab', ('_', '#7e8b6c', '이끼 조약돌 반 블록')),
     ('polished_diorite',      ('#', '#d8d8d8', '윤나는 섬록암')),
     ('diorite',               ('d', '#c9c9c9', '섬록암')),
     ('diorite_stairs',        ('<', '#cfcfcf', '섬록암 계단')),
@@ -667,7 +684,7 @@ def build(family):
     pools = load_pools(family)
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
-            'swamp': 'swamps', 'ice': 'fortresses'}
+            'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

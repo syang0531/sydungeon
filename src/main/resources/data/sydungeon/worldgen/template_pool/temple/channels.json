@@ -1,0 +1,17 @@
+{
+  "fallback": "sydungeon:temple/channel_caps",
+  "elements": [
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/flow", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/flow_corner", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/flow_cross", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/pool", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/drain", "projection": "rigid", "processors": "sydungeon:temple_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:temple/treasury", "projection": "rigid", "processors": "sydungeon:temple_weathering" } }
+  ]
+}
