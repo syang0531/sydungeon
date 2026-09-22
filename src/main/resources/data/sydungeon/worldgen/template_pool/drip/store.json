@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:drip/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/store", "projection": "rigid", "processors": "sydungeon:drip_weathering" } }
+  ]
+}

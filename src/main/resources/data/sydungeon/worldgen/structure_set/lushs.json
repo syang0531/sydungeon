@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 18,
+    "separation": 7,
+    "salt": 43516036
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:lush",
+      "weight": 1
+    }
+  ]
+}

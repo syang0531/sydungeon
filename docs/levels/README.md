@@ -18,19 +18,21 @@
 | [dwarf.md](dwarf.md) | 드워프의 전당 | 18 | 지상은 문 하나, 나머지는 42칸 아래 |
 | [light.md](light.md) | 침몰한 등대 | 18 | 마른 쪽과 젖은 쪽이 수면에서 만난다 |
 
-**중소규모 여덟은 한 기계에서 나온다** (`tools/generate_small.py`, §2.8). 문서도 한 원고에서
-껍질마다 채워진 것이라, 읽을 것은 사실상 하나다.
+**중소규모 열은 한 기계에서 나온다** (`tools/generate_small.py`, §2.8). 문서도 한 원고에서
+껍질마다 채워진 것이라, 읽을 것은 사실상 하나다. 여덟은 지표에서 내려가고 둘은 지표가 없다.
 
 | 문서 | 던전 | 조각 | 껍질 |
 |---|---|---|---|
-| [well.md](well.md) | 숨은 우물 | 10 | 같은 기계, plains 껍질 |
-| [tomb.md](tomb.md) | 모래 아래 무덤 | 10 | 같은 기계, desert 껍질 |
-| [cabin.md](cabin.md) | 사냥꾼의 오두막 | 10 | 같은 기계, taiga 껍질 |
-| [cairn.md](cairn.md) | 눈 속 돌무덤 | 10 | 같은 기계, snowy_plains 껍질 |
-| [dryw.md](dryw.md) | 마른 우물 | 10 | 같은 기계, savanna 껍질 |
-| [canopy.md](canopy.md) | 덩굴 밑 저장고 | 10 | 같은 기계, jungle 껍질 |
-| [lodge.md](lodge.md) | 숲지기의 지하실 | 10 | 같은 기계, dark_forest 껍질 |
-| [mire.md](mire.md) | 물에 잠긴 저장고 | 10 | 같은 기계, swamp 껍질 |
+| [well.md](well.md) | 숨은 우물 | 10 | plains 껍질 |
+| [tomb.md](tomb.md) | 모래 아래 무덤 | 10 | desert 껍질 |
+| [cabin.md](cabin.md) | 사냥꾼의 오두막 | 10 | taiga 껍질 |
+| [cairn.md](cairn.md) | 눈 속 돌무덤 | 10 | snowy_plains 껍질 |
+| [dryw.md](dryw.md) | 마른 우물 | 10 | savanna 껍질 |
+| [canopy.md](canopy.md) | 덩굴 밑 저장고 | 10 | jungle 껍질 |
+| [lodge.md](lodge.md) | 숲지기의 지하실 | 10 | dark_forest 껍질 |
+| [mire.md](mire.md) | 물에 잠긴 저장고 | 10 | swamp 껍질 |
+| [lush.md](lush.md) | 이끼 낀 굴 | 8 | 지표 입구 없음 |
+| [drip.md](drip.md) | 점적석 굴 | 8 | 지표 입구 없음 |
 
 ```bash
 python tools/gen_level_doc.py          # 셋 다 다시 만든다

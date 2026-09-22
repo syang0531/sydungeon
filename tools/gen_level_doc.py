@@ -31,7 +31,8 @@ OUT = os.path.join(ROOT, 'docs', 'levels')
 FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
             'grove', 'shrine', 'dwarf', 'light',
             # the small ones, one machine and a skin each (generate_small.py)
-            'well', 'tomb', 'cabin', 'cairn', 'dryw', 'canopy', 'lodge', 'mire')
+            'well', 'tomb', 'cabin', 'cairn', 'dryw', 'canopy', 'lodge', 'mire',
+            'lush', 'drip')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -116,6 +117,7 @@ STYLE = OrderedDict([
     ('lightning_rod',         ('!', '#c4794a', '피뢰침')),
     ('deepslate_tile_slab',   ('_', '#37373b', '심층암 타일 반 블록')),
     ('cracked_deepslate_tiles', ('c', '#333338', '금 간 심층암 타일')),
+    ('azalea',                ('z', '#5f8a3a', '진달래')),
     ('spruce_slab',           ('_', '#6b4f2a', '가문비 반 블록')),
     ('cut_red_sandstone',     ('R', '#a8542a', '깎은 붉은 사암')),
     ('clay',                  ('y', '#9ea4b0', '점토')),
@@ -788,7 +790,8 @@ def build(family):
             'dwarf': 'halls',
             'light': 'lighthouses',
             'well': 'wells', 'tomb': 'tombs', 'cabin': 'cabins', 'cairn': 'cairns',
-            'dryw': 'dryws', 'canopy': 'canopys', 'lodge': 'lodges', 'mire': 'mires'}
+            'dryw': 'dryws', 'canopy': 'canopys', 'lodge': 'lodges', 'mire': 'mires',
+            'lush': 'lushs', 'drip': 'drips'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

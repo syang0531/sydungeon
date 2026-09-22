@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:lush/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:lush/store", "projection": "rigid", "processors": "sydungeon:lush_weathering" } }
+  ]
+}

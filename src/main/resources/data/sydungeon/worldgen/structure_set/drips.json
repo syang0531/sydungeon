@@ -1,0 +1,14 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 18,
+    "separation": 7,
+    "salt": 43413089
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:drip",
+      "weight": 1
+    }
+  ]
+}

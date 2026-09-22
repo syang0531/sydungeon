@@ -1,0 +1,15 @@
+{
+  "fallback": "sydungeon:drip/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/passage", "projection": "rigid", "processors": "sydungeon:drip_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/corner", "projection": "rigid", "processors": "sydungeon:drip_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/cross", "projection": "rigid", "processors": "sydungeon:drip_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/den", "projection": "rigid", "processors": "sydungeon:drip_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:drip/nook", "projection": "rigid", "processors": "sydungeon:drip_weathering" } }
+  ]
+}

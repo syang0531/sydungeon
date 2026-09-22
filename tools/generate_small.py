@@ -91,6 +91,17 @@ SKINS = [
          biomes=['swamp', 'mangrove_swamp'],
          rock='stone', band='clay', brick='mud_bricks', trim='packed_mud',
          floor='mud', wood='mangrove', avoid='swamps'),
+    # and two with no way in from the surface at all: a maze in the rock, dropped at a
+    # depth instead of on the ground. The cheapest small dungeon there is - no entrance to
+    # build and no slope to stand on - and the cave biomes had nothing (concepts.md 4.0).
+    dict(key='lush', title='이끼 낀 굴', head=None, deep=(-40, 8),
+         mob='minecraft:cave_spider', biomes=['lush_caves'],
+         rock='stone', band='moss_block', brick='mossy_cobblestone',
+         trim='mossy_stone_bricks', floor='moss_block', wood='oak', avoid=None),
+    dict(key='drip', title='점적석 굴', head=None, deep=(-48, 0),
+         mob='minecraft:skeleton', biomes=['dripstone_caves'],
+         rock='stone', band='dripstone_block', brick='cobblestone',
+         trim='stone_bricks', floor='dripstone_block', wood='oak', avoid=None),
 ]
 
 CELLS = ('passage', 'corner', 'cross', 'den', 'nook')
@@ -266,8 +277,20 @@ def door(p, skin, side, pool, name=None, target=None, priority=0):
 
 def hub(skin):
     """Where the ladder lands. West and south open into the maze; north calls the store room
-    on its own single-element pool, so every one of these has a chest in it."""
+    on its own single-element pool, so every one of these has a chest in it.
+
+    The deep ones have no ladder and no way in: this piece is their start, dropped at a depth
+    into whatever rock is there, so it opens east as well and the maze is the whole dungeon.
+    """
     b = skin_blocks(skin)
+    if skin.get('deep'):
+        p = room(skin, ['west', 'north', 'south', 'east'])
+        for side in ('west', 'south', 'east'):
+            door(p, skin, side, pool_name(skin, 'cells'), priority=PRIORITY)
+        door(p, skin, 'north', pool_name(skin, 'store'), priority=PRIORITY)
+        p.set(1, 1, 1, 'minecraft:lantern', STANDING)
+        p.set(CELL - 2, 1, CELL - 2, *chest(skin, 'west'))
+        return p
     p = room(skin, ['west', 'north', 'south'])
     cx, cz = HOLE
     for x in range(CELL):                                        # close the ceiling first
@@ -342,8 +365,12 @@ def cap(skin):
 
 
 def build(skin):
-    return {'head': head(skin), 'shaft': shaft(skin), 'hub': hub(skin), 'store': store(skin),
-            'cap': cap(skin), **{k: cell(skin, k) for k in CELLS}}
+    out = {'hub': hub(skin), 'store': store(skin), 'cap': cap(skin),
+           **{k: cell(skin, k) for k in CELLS}}
+    if not skin.get('deep'):
+        out['head'] = head(skin)
+        out['shaft'] = shaft(skin)
+    return out
 
 
 # ---------------------------------------------------------------------------------- checks
@@ -437,6 +464,8 @@ EXTRA = {
     'canopy': ['cocoa_beans', 'jungle_sapling', 'melon_slice', 'bamboo', 'emerald'],
     'lodge': ['brown_mushroom', 'red_mushroom', 'dark_oak_sapling', 'bowl', 'book'],
     'mire': ['slime_ball', 'clay_ball', 'lily_pad', 'mangrove_propagule', 'kelp'],
+    'lush': ['glow_berries', 'moss_block', 'bone_meal', 'azalea', 'emerald'],
+    'drip': ['pointed_dripstone', 'copper_ingot', 'raw_iron', 'flint', 'emerald'],
 }
 
 
@@ -455,7 +484,7 @@ def write_data(skin):
     put('tags/worldgen/biome/has_structure/%s.json' % key,
         {'values': [mc(b) for b in skin['biomes']]})
 
-    put('worldgen/structure/%s.json' % key, {
+    structure = {
         'type': 'sydungeon:ranged_jigsaw',
         'biomes': '#sydungeon:has_structure/%s' % key,
         'step': 'underground_structures',
@@ -470,16 +499,30 @@ def write_data(skin):
         'liquid_settings': 'ignore_waterlogging',
         'dimension_padding': {'bottom': 8, 'top': 0},
         'level_ground_drop': 8,
-        'level_ground_radius': 6})
+        'level_ground_radius': 6}
+    if skin.get('deep'):
+        # no heightmap: the start is dropped at a depth, into whatever rock is there. Which
+        # is why there is no level ground to ask for and nothing for the beard to do either.
+        low, high = skin['deep']
+        structure.pop('project_start_to_heightmap')
+        structure.pop('level_ground_drop')
+        structure.pop('level_ground_radius')
+        structure['start_height'] = {'type': 'minecraft:uniform',
+                                     'min_inclusive': {'absolute': low},
+                                     'max_inclusive': {'absolute': high}}
+        structure['dimension_padding'] = {'bottom': 16, 'top': 16}
+    put('worldgen/structure/%s.json' % key, structure)
 
     # close together, because a small one is meant to be tripped over rather than sought
     # (section 2.8), and kept away from the large dungeon that owns the same biomes
+    placement = {'type': 'minecraft:random_spread',
+                 'spacing': 18, 'separation': 7,
+                 'salt': 40000000 + sum(ord(c) for c in key) * 7919}
+    if skin['avoid']:
+        placement['exclusion_zone'] = {'other_set': '%s:%s' % (NS, skin['avoid']),
+                                       'chunk_count': 6}
     put('worldgen/structure_set/%ss.json' % key, {
-        'placement': {'type': 'minecraft:random_spread',
-                      'spacing': 18, 'separation': 7,
-                      'salt': 40000000 + sum(ord(c) for c in key) * 7919,
-                      'exclusion_zone': {'other_set': '%s:%s' % (NS, skin['avoid']),
-                                         'chunk_count': 6}},
+        'placement': placement,
         'structures': [{'structure': '%s:%s' % (NS, key), 'weight': 1}]})
 
     b = skin_blocks(skin)
@@ -512,7 +555,7 @@ def write_pools(skin):
         os.makedirs(out)
     caps = pool_name(skin, 'caps')
     pools = {
-        'start': ([element(skin, 'head', 1)], EMPTY),
+        'start': ([element(skin, 'hub' if skin.get('deep') else 'head', 1)], EMPTY),
         'down': ([element(skin, 'shaft', 1)], EMPTY),
         'first': ([element(skin, 'hub', 1)], EMPTY),
         'store': ([element(skin, 'store', 1)], caps),
@@ -521,6 +564,14 @@ def write_pools(skin):
                    element(skin, 'nook', 6)], caps),
         'caps': ([element(skin, 'cap', 1)], EMPTY),
     }
+    if skin.get('deep'):
+        # no shaft and no hub-below-a-shaft: the hub IS the start, so those two pools would
+        # point at pieces that do not exist
+        for gone in ('down', 'first'):
+            pools.pop(gone)
+            stale = os.path.join(out, gone + '.json')
+            if os.path.exists(stale):
+                os.remove(stale)
     for name, (elements, fallback) in pools.items():
         text = ('{\n  "fallback": "%s",\n  "elements": [\n%s\n  ]\n}\n'
                 % (fallback, ',\n'.join(elements)))
