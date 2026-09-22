@@ -48,6 +48,13 @@ def downgrade_palette(palette):
         out.append(e)
     return out
 
+# The stair's lower jigsaw is named for itself rather than `door`, so nothing in the maze can
+# attach to it: a corridor targets `door` and this is not one. The stair can therefore only be
+# entered from its top, and the maze only ever goes down. Left as `door` on both, half of them
+# were climbed the other way and the maze wandered up as far as it went down - which is how it
+# ended up standing in the open on a hillside (2026-09-22).
+FOOT = NS + ':stair_foot'
+
 RENAME = {
     'st_passage': 'passage',
     'st_passage_1': 'passage_cell',
@@ -64,15 +71,16 @@ POOL = {
 }
 
 
-def convert(src, dst):
+def convert(src, dst, one_way=False):
     root = nbt.read(src)
     palette = root['palette']
     changed = 0
-    for block in root['blocks']:
-        if nbt.palette_name(palette[block['state']]) != 'minecraft:jigsaw':
-            continue
+    jigsaws = [b for b in root['blocks']
+               if nbt.palette_name(palette[b['state']]) == 'minecraft:jigsaw']
+    foot = min((int(b['pos'][1]) for b in jigsaws), default=None) if one_way else None
+    for block in jigsaws:
         meta = block['nbt']
-        meta['name'] = DOOR
+        meta['name'] = FOOT if one_way and int(block['pos'][1]) == foot else DOOR
         meta['target'] = DOOR
         meta['pool'] = POOL[meta['pool']]
         changed += 1
@@ -87,7 +95,7 @@ def main():
     for old, new in RENAME.items():
         src = os.path.join(SRC, old + '.nbt')
         dst = os.path.join(DST, new + '.nbt')
-        n, size = convert(src, dst)
+        n, size = convert(src, dst, one_way=(new == 'stair'))
         print('%-14s -> %-14s %d jigsaw(s), size %s' % (old, new, n, list(size)))
 
 

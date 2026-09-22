@@ -42,7 +42,8 @@ DOOR = NS + ':door'
 # continuation door as often as not, and the branch would lose the room.
 BOSS_DOOR = NS + ':boss_door'
 POOL = {k: NS + ':dungeon/' + k for k in (
-    'passages', 'cells', 'caps', 'shaft_first', 'shafts', 'shaft_caps', 'boss_approach')}
+    'passages', 'cells', 'caps', 'shaft_first', 'shaft_second', 'shafts', 'shaft_caps',
+    'boss_approach')}
 
 # The boss corridor is at least this many pieces long before the room may appear. Each step
 # is its own pool (boss_approach_1 .. _N) holding one boss_passage variant whose continuation
@@ -186,13 +187,29 @@ def entrance():
     return p
 
 
-def shaft():
+def shaft(down=None):
+    """Twenty-one of ladder. `down` is the pool under it, which is how the chain is forced:
+    shaft_1 calls shaft_2 and only shaft_2 lets the maze begin, so the hub is never less than
+    forty-two under the door.
+
+    That depth is what keeps the maze underground. A dungeon spreads eighty blocks or so, and
+    on a hillside twenty-one of fall over that distance is an ordinary slope - the corridors
+    came out of the grass and stood there in the open (2026-09-22 screenshot). Forty-two is a
+    cliff, and rare."""
     p = Piece(7, 21, 7, STONE)
     p.box(2, 0, 1, 4, 20, 3, AIR)
     p.ladder(3, 0, 20, 1, 'south')
     p.jigsaw(3, 20, 2, 'up_east', POOL['shafts'], AIR, joint='aligned')
-    p.jigsaw(3, 0, 2, 'down_east', POOL['shafts'], AIR, joint='aligned')
+    p.jigsaw(3, 0, 2, 'down_east', down or POOL['shafts'], AIR, joint='aligned')
     return p
+
+
+def shaft_1():
+    return shaft(POOL['shaft_second'])
+
+
+def shaft_2():
+    return shaft(POOL['shafts'])
 
 
 def hub():
@@ -294,6 +311,8 @@ PIECES = {
     'shaft_cap': shaft_cap,
     'entrance': entrance,
     'shaft': shaft,
+    'shaft_1': shaft_1,
+    'shaft_2': shaft_2,
     'hub': hub,
     'boss_room': boss_room,
 }

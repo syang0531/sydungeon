@@ -58,7 +58,9 @@ HIGH = 18                        # box height above it
 WARD = 7                         # the courtyard strip a panel carries in front of itself
 PANEL = (KEEP, FOOT + HIGH, WARD + CELL)      # 21 x 25 x 14
 TOWER = (2 * CELL, FOOT + HIGH, 2 * CELL)     # 14 x 25 x 14
-SHAFT_H = 14
+SHAFT_H = 28                     # two cells' worth of ladder, so the cellars stay buried:
+                                 # the fortress stands in mountain biomes and fourteen of
+                                 # fall over the maze's spread is an ordinary slope
 BOSS = (21, 14, 21)
 MIN_BOSS_STEPS = 3
 
