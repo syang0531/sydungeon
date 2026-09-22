@@ -13,6 +13,8 @@
 | [temple.md](temple.md) | 덩굴에 삼킨 신전 | 27 | 껍데기 하나에 지상과 지하를 같이 넣는다 |
 | [camp.md](camp.md) | 군벌의 진영 | 21 | 성채의 고리를 얇은 목책으로 |
 | [grave.md](grave.md) | 저주받은 묘지 | 25 | 늪처럼 퍼지고, 지하는 바위를 파낸다 |
+| [grove.md](grove.md) | 균사 동굴 | 14 | 감옥을 줄인 것. 보스도 시그니처도 없다 |
+| [shrine.md](shrine.md) | 산신의 사당 | 11 | 오르막을 지형에서 마당 안으로 들여왔다 |
 
 ```bash
 python tools/gen_level_doc.py          # 셋 다 다시 만든다

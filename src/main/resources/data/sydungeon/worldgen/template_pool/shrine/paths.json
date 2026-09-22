@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:shrine/path_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/run", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/bend", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/cross", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/gate", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/rest", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 7, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/garden", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/spring", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:shrine/lantern", "projection": "rigid", "processors": "sydungeon:shrine_weathering" } }
+  ]
+}

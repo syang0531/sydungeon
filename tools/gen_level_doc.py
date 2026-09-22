@@ -29,7 +29,7 @@ DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
 FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
-            'grove')
+            'grove', 'shrine')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -102,6 +102,20 @@ STYLE = OrderedDict([
     ('red_mushroom',          ('e', '#c0392b', '붉은 버섯')),
     ('brown_mushroom',        ('n', '#9a7b5a', '갈색 버섯')),
     ('bone_block',            ('B', '#e0ddc7', '뼈 블록')),
+    ('cherry_log',            ('L', '#5b4544', '벚나무 원목')),
+    ('stripped_cherry_log',   ('l', '#e3a0a0', '껍질 벗긴 벚나무')),
+    ('cherry_planks',         ('w', '#e3b7b2', '벚나무 판자')),
+    ('cherry_leaves',         ('^', '#f2b6cf', '벚나무 잎')),
+    ('cherry_sapling',        ('t', '#e59ab8', '벚나무 묘목')),
+    ('pink_petals',           (',', '#f6c6da', '분홍 꽃잎')),
+    ('pink_tulip',            ('v', '#e58cb0', '분홍 튤립')),
+    ('polished_andesite',     ('a', '#a2a3a0', '윤나는 안산암')),
+    ('andesite_wall',         ('r', '#8b8c89', '안산암 담장')),
+    ('smooth_stone',          ('o', '#9f9f9f', '매끄러운 돌')),
+    ('smooth_stone_slab',     ('_', '#b0b0b0', '매끄러운 돌 반 블록')),
+    ('stone_stairs',          ('/', '#8a8a8a', '돌 계단')),
+    ('magma_block',           ('g', '#8f4a1e', '마그마 블록')),
+    ('bell',                  ('q', '#e0b84a', '종')),
     ('soul_soil',             ('s', '#4a3a30', '영혼 흙')),
     ('soul_lantern',          ('*', '#5fd8f0', '영혼 랜턴')),
     ('soul_torch',            ('i', '#69e0f2', '영혼 횃불')),
@@ -730,7 +744,8 @@ def build(family):
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
             'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
-            'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows'}
+            'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows',
+            'shrine': 'shrines'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

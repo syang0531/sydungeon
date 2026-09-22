@@ -3,7 +3,7 @@
 
     python tools/make_pieces.py
 
-Eleven steps, each its own script:
+Twelve steps, each its own script:
   1. convert_yame.py     the hand-built practice pieces, renamed and rewired, brought to 26.2
   2. generate_pieces.py  the prison's plugs and entrance shaft, described in code
   3. decorate.py         loot chests and spawners placed into the pieces above
@@ -15,6 +15,7 @@ Eleven steps, each its own script:
   9. generate_camp.py    the warlord's camp: palisade, longhouse, watchtowers, the mine
  10. generate_grave.py   the cursed graveyard: the chapel, the plots, the ossuary
  11. generate_grove.py   the mycelium hollow: the first small one, no boss at all
+ 12. generate_shrine.py  the mountain shrine: gates, a plinth, a sealed cellar
 
 Pieces saved from the dev client and brought in with import_piece.py are not touched by
 this - they are already ours. Note that step 1 overwrites the eight converted pieces, so a
@@ -37,6 +38,7 @@ import generate_temple  # noqa: E402
 import generate_camp  # noqa: E402
 import generate_grave  # noqa: E402
 import generate_grove  # noqa: E402
+import generate_shrine  # noqa: E402
 
 if __name__ == '__main__':
     print('-- convert')
@@ -61,3 +63,5 @@ if __name__ == '__main__':
     generate_grave.main()
     print('-- grove')
     generate_grove.main()
+    print('-- shrine')
+    generate_shrine.main()
