@@ -29,7 +29,9 @@ DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
 FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp', 'grave',
-            'grove', 'shrine', 'dwarf', 'light')
+            'grove', 'shrine', 'dwarf', 'light',
+            # the small ones, one machine and a skin each (generate_small.py)
+            'well', 'tomb', 'cabin', 'cairn', 'dryw', 'canopy', 'lodge', 'mire')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -114,6 +116,11 @@ STYLE = OrderedDict([
     ('lightning_rod',         ('!', '#c4794a', '피뢰침')),
     ('deepslate_tile_slab',   ('_', '#37373b', '심층암 타일 반 블록')),
     ('cracked_deepslate_tiles', ('c', '#333338', '금 간 심층암 타일')),
+    ('spruce_slab',           ('_', '#6b4f2a', '가문비 반 블록')),
+    ('cut_red_sandstone',     ('R', '#a8542a', '깎은 붉은 사암')),
+    ('clay',                  ('y', '#9ea4b0', '점토')),
+    ('mud',                   ('u', '#4c4038', '진흙')),
+    ('mangrove_fence',        ('f', '#7a3b34', '맹그로브 울타리')),
     ('granite',               ('G', '#9a6a55', '화강암')),
     ('tuff_bricks',           ('T', '#6f7169', '응회암 벽돌')),
     ('deepslate_tiles',       ('t', '#3b3b3e', '심층암 타일')),
@@ -779,7 +786,9 @@ def build(family):
             'camp': 'camps', 'grave': 'graveyards', 'grove': 'hollows',
             'shrine': 'shrines',
             'dwarf': 'halls',
-            'light': 'lighthouses'}
+            'light': 'lighthouses',
+            'well': 'wells', 'tomb': 'tombs', 'cabin': 'cabins', 'cairn': 'cairns',
+            'dryw': 'dryws', 'canopy': 'canopys', 'lodge': 'lodges', 'mire': 'mires'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

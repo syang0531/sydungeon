@@ -1,0 +1,29 @@
+{
+  "type": "sydungeon:ranged_jigsaw",
+  "biomes": "#sydungeon:has_structure/canopy",
+  "step": "underground_structures",
+  "terrain_adaptation": "none",
+  "spawn_overrides": {},
+  "start_pool": "sydungeon:canopy/start",
+  "size": {
+    "type": "minecraft:uniform",
+    "min_inclusive": 6,
+    "max_inclusive": 10
+  },
+  "start_height": {
+    "absolute": 0
+  },
+  "project_start_to_heightmap": "WORLD_SURFACE_WG",
+  "max_distance_from_center": {
+    "horizontal": 40,
+    "vertical": 48
+  },
+  "use_expansion_hack": false,
+  "liquid_settings": "ignore_waterlogging",
+  "dimension_padding": {
+    "bottom": 8,
+    "top": 0
+  },
+  "level_ground_drop": 8,
+  "level_ground_radius": 6
+}

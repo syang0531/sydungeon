@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:mire/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:mire/store", "projection": "rigid", "processors": "sydungeon:mire_weathering" } }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:canopy/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:canopy/store", "projection": "rigid", "processors": "sydungeon:canopy_weathering" } }
+  ]
+}

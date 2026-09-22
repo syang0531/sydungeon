@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:cairn/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/store", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } }
+  ]
+}

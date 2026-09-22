@@ -1,0 +1,15 @@
+{
+  "fallback": "sydungeon:well/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/passage", "projection": "rigid", "processors": "sydungeon:well_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/corner", "projection": "rigid", "processors": "sydungeon:well_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/cross", "projection": "rigid", "processors": "sydungeon:well_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/den", "projection": "rigid", "processors": "sydungeon:well_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/nook", "projection": "rigid", "processors": "sydungeon:well_weathering" } }
+  ]
+}

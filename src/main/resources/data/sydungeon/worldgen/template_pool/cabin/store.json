@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:cabin/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cabin/store", "projection": "rigid", "processors": "sydungeon:cabin_weathering" } }
+  ]
+}

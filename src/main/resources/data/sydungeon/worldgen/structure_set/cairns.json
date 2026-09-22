@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 18,
+    "separation": 7,
+    "salt": 44157475,
+    "exclusion_zone": {
+      "other_set": "sydungeon:fortresses",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:cairn",
+      "weight": 1
+    }
+  ]
+}

@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:well/caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:well/store", "projection": "rigid", "processors": "sydungeon:well_weathering" } }
+  ]
+}

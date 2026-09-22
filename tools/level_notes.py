@@ -414,6 +414,7 @@ from level_notes_grove import install as _install_grove  # noqa: E402
 from level_notes_shrine import install as _install_shrine  # noqa: E402
 from level_notes_dwarf import install as _install_dwarf  # noqa: E402
 from level_notes_light import install as _install_light  # noqa: E402
+from level_notes_small import install as _install_small  # noqa: E402
 
 _install_tower(INTRO, NOTES)
 _install_swamp(INTRO, NOTES)
@@ -425,3 +426,4 @@ _install_grove(INTRO, NOTES)
 _install_shrine(INTRO, NOTES)
 _install_dwarf(INTRO, NOTES)
 _install_light(INTRO, NOTES)
+_install_small(INTRO, NOTES)

@@ -1,0 +1,15 @@
+{
+  "fallback": "sydungeon:cairn/caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/passage", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/corner", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/cross", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/den", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } },
+    { "weight": 6, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:cairn/nook", "projection": "rigid", "processors": "sydungeon:cairn_weathering" } }
+  ]
+}

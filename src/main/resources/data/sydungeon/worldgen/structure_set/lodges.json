@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 18,
+    "separation": 7,
+    "salt": 44141637,
+    "exclusion_zone": {
+      "other_set": "sydungeon:graveyards",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:lodge",
+      "weight": 1
+    }
+  ]
+}

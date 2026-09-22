@@ -1,0 +1,18 @@
+{
+  "placement": {
+    "type": "minecraft:random_spread",
+    "spacing": 18,
+    "separation": 7,
+    "salt": 43452684,
+    "exclusion_zone": {
+      "other_set": "sydungeon:dungeons",
+      "chunk_count": 6
+    }
+  },
+  "structures": [
+    {
+      "structure": "sydungeon:well",
+      "weight": 1
+    }
+  ]
+}
