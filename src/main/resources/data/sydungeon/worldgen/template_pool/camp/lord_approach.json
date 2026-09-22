@@ -1,0 +1,9 @@
+{
+  "fallback": "sydungeon:camp/drift_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/warlord_hall", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/approach_3", "projection": "rigid", "processors": "sydungeon:camp_weathering" } }
+  ]
+}

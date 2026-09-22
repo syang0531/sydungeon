@@ -1678,13 +1678,13 @@ y = 20   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnJnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmJmmm
 y = 1–3   x →동, z ↓남
   NNNNNNN
   N.....N
@@ -1743,13 +1743,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1–4   x →동, z ↓남
   NNNNNNN
   N.....N
@@ -1800,13 +1800,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNN
   N.....N
@@ -1865,13 +1865,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  Jnnnnnn
-  nnnnnnn
-  nnnnnnn
-  nnnJnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  Jmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmJmmm
 y = 1–4   x →동, z ↓남
   NNNNNNN
   N.....N
@@ -1924,13 +1924,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnJnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnJnnn
+  mmmJmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmJmmm
 y = 1–4   x →동, z ↓남
   NN...NN
   N.....N
@@ -1983,13 +1983,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnJnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnJnnn
+  mmmJmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmJmmm
 y = 1   x →동, z ↓남
   NN...NN
   N.....N
@@ -2048,20 +2048,20 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  Jnnnnnn
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  Jmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNN
-  Nn....N
-  .n....N
-  .n...cN
-  .n....N
-  Nn....N
+  N#....N
+  .#....N
+  .#...cN
+  .#....N
+  N#....N
   NNNNNNN
 y = 2   x →동, z ↓남
   NNNNNNN
@@ -2128,20 +2128,20 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  Jnnnnnn
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  Jmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNN
   NU....N
   ......N
   ......N
   ......N
-  NnnnnnN
+  N#####N
   NNNNNNN
 y = 2   x →동, z ↓남
   NNNNNNN
@@ -2208,13 +2208,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  Jnnnnnn
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  Jmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNN
   N..S.cN
@@ -2274,13 +2274,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNN
   NR~~~~N
@@ -2388,13 +2388,13 @@ y = 1–6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnJnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmJmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1–4   x →동, z ↓남
   NN...NN
   N.....N
@@ -2448,13 +2448,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnJnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmJmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1–4   x →동, z ↓남
   NN...NN
   N.....N
@@ -2508,13 +2508,13 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnJnnn
-  nnnnnnn
-  nnnnnnn
-  JnnnnnJ
-  nnnnnnn
-  nnnnnnn
-  nnnnnnn
+  mmmJmmm
+  mmmmmmm
+  mmmmmmm
+  JmmmmmJ
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
 y = 1–4   x →동, z ↓남
   NN...NN
   N.....N
@@ -2571,27 +2571,27 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnn~~~~~~~~~nnnnnn
-  nnnnnn~~~~~~~~~nnnnnn
-  nnnnnn~~nnnnn~~nnnnnn
-  nnnnnn~~nnnnn~~nnnnnn
-  Jnnnnn~~nnnnn~~nnnnnn
-  nnnnnn~~nnnnn~~nnnnnn
-  nnnnnn~~nnnnn~~nnnnnn
-  nnnnnn~~~~~~~~~nnnnnn
-  nnnnnn~~~~~~~~~nnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
-  nnnnnnnnnnnnnnnnnnnnn
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmm~~~~~~~~~mmmmmm
+  mmmmmm~~~~~~~~~mmmmmm
+  mmmmmm~~mmmmm~~mmmmmm
+  mmmmmm~~mmmmm~~mmmmmm
+  Jmmmmm~~mmmmm~~mmmmmm
+  mmmmmm~~mmmmm~~mmmmmm
+  mmmmmm~~mmmmm~~mmmmmm
+  mmmmmm~~~~~~~~~mmmmmm
+  mmmmmm~~~~~~~~~mmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
 y = 1   x →동, z ↓남
   NNNNNNNNNNNNNNNNNNNNN
   N...................N
@@ -2602,9 +2602,9 @@ y = 1   x →동, z ↓남
   N...................N
   N...................N
   N...................N
-  .........nnn........N
-  .........nnn........N
-  .........nnn........N
+  .........###........N
+  .........###........N
+  .........###........N
   N...................N
   N...................N
   N...................N
@@ -2766,8 +2766,8 @@ y = 13   x →동, z ↓남
   ....................N
   ....................N
   ..........T.........N
-  .........nnn........N
-  Jnnnnn~~nnnnn~~nnnnnn
+  .........###........N
+  Jmmmmm~~mmmmm~~mmmmmm
 단면 x = 10   z →남, y ↑하늘
   NNNNNNNNNNNNNNNNNNNNN
   N...................N
@@ -2781,8 +2781,8 @@ y = 13   x →동, z ↓남
   N...................N
   N...................N
   N.........T.........N
-  N........nnn........N
-  nnnnnn~~nnnnn~~nnnnnn
+  N........###........N
+  mmmmmm~~mmmmm~~mmmmmm
 ```
 
 </details>

@@ -28,7 +28,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DATA = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon')
 OUT = os.path.join(ROOT, 'docs', 'levels')
 
-FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple')
+FAMILIES = ('dungeon', 'pyramid', 'tower', 'swamp', 'ice', 'temple', 'camp')
 
 
 # --- how each block is drawn ------------------------------------------------------------
@@ -81,6 +81,16 @@ STYLE = OrderedDict([
     ('oxidized_copper_grate', ('G', '#3f8270', '산화 구리 격자')),
     ('oxidized_copper_chain', ('j', '#5aa893', '산화 구리 사슬')),
     ('oxidized_lightning_rod', ('!', '#8fe0c8', '피뢰침')),
+    ('acacia_log',            ('L', '#96613a', '아카시아 원목')),
+    ('stripped_acacia_log',   ('l', '#b4744a', '껍질 벗긴 아카시아')),
+    ('acacia_planks',         ('w', '#b06437', '아카시아 판자')),
+    ('acacia_fence',          ('f', '#a05a30', '아카시아 울타리')),
+    ('acacia_slab',           ('_', '#bb6d3f', '아카시아 반 블록')),
+    ('acacia_trapdoor',       ('=', '#a8613a', '아카시아 다락문')),
+    ('coarse_dirt',           ('d', '#7d5d41', '거친 흙')),
+    ('packed_mud',            ('m', '#9a7a5e', '굳은 진흙')),
+    ('terracotta',            ('K', '#9b6a52', '테라코타')),
+    ('hay_block',             ('h', '#c8a41c', '건초 더미')),
     ('mossy_cobblestone',     ('#', '#6f7c66', '이끼 낀 조약돌')),
     ('cobblestone',           (',', '#828282', '조약돌')),
     ('moss_block',            ('m', '#5a7040', '이끼 블록')),
@@ -684,7 +694,8 @@ def build(family):
     pools = load_pools(family)
     structure = load_json('worldgen', 'structure', '%s.json' % family)
     sets = {'dungeon': 'dungeons', 'pyramid': 'pyramids', 'tower': 'towers',
-            'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples'}
+            'swamp': 'swamps', 'ice': 'fortresses', 'temple': 'temples',
+            'camp': 'camps'}
     placement = load_json('worldgen', 'structure_set', '%s.json' % sets[family])['placement']
     start_pool = structure['start_pool'].split('/')[-1]
 

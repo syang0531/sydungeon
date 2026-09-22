@@ -1,0 +1,21 @@
+{
+  "fallback": "sydungeon:camp/drift_caps",
+  "elements": [
+    { "weight": 10, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/drift", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 9, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/drift_corner", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 4, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/drift_cross", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/guard", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 8, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/store", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/cave_in", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 3, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/cage", "projection": "rigid", "processors": "sydungeon:camp_weathering" } },
+    { "weight": 5, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/dig", "projection": "rigid", "processors": "sydungeon:camp_weathering" } }
+  ]
+}

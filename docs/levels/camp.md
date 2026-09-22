@@ -1,0 +1,2717 @@
+# 레벨 설계 — 군벌의 진영
+
+> 이 문서는 `python tools/gen_level_doc.py camp`가 만든다. 조각을 고치면 다시 돌린다. 그림과 표는 게임이 읽는 파일(`structure/camp/*.nbt`, `worldgen/**`)에서 그대로 읽어 온 것이라 모드와 어긋날 수 없다. 설명 문장만 사람이 쓴다 (`tools/gen_level_doc.py`의 `INTRO`·`NOTES`).
+
+## 1. 한눈에
+
+사바나와 악지에 선 49칸짜리 진영이다. 통나무 **목책**이 마당을 두르고 네 귀퉁이에 **감시탑**이
+서고, 가운데 **대말움집**이 있다. 서쪽 목책의 문으로 들어간다. 움집 바닥의 구멍으로 사다리가
+21칸 내려가면 나무로 받친 **갱도**고, 통로 셋 뒤에 **군벌**이 있다.
+
+**한 판:** 문 → 마당(모닥불·상자·약탈자) → 감시탑 넷(궁수와 상자) → 움집 → 사다리 → 갱도
+(무너진 곳·수상한 자갈·**라버저 우리**) → 군벌. 이기면 **다중 발사 또는 관통 석궁 + 불길한 병
+2~3 + 에메랄드 10~18 + 파수꾼 장식 템플릿 2**가 확정이다. 불길한 병은 바닐라 트라이얼 챔버를
+불길하게 여는 열쇠고, 이 모드에서 그것을 주는 곳은 여기뿐이다.
+
+| 항목 | 값 |
+|---|---|
+| 생성 단계 | `surface_structures` |
+| 바이옴 | `#sydungeon:has_structure/camp` |
+| 간격 / 최소거리 | spacing 40 / separation 14 |
+| 직소 깊이 | 14 ~ 22 (`sydungeon:ranged_jigsaw`) |
+| 시작 풀 | `start` |
+| 조각 / 풀 | 21개 / 14개 |
+
+## 2. 조립 원리
+
+### 얼음 성채의 기계를 아카시아로
+
+고리는 성채와 똑같이 만든다 (`CLAUDE.md` §19). **대말움집이 시작 조각**이고 사방으로 목책
+조각을 부르며, **북쪽과 남쪽 조각만** 제 양 끝에서 감시탑을 부른다 — 한 번만 부르면 회전이
+하나로 정해지고, 거울 한 쌍으로 좌우를 맞춘다 (§13). 상자들이 진영 가운데를 비워 두므로
+**아래로 내려가는 가지가 갇히지 않는다.**
+
+성채와 다른 점은 **목책이 얇다**는 것이다. 성채의 벽은 일곱 칸 두께라 탑이 순찰로에서만
+열렸지만, 목책은 두 칸이고 마당이 탑까지 닿아서 **탑 문이 땅 높이에 있다.**
+
+### 악지가 기초를 요구한다
+
+사바나는 평평한데 악지는 한 구조물 안에서 지형이 무너진다. 그래서 조각마다 **기초 일곱 켜**를
+달고 있다 (§18). 시작 조각은 바닥이 지표에 고정되지만 자식은 직소 높이로만 놓이므로, 목책과
+탑은 얼마든지 깊어도 된다.
+
+### 사다리와 발판
+
+세 곳에서 같은 문제를 만났고 셋 다 같은 규칙으로 풀었다 (§24).
+
+- 움집 바닥의 3×3 구멍 — **사다리가 있는 줄을 바닥 켜에서 남긴다.** 걸어 나가서 올라탄다
+- 갱도 허브 — 사다리가 방 한가운데라 걸 데가 없다. **통나무 기둥**을 세우고 그 안에 직소를 넣었다
+- 감시탑 — 사다리가 발판 밑에서 끊기면 올라가도 설 자리가 없다. **발판을 뚫고 한 칸 더** 올라가고,
+  난간 한 칸을 비워 그리로 내린다. 귀퉁이 기둥이 난간보다 한 칸 높은 이유도 그것이다 — 사다리의
+  맨 윗칸이 걸릴 벽이 필요하다
+
+### 트리거가 있는 함정은 없다
+
+콘셉트의 라버저 우리는 **트리거가 아니라 선택**이다. 철창 안에 라버저 스포너가 있고, 깨는 것은
+플레이어의 판단이다 — 몹은 철창을 깨지 않는다. 무너진 갱도와 수상한 자갈도 같다: 하나는 늘
+거기 있는 위험이고, 하나는 솔질이 플레이어만 되는 것이다 (§12).
+
+## 3. 풀 배선
+
+풀이 어떤 조각을 내놓는지(실선, 숫자는 가중치)와 그 조각의 직소가 다시 어떤 풀을 부르는지(점선)다. 직소 생성은 이 그래프를 깊이만큼 따라간다.
+
+```mermaid
+flowchart LR
+  P_corner_a(["corner_a"])
+  P_corner_b(["corner_b"])
+  P_down(["down"])
+  P_drift_caps(["drift_caps"])
+  P_drifts(["drifts"])
+  P_gate(["gate"])
+  P_lord_approach(["lord_approach"])
+  P_lord_approach_1(["lord_approach_1"])
+  P_lord_approach_2(["lord_approach_2"])
+  P_lord_approach_3(["lord_approach_3"])
+  P_mine_first(["mine_first"])
+  P_panels(["panels"])
+  P_panels_end(["panels_end"])
+  P_start(["start"])
+  E_approach_1["approach_1"]
+  E_approach_2["approach_2"]
+  E_approach_3["approach_3"]
+  E_cage["cage"]
+  E_cap["cap"]
+  E_cave_in["cave_in"]
+  E_dig["dig"]
+  E_drift["drift"]
+  E_drift_corner["drift_corner"]
+  E_drift_cross["drift_cross"]
+  E_gate["gate"]
+  E_guard["guard"]
+  E_longhouse["longhouse"]
+  E_mine_hub["mine_hub"]
+  E_panel["panel"]
+  E_panel_end["panel_end"]
+  E_shaft["shaft"]
+  E_store["store"]
+  E_tower_a["tower_a"]
+  E_tower_b["tower_b"]
+  E_warlord_hall["warlord_hall"]
+  P_corner_a -- 1 --> E_tower_a
+  P_corner_b -- 1 --> E_tower_b
+  P_down -- 1 --> E_shaft
+  P_drift_caps -- 1 --> E_cap
+  P_drifts -- 10 --> E_drift
+  P_drifts -- 9 --> E_drift_corner
+  P_drifts -- 4 --> E_drift_cross
+  P_drifts -- 5 --> E_guard
+  P_drifts -- 8 --> E_store
+  P_drifts -- 5 --> E_cave_in
+  P_drifts -- 3 --> E_cage
+  P_drifts -- 5 --> E_dig
+  P_gate -- 1 --> E_gate
+  P_lord_approach -- 1 --> E_warlord_hall
+  P_lord_approach -- 1 --> E_approach_3
+  P_lord_approach_1 -- 1 --> E_approach_1
+  P_lord_approach_2 -- 1 --> E_approach_2
+  P_lord_approach_3 -- 1 --> E_approach_3
+  P_mine_first -- 1 --> E_mine_hub
+  P_panels -- 1 --> E_panel
+  P_panels_end -- 1 --> E_panel_end
+  P_start -- 1 --> E_longhouse
+  E_approach_1 -.-> P_drifts
+  E_approach_1 -.-> P_lord_approach_2
+  E_approach_2 -.-> P_drifts
+  E_approach_2 -.-> P_lord_approach_3
+  E_approach_3 -.-> P_drifts
+  E_approach_3 -.-> P_lord_approach
+  E_cage -.-> P_drifts
+  E_cap -.-> P_drift_caps
+  E_cave_in -.-> P_drifts
+  E_dig -.-> P_drifts
+  E_drift -.-> P_drifts
+  E_drift_corner -.-> P_drifts
+  E_drift_cross -.-> P_drifts
+  E_guard -.-> P_drifts
+  E_longhouse -.-> P_gate
+  E_longhouse -.-> P_down
+  E_longhouse -.-> P_panels_end
+  E_longhouse -.-> P_panels
+  E_mine_hub -.-> P_drifts
+  E_mine_hub -.-> P_lord_approach_1
+  E_panel_end -.-> P_corner_a
+  E_panel_end -.-> P_corner_b
+  E_shaft -.-> P_mine_first
+  E_store -.-> P_drifts
+  P_start:::start
+  classDef start fill:#ffe9a8,stroke:#c99a00,stroke-width:2px
+```
+
+| 풀 | fallback | 원소 (가중치) |
+|---|---|---|
+| `corner_a` | `minecraft:empty` | `tower_a` 1 |
+| `corner_b` | `minecraft:empty` | `tower_b` 1 |
+| `down` | `minecraft:empty` | `shaft` 1 |
+| `drift_caps` | `minecraft:empty` | `cap` 1 |
+| `drifts` | `drift_caps` | `drift` 10, `drift_corner` 9, `drift_cross` 4, `guard` 5, `store` 8, `cave_in` 5, `cage` 3, `dig` 5 |
+| `gate` | `minecraft:empty` | `gate` 1 |
+| `lord_approach` | `drift_caps` | `warlord_hall` 1, `approach_3` 1 |
+| `lord_approach_1` | `drift_caps` | `approach_1` 1 |
+| `lord_approach_2` | `drift_caps` | `approach_2` 1 |
+| `lord_approach_3` | `drift_caps` | `approach_3` 1 |
+| `mine_first` | `minecraft:empty` | `mine_hub` 1 |
+| `panels` | `minecraft:empty` | `panel` 1 |
+| `panels_end` | `minecraft:empty` | `panel_end` 1 |
+| `start` | `minecraft:empty` | `longhouse` 1 |
+
+## 4. 뼈대 — 반드시 이렇게 놓이는 부분
+
+움집과 그것이 부르는 목책·감시탑, 그리고 사다리 아래의 사슬. **원소가 하나뿐인 풀로 놓이는
+것만** 그렸다. 갱도는 판마다 다르다. 지상 조각 여덟이 49×49를 빈틈없이 덮는다.
+
+| 조각 | 놓이는 자리 (시작 조각 기준) | 누가 놓나 |
+|---|---|---|
+| `longhouse` | (0, 0, 0) | 시작 풀 |
+| `gate` | (-14, 0, 0) | longhouse의 서 cmp_wall 직소 |
+| `shaft` | (7, -21, 7) | longhouse의 아래 cmp_down 직소 |
+| `panel_end` | (0, 0, -14) | longhouse의 북 cmp_wall 직소 |
+| `panel_end` | (0, 0, 21) | longhouse의 남 cmp_wall 직소 |
+| `panel` | (21, 0, 0) | longhouse의 동 cmp_wall 직소 |
+| `mine_hub` | (7, -28, 7) | shaft의 아래 cmp_drift 직소 |
+| `tower_a` | (-14, 0, -14) | panel_end의 서 cmp_corner_a 직소 |
+| `tower_b` | (21, 0, -14) | panel_end의 동 cmp_corner_b 직소 |
+| `tower_a` | (-14, 0, 21) | panel_end의 서 cmp_corner_a 직소 |
+| `tower_b` | (21, 0, 21) | panel_end의 동 cmp_corner_b 직소 |
+| `approach_1` | (7, -28, 14) | mine_hub의 남 cmp_drift 직소 |
+| `approach_2` | (14, -28, 14) | approach_1의 동 cmp_drift 직소 |
+| `approach_3` | (21, -28, 14) | approach_2의 동 cmp_drift 직소 |
+
+![뼈대](img/camp/_assembly.svg)
+
+![조각 지도](img/camp/_assembly_pieces.svg)
+
+## 5. 조각
+
+
+그림은 조각 하나를 **층마다 한 장씩** 블록 단위로 그린 것이다. 같은 층이 이어지면 `y = 2–5`처럼 묶었고, 마지막 두 장은 가운데를 자른 세로 단면이다. 분홍 점이 직소, 화살표가 그 직소가 보는 방향이다 — **마주 본 직소끼리만 붙는다.**
+
+### `longhouse` — 21×21×21 — 3×3×3 셀
+
+시작 조각. 21×21의 대말움집이고 사방에 문이 있어 **그 넷이 목책을 부른다.** 바닥의 3×3 구멍이
+갱도로 가는 유일한 길이고, 사다리가 있는 줄은 바닥 켜에서 남겨 두어 걸어 나가 올라탈 수 있다.
+
+안에 모닥불·전쟁 탁자(지도 제작대)·숫돌·상자·통, 그리고 변명자 스포너 하나.
+
+**어느 풀에 있나** — `start` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (9, 0, 12) | ◇ 아래 | `cmp_down` | `cmp_down` | `camp/down` |
+| (10, 7, 0) | ▲ 북 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
+| (0, 7, 10) | ◀ 서 | `cmp_wall` | `cmp_wall` | `camp/gate` |
+| (20, 7, 10) | ▶ 동 | `cmp_wall` | `cmp_wall` | `camp/panels` |
+| (10, 7, 20) | ▼ 남 | `cmp_wall` | `cmp_wall` | `camp/panels_end` |
+
+**뚫린 면** — 서: z 0–20, y 8–20 (138칸) / 동: z 0–20, y 8–20 (138칸) / 북: x 0–20, y 8–20 (138칸) / 남: x 0–20, y 8–20 (138칸) / 아래: x 9–11, z 9–11 (8칸) / 위: x 0–20, z 0–20 (441칸)
+
+**블록** — 거친 흙 3023, 아카시아 판자 830, 아카시아 반 블록 441, 아카시아 원목 34, 아카시아 다락문 8, 사다리 8, 직소 5, 랜턴 4
+
+![longhouse](img/camp/longhouse.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  dddddddddH..ddddddddd
+  dddddddddJddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 1–6   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  dddddddddH..ddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 7   x →동, z ↓남
+  wwwwwwwwwwJwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwww...wwwwwwwww
+  Jwwwwwwww...wwwwwwwwJ
+  wwwwwwwwwHwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwwwwwwwwwwww
+  wwwwwwwwwwJwwwwwwwwww
+y = 8   x →동, z ↓남
+  Lwwwwwwww...wwwwwwwwL
+  w...................w
+  w.........S.....mmG.w
+  w..^................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w.a...............c.w
+  w...................w
+  Lwwwwwwww...wwwwwwwwL
+y = 9   x →동, z ↓남
+  Lwwwwwwww...wwwwwwwwL
+  w...................w
+  w................P..w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  Lwwwwwwww...wwwwwwwwL
+y = 10   x →동, z ↓남
+  Lwww=wwww...wwww=wwwL
+  w...................w
+  w...................w
+  w...................w
+  =...................=
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  =...................=
+  w...................w
+  w...................w
+  w...................w
+  Lwww=wwww...wwww=wwwL
+y = 11   x →동, z ↓남
+  Lwwwwwwww...wwwwwwwwL
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  Lwwwwwwww...wwwwwwwwL
+y = 12   x →동, z ↓남
+  LwwwwwwwwwwwwwwwwwwwL
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  LwwwwwwwwwwwwwwwwwwwL
+y = 13   x →동, z ↓남
+  LwwwwwwwwwwwwwwwwwwwL
+  w...................w
+  w...................w
+  w...................w
+  w...*...........*...w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...................w
+  w...*...........*...w
+  w...................w
+  w...................w
+  w...................w
+  LwwwwwwwwwwwwwwwwwwwL
+y = 14   x →동, z ↓남
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+  _____________________
+y = 15   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .L.L.L.L.L.L.L.L.L.L.
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 16–20   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 10   x →동, y ↑하늘
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .L.L.L.L.L.L.L.L.L.L.
+  _____________________
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  .....................
+  Jwwwwwwww...wwwwwwwwJ
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+단면 x = 10   z →남, y ↑하늘
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  _____________________
+  w...................w
+  w...................w
+  .....................
+  .....................
+  .....................
+  ..S..................
+  Jwwwwwwww..wwwwwwwwwJ
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+  ddddddddd...ddddddddd
+```
+
+</details>
+
+
+### `gate` — 21×21×14 — 3×3×2 셀
+
+서쪽 문. 통나무를 3×4로 뚫고 양옆에 목책보다 높은 문기둥을 세우고, 상인방 아래에 랜턴을
+걸었다. 마당 쪽으로 굳은 진흙 길이 이어진다. 여기에는 스포너를 두지 않았다 — 들어서는 순간
+석궁이 날아오는 것은 진영이 아니라 함정이다.
+
+**어느 풀에 있나** — `gate` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (10, 7, 13) | ▼ 남 | `cmp_wall` | `cmp_wall` | `—` |
+
+**뚫린 면** — 서: z 0–13, y 8–20 (172칸) / 동: z 0–13, y 8–20 (172칸) / 북: x 0–20, y 8–20 (175칸) / 남: x 0–20, y 8–20 (273칸) / 위: x 0–20, z 0–13 (294칸)
+
+**블록** — 거친 흙 2244, 아카시아 원목 198, 굳은 진흙 35, 아카시아 울타리 32, 자갈 30, 아카시아 판자 6, 모닥불 2, 통 1
+
+![gate](img/camp/gate.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–6   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 7   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  dddgdddddmmmdddddgddd
+  dgddddddgmmmdddgddddd
+  ddddddgddmmmdgddddddg
+  ddddgddddmmmddddddgdd
+  ddgddddddmmmddddgdddd
+  gddddddgdmmmddgdddddd
+  dddddgdddmmmgddddddgd
+  dddgdddddmmmdddddgddd
+  dgddddddgmmmdddgddddd
+  ddddddgddmmmdgddddddg
+  ddddgddddmmmddddddgdd
+  ddgddddddmJmddddgdddd
+y = 8   x →동, z ↓남
+  LLLLLLLLL...LLLLLLLLL
+  LLLLLLLLL...LLLLLLLLL
+  .....................
+  ...^.............^...
+  ......a.......c......
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 9–10   x →동, z ↓남
+  LLLLLLLLL...LLLLLLLLL
+  LLLLLLLLL...LLLLLLLLL
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 11   x →동, z ↓남
+  LLLLLLLLL.*.LLLLLLLLL
+  LLLLLLLLL...LLLLLLLLL
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 12   x →동, z ↓남
+  ffffffffLwwwLffffffff
+  ffffffffLwwwLffffffff
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 13–14   x →동, z ↓남
+  ........L...L........
+  ........L...L........
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 15–20   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 7   x →동, y ↑하늘
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  gddddddgdmmmddgdddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+단면 x = 10   z →남, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ww............
+  *.............
+  ..............
+  ..............
+  ..............
+  LLmmmmmmmmmmmJ
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+```
+
+</details>
+
+
+### `panel` — 21×21×14 — 3×3×2 셀
+
+목책 한 변과 그 앞의 마당. 통나무 두 겹을 다섯 칸 높이로 세우고 위에 울타리로 끝을 뾰족하게
+했다. 안쪽에 버팀대, 마당에 모닥불 둘과 상자·통, 그리고 약탈자 스포너 하나.
+
+아래 일곱 켜는 기초다 — 악지에서 진영이 공중에 뜨지 않게 하는 것이 그것이다 (§18).
+
+**어느 풀에 있나** — `panels` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (10, 7, 13) | ▼ 남 | `cmp_wall` | `cmp_wall` | `—` |
+
+**뚫린 면** — 서: z 0–13, y 8–20 (172칸) / 동: z 0–13, y 8–20 (172칸) / 북: x 0–20, y 13–20 (168칸) / 남: x 0–20, y 8–20 (273칸) / 위: x 0–20, z 0–13 (294칸)
+
+**블록** — 거친 흙 2273, 아카시아 원목 210, 아카시아 울타리 42, 자갈 36, 모닥불 2, 통 1, 직소 1, 몬스터 스포너 1
+
+![panel](img/camp/panel.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–6   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 7   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  dddgddddddgddddddgddd
+  dgddddddgddddddgddddd
+  ddddddgddddddgddddddg
+  ddddgddddddgddddddgdd
+  ddgddddddgddddddgdddd
+  gddddddgddddddgdddddd
+  dddddgddddddgddddddgd
+  dddgddddddgddddddgddd
+  dgddddddgddddddgddddd
+  ddddddgddddddgddddddg
+  ddddgddddddgddddddgdd
+  ddgddddddgJdddddgdddd
+y = 8   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  .....................
+  ...^.............^...
+  ......a.......c......
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ..........S..........
+  .....................
+  .....................
+y = 9–11   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 12   x →동, z ↓남
+  fffffffffffffffffffff
+  fffffffffffffffffffff
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 13–20   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 7   x →동, y ↑하늘
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  gddddddgddddddgdddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+단면 x = 10   z →남, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ff............
+  LL............
+  LL............
+  LL............
+  LL.........S..
+  LLgddddddgdddJ
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+```
+
+</details>
+
+
+### `panel_end` — 21×21×14 — 3×3×2 셀
+
+북쪽과 남쪽 목책. `panel`과 같은데 **양 끝에 감시탑을 부르는 직소**가 하나씩 더 있다. 동·서에는
+없다 — 탑을 두 방향에서 부르면 어느 쪽이 먼저 놓이느냐에 따라 회전이 갈린다 (§13).
+
+**어느 풀에 있나** — `panels_end` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 7, 11) | ◀ 서 | `cmp_corner_a` | `cmp_corner_a` | `camp/corner_a` |
+| (20, 7, 11) | ▶ 동 | `cmp_corner_b` | `cmp_corner_b` | `camp/corner_b` |
+| (10, 7, 13) | ▼ 남 | `cmp_wall` | `cmp_wall` | `—` |
+
+**뚫린 면** — 서: z 0–13, y 8–20 (172칸) / 동: z 0–13, y 8–20 (172칸) / 북: x 0–20, y 13–20 (168칸) / 남: x 0–20, y 8–20 (273칸) / 위: x 0–20, z 0–13 (294칸)
+
+**블록** — 거친 흙 2272, 아카시아 원목 210, 아카시아 울타리 42, 자갈 35, 직소 3, 모닥불 2, 통 1, 몬스터 스포너 1
+
+![panel_end](img/camp/panel_end.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–6   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 7   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  dddgddddddgddddddgddd
+  dgddddddgddddddgddddd
+  ddddddgddddddgddddddg
+  ddddgddddddgddddddgdd
+  ddgddddddgddddddgdddd
+  gddddddgddddddgdddddd
+  dddddgddddddgddddddgd
+  dddgddddddgddddddgddd
+  dgddddddgddddddgddddd
+  JdddddgddddddgddddddJ
+  ddddgddddddgddddddgdd
+  ddgddddddgJdddddgdddd
+y = 8   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  .....................
+  ...^.............^...
+  ......a.......c......
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ..........S..........
+  .....................
+  .....................
+y = 9–11   x →동, z ↓남
+  LLLLLLLLLLLLLLLLLLLLL
+  LLLLLLLLLLLLLLLLLLLLL
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 12   x →동, z ↓남
+  fffffffffffffffffffff
+  fffffffffffffffffffff
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+y = 13–20   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 7   x →동, y ↑하늘
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  gddddddgddddddgdddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+단면 x = 10   z →남, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ff............
+  LL............
+  LL............
+  LL............
+  LL.........S..
+  LLgddddddgdddJ
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+```
+
+</details>
+
+
+### `tower_a` — 14×28×14 — 2×4×2 셀
+
+북서 귀퉁이. 14×14를 네 칸으로 나눠 **바깥 모서리에 감시탑, 두 팔은 목책, 안쪽은 마당**이다.
+탑은 통나무 네 기둥 위에 판자 발판을 얹은 것이고, 사다리가 발판을 뚫고 올라가 난간의 빈
+한 칸으로 내린다. 위에 약탈자 스포너와 상자.
+
+**어느 풀에 있나** — `corner_a` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (13, 7, 11) | ▶ 동 | `cmp_corner_a` | `cmp_corner_a` | `—` |
+
+**뚫린 면** — 서: z 0–13, y 8–27 (245칸) / 동: z 0–13, y 0–27 (310칸) / 북: x 0–13, y 8–27 (245칸) / 남: x 0–13, y 8–27 (270칸) / 아래: x 7–13, z 2–6 (35칸) / 위: x 0–13, z 0–13 (196칸)
+
+**블록** — 거친 흙 1248, 아카시아 원목 192, 아카시아 울타리 46, 아카시아 판자 24, 사다리 14, 자갈 11, 몬스터 스포너 1, 랜턴 1
+
+![tower_a](img/camp/tower_a.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–6   x →동, z ↓남
+  dddddddddddddd
+  dddddddddddddd
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+y = 7   x →동, z ↓남
+  dddddddLLLLLLL
+  dddddddLLLLLLL
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  ddddddd.......
+  LLdddddgdddddd
+  LLdddgddddddgd
+  LLdgddddddgddd
+  LLddddddgddddd
+  LLddddgddddddJ
+  LLddgddddddgdd
+  LLgddddddgdddd
+y = 8   x →동, z ↓남
+  .......LLLLLLL
+  .LH..L.LLLLLLL
+  .......f...f..
+  ..............
+  ....*.........
+  .L...L........
+  ..............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+y = 9–11   x →동, z ↓남
+  .......LLLLLLL
+  .LH..L.LLLLLLL
+  .......f...f..
+  ..............
+  ..............
+  .L...L........
+  ..............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+  LL............
+y = 12   x →동, z ↓남
+  .......fffffff
+  .LH..L.fffffff
+  ..............
+  ..............
+  ..............
+  .L...L........
+  ..............
+  ff............
+  ff............
+  ff............
+  ff............
+  ff............
+  ff............
+  ff............
+y = 13–19   x →동, z ↓남
+  ..............
+  .LH..L........
+  ..............
+  ..............
+  ..............
+  .L...L........
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 20   x →동, z ↓남
+  ..............
+  .wHwww........
+  .wwwww........
+  .wwwww........
+  .wwwww........
+  .wwwww........
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 21   x →동, z ↓남
+  ..............
+  .LH.fL........
+  .f...f........
+  .f...f........
+  .fS.cf........
+  .LfffL........
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 22–27   x →동, z ↓남
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 7   x →동, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ff............
+  LL............
+  LL............
+  LL............
+  LL............
+  LLdddddgdddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+단면 x = 7   z →남, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ff............
+  LLf...........
+  LLf...........
+  LLf...........
+  LLf...........
+  LL.....gdddddd
+  dd.....ddddddd
+  dd.....ddddddd
+  dd.....ddddddd
+  dd.....ddddddd
+  dd.....ddddddd
+  dd.....ddddddd
+  dd.....ddddddd
+```
+
+</details>
+
+
+### `tower_b` — 14×28×14 — 2×4×2 셀
+
+북동 귀퉁이. `tower_a`를 x로 뒤집은 것이다. 바닐라는 돌려는 줘도 뒤집어 주지 않는다.
+
+**어느 풀에 있나** — `corner_b` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 7, 11) | ◀ 서 | `cmp_corner_b` | `cmp_corner_b` | `—` |
+
+**뚫린 면** — 서: z 0–13, y 0–27 (310칸) / 동: z 0–13, y 8–27 (245칸) / 북: x 0–13, y 8–27 (245칸) / 남: x 0–13, y 8–27 (270칸) / 아래: x 0–6, z 2–6 (35칸) / 위: x 0–13, z 0–13 (196칸)
+
+**블록** — 거친 흙 1248, 아카시아 원목 192, 아카시아 울타리 46, 아카시아 판자 24, 사다리 14, 자갈 11, 직소 1, 랜턴 1
+
+![tower_b](img/camp/tower_b.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0–6   x →동, z ↓남
+  dddddddddddddd
+  dddddddddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+y = 7   x →동, z ↓남
+  LLLLLLLddddddd
+  LLLLLLLddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  .......ddddddd
+  ddddddgdddddLL
+  dgddddddgdddLL
+  dddgddddddgdLL
+  dddddgddddddLL
+  JddddddgddddLL
+  ddgddddddgddLL
+  ddddgddddddgLL
+y = 8   x →동, z ↓남
+  LLLLLLL.......
+  LLLLLLL.L..HL.
+  ..f...f.......
+  ..............
+  .........*....
+  ........L...L.
+  ..............
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+y = 9–11   x →동, z ↓남
+  LLLLLLL.......
+  LLLLLLL.L..HL.
+  ..f...f.......
+  ..............
+  ..............
+  ........L...L.
+  ..............
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+y = 12   x →동, z ↓남
+  fffffff.......
+  fffffff.L..HL.
+  ..............
+  ..............
+  ..............
+  ........L...L.
+  ..............
+  ............ff
+  ............ff
+  ............ff
+  ............ff
+  ............ff
+  ............ff
+  ............ff
+y = 13–19   x →동, z ↓남
+  ..............
+  ........L..HL.
+  ..............
+  ..............
+  ..............
+  ........L...L.
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 20   x →동, z ↓남
+  ..............
+  ........wwwHw.
+  ........wwwww.
+  ........wwwww.
+  ........wwwww.
+  ........wwwww.
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 21   x →동, z ↓남
+  ..............
+  ........Lf.HL.
+  ........f...f.
+  ........f...f.
+  ........fc.Sf.
+  ........LfffL.
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+y = 22–27   x →동, z ↓남
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 7   x →동, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ............ff
+  ............LL
+  ............LL
+  ............LL
+  ............LL
+  ddddddgdddddLL
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+단면 x = 7   z →남, y ↑하늘
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  ..............
+  dddddddddddgdd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+  dddddddddddddd
+```
+
+</details>
+
+
+### `shaft` — 7×21×7 — 1×3×1 셀
+
+움집 바닥에서 굳은 진흙을 뚫고 21칸. 움집과 x·z가 같아 사다리가 한 줄이다.
+
+**어느 풀에 있나** — `down` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (2, 0, 5) | ◇ 아래 | `cmp_drift` | `cmp_drift` | `camp/mine_first` |
+| (2, 20, 5) | ◆ 위 | `cmp_down` | `cmp_down` | `—` |
+
+**뚫린 면** — 아래: x 2–4, z 2–4 (8칸) / 위: x 2–4, z 2–4 (8칸)
+
+**블록** — 굳은 진흙 838, 사다리 21, 직소 2
+
+![shaft](img/camp/shaft.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mm...mm
+  mm...mm
+  mmH..mm
+  mmJmmmm
+  mmmmmmm
+y = 1–19   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mm...mm
+  mm...mm
+  mmH..mm
+  mmmmmmm
+  mmmmmmm
+y = 20   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mm...mm
+  mm...mm
+  mmH..mm
+  mmJmmmm
+  mmmmmmm
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 3   x →동, y ↑하늘
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+단면 x = 3   z →남, y ↑하늘
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+  mm...mm
+```
+
+</details>
+
+
+### `mine_hub` — 7×7×7 — 1×1×1 셀
+
+사다리가 닿는 방. 서·북문이 갱도로, **남문 하나만** `cmp_lord`를 target으로 삼아 보스 사슬을
+부른다. 사다리가 방 한가운데라 걸 데가 없으므로 **통나무 기둥**을 바닥부터 천장까지 세우고
+직소를 그 안에 넣었다 (§24).
+
+**어느 풀에 있나** — `mine_first` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (3, 0, 6) | ▼ 남 | `cmp_drift` | `cmp_lord` | `camp/lord_approach_1` |
+| (2, 6, 5) | ◆ 위 | `cmp_drift` | `cmp_drift` | `—` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 위: x 2–4, z 2–4 (8칸)
+
+**블록** — 굳은 진흙 123, 거친 흙 46, 아카시아 울타리 15, 아카시아 판자 15, 사다리 6, 아카시아 원목 5, 직소 4, 랜턴 1
+
+![mine_hub](img/camp/mine_hub.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  Jdddddd
+  ddddddd
+  ddddddd
+  dddJddd
+y = 1–3   x →동, z ↓남
+  mm...mm
+  mf...fm
+  ......m
+  ......m
+  ..H...m
+  mfL..fm
+  mm...mm
+y = 4   x →동, z ↓남
+  mm...mm
+  m*...fm
+  ......m
+  ......m
+  ..H...m
+  mfL..fm
+  mm...mm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mw...wm
+  mw...wm
+  mwH..wm
+  mwLwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mm...mm
+  mm...mm
+  mmH..mm
+  mmJmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `drift` — 7×7×7 — 1×1×1 셀
+
+갱도의 기본 단위. 네 귀퉁이에 울타리 기둥, 천장에 판자.
+
+**어느 풀에 있나** — `drifts` (가중치 10)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 아카시아 울타리 16, 직소 2
+
+![drift](img/camp/drift.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1–4   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `drift_corner` — 7×7×7 — 1×1×1 셀
+
+꺾이는 갱도.
+
+**어느 풀에 있나** — `drifts` (가중치 9)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (3, 0, 6) | ▼ 남 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 아카시아 울타리 16, 직소 2
+
+![drift_corner](img/camp/drift_corner.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  Jdddddd
+  ddddddd
+  ddddddd
+  dddJddd
+y = 1–4   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ......m
+  ......m
+  ......m
+  mf...fm
+  mm...mm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `drift_cross` — 7×7×7 — 1×1×1 셀
+
+갱도 네거리.
+
+**어느 풀에 있나** — `drifts` (가중치 4)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (3, 0, 6) | ▼ 남 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 121, 거친 흙 45, 아카시아 판자 25, 아카시아 울타리 16, 직소 4
+
+![drift_cross](img/camp/drift_cross.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  dddJddd
+y = 1–4   x →동, z ↓남
+  mm...mm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mm...mm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `guard` — 7×7×7 — 1×1×1 셀
+
+교차로 한가운데 약탈자 스포너.
+
+**어느 풀에 있나** — `drifts` (가중치 5)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (3, 0, 6) | ▼ 남 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 121, 거친 흙 45, 아카시아 판자 25, 아카시아 울타리 15, 직소 4, 통 1, 몬스터 스포너 1
+
+![guard](img/camp/guard.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  dddJddd
+y = 1   x →동, z ↓남
+  mm...mm
+  ma...fm
+  .......
+  ...S...
+  .......
+  mf...fm
+  mm...mm
+y = 2–4   x →동, z ↓남
+  mm...mm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mm...mm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `store` — 7×7×7 — 1×1×1 셀
+
+막다른 저장고. 상자와 통, 건초. 문이 하나면 상자를 준다.
+
+**어느 풀에 있나** — `drifts` (가중치 8)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 157, 거친 흙 48, 아카시아 판자 25, 아카시아 울타리 14, 직소 1, 통 1, 건초 더미 1, 랜턴 1
+
+![store](img/camp/store.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  Jdddddd
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1   x →동, z ↓남
+  mmmmmmm
+  ma...fm
+  ......m
+  .....cm
+  ......m
+  mh...fm
+  mmmmmmm
+y = 2–3   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ......m
+  ......m
+  ......m
+  mf...fm
+  mmmmmmm
+y = 4   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ......m
+  ...*..m
+  ......m
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `cave_in` — 7×7×7 — 1×1×1 셀
+
+천장이 무너져 자갈이 절반을 메운 갱도. 거미줄이 남아 있다. 트리거가 없는 위험이다.
+
+**어느 풀에 있나** — `drifts` (가중치 5)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 자갈 18, 아카시아 울타리 10, 거미줄 3, 직소 2
+
+![cave_in](img/camp/cave_in.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1–2   x →동, z ↓남
+  mmmmmmm
+  mg...gm
+  .g...g.
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 3   x →동, z ↓남
+  mmmmmmm
+  mgggggm
+  .ggggg.
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 4   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ...*...
+  .*...*.
+  .......
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `cage` — 7×7×7 — 1×1×1 셀
+
+철창 우리와 그 안의 라버저 스포너. **트리거가 아니라 선택이다** — 몹은 철창을 깨지 않으므로,
+이 방이 위험해지는 것은 플레이어가 깨기로 마음먹을 때뿐이다 (§12).
+
+**어느 풀에 있나** — `drifts` (가중치 3)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 157, 거친 흙 48, 철창 32, 아카시아 판자 25, 아카시아 울타리 15, 직소 1, 건초 더미 1, 몬스터 스포너 1
+
+![cage](img/camp/cage.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  Jdddddd
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1   x →동, z ↓남
+  mmmmmmm
+  mh...fm
+  ..|||.m
+  ..|S|.m
+  ..|||.m
+  mf...fm
+  mmmmmmm
+y = 2–3   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ..|||.m
+  ..|.|.m
+  ..|||.m
+  mf...fm
+  mmmmmmm
+y = 4   x →동, z ↓남
+  mmmmmmm
+  mf.*.fm
+  ..|||.m
+  ..|.|.m
+  ..|||.m
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `dig` — 7×7×7 — 1×1×1 셀
+
+자갈 바닥에 수상한 자갈 셋. 솔질은 플레이어만 한다.
+
+**어느 풀에 있나** — `drifts` (가중치 5)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 157, 거친 흙 48, 아카시아 판자 25, 자갈 22, 아카시아 울타리 11, 수상한 자갈 3, 직소 1, 테라코타 1
+
+![dig](img/camp/dig.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddd
+  ddddddd
+  ddddddd
+  Jdddddd
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1   x →동, z ↓남
+  mmmmmmm
+  mgggggm
+  .g?gggm
+  .ggg?gm
+  .gg?ggm
+  mgggggm
+  mmmmmmm
+y = 2   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ......m
+  ......m
+  ......m
+  mf...Km
+  mmmmmmm
+y = 3–4   x →동, z ↓남
+  mmmmmmm
+  mf...fm
+  ......m
+  ......m
+  ......m
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `cap` — 1×7×7
+
+두께 1의 굳은 진흙 마개. 갱도 풀의 fallback (§4).
+
+**어느 풀에 있나** — `drift_caps` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drift_caps` |
+
+**블록** — 굳은 진흙 48, 직소 1
+
+![cap](img/camp/cap.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  m
+  m
+  m
+  J
+  m
+  m
+  m
+y = 1–6   x →동, z ↓남
+  m
+  m
+  m
+  m
+  m
+  m
+  m
+```
+
+</details>
+
+
+### `approach_1` — 7×7×7 — 1×1×1 셀
+
+보스 사슬의 1번째 칸. **서문만 이름이 `cmp_lord`**이고 동문의 target이 `cmp_lord`다. 부모는
+서문으로만 들어올 수 있어 사슬이 거꾸로 흐르지 않는다. 북문은 평범한 갱도라 보스 가지도
+갱도를 낳는다. 우선순위가 10이라 갱도보다 먼저 놓인다 (§7).
+
+**어느 풀에 있나** — `lord_approach_1` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_lord` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_lord` | `camp/lord_approach_2` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+
+![approach_1](img/camp/approach_1.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1–4   x →동, z ↓남
+  mm...mm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `approach_2` — 7×7×7 — 1×1×1 셀
+
+보스 사슬의 2번째 칸. **서문만 이름이 `cmp_lord`**이고 동문의 target이 `cmp_lord`다. 부모는
+서문으로만 들어올 수 있어 사슬이 거꾸로 흐르지 않는다. 북문은 평범한 갱도라 보스 가지도
+갱도를 낳는다. 우선순위가 10이라 갱도보다 먼저 놓인다 (§7).
+
+**어느 풀에 있나** — `lord_approach_2` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_lord` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_lord` | `camp/lord_approach_3` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+
+![approach_2](img/camp/approach_2.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1–4   x →동, z ↓남
+  mm...mm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `approach_3` — 7×7×7 — 1×1×1 셀
+
+보스 사슬의 3번째 칸. **서문만 이름이 `cmp_lord`**이고 동문의 target이 `cmp_lord`다. 부모는
+서문으로만 들어올 수 있어 사슬이 거꾸로 흐르지 않는다. 북문은 평범한 갱도라 보스 가지도
+갱도를 낳는다. 우선순위가 10이라 갱도보다 먼저 놓인다 (§7).
+
+**어느 풀에 있나** — `lord_approach` (가중치 1), `lord_approach_3` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (3, 0, 0) | ▲ 북 | `cmp_drift` | `cmp_drift` | `camp/drifts` |
+| (0, 0, 3) | ◀ 서 | `cmp_lord` | `cmp_drift` | `camp/drifts` |
+| (6, 0, 3) | ▶ 동 | `cmp_drift` | `cmp_lord` | `camp/lord_approach` |
+
+**뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+
+![approach_3](img/camp/approach_3.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  dddJddd
+  ddddddd
+  ddddddd
+  JdddddJ
+  ddddddd
+  ddddddd
+  ddddddd
+y = 1–4   x →동, z ↓남
+  mm...mm
+  mf...fm
+  .......
+  .......
+  .......
+  mf...fm
+  mmmmmmm
+y = 5   x →동, z ↓남
+  mmmmmmm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mwwwwwm
+  mmmmmmm
+y = 6   x →동, z ↓남
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+  mmmmmmm
+```
+
+</details>
+
+
+### `warlord_hall` — 21×14×21 — 3×2×3 셀
+
+21×14×21. 가장 깊은 채굴장이고 통나무를 통째로 세워 받쳤다. 가운데 테라코타 단상에 군벌
+(약탈자, 체력 100, 관통 III 석궁) 트라이얼 스포너가 서고, 사분면마다 경비 스포너 넷
+(약탈자·변명자, 드물게 라버저).
+
+확정 보상: **다중 발사 또는 관통 석궁 + 불길한 병 2~3 + 에메랄드 10~18 + 파수꾼 장식 템플릿 2.**
+불길한 병은 바닐라 트라이얼 챔버를 불길하게 여는 열쇠다.
+
+**어느 풀에 있나** — `lord_approach` (가중치 1)
+
+| 직소 위치 | 향 | name | target | pool |
+|---|---|---|---|---|
+| (0, 0, 10) | ◀ 서 | `cmp_lord` | `cmp_drift` | `—` |
+
+**뚫린 면** — 서: z 9–11, y 1–4 (12칸)
+
+**블록** — 굳은 진흙 1398, 거친 흙 440, 아카시아 판자 361, 아카시아 원목 176, 테라코타 49, 트라이얼 스포너 5, 랜턴 4, 건초 더미 2
+
+![warlord_hall](img/camp/warlord_hall.svg)
+
+<details><summary>층별 지도 (텍스트)</summary>
+
+```
+y = 0   x →동, z ↓남
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  Jdddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+  ddddddddddddddddddddd
+y = 1   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m.h...............h.m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m....T.........T....m
+  m...................m
+  m......KKKKKKK......m
+  m......KKKKKKK......m
+  .......KKKKKKK......m
+  .......KKKKKKK......m
+  .......KKKKKKK......m
+  m......KKKKKKK......m
+  m......KKKKKKK......m
+  m...................m
+  m....T.........T....m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 2   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  .........mmm........m
+  .........mmm........m
+  .........mmm........m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 3   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  ....................m
+  ..........T.........m
+  ....................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 4   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  ....................m
+  ....................m
+  ....................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 5–10   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 11   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  m...................m
+  m...................m
+  m..LL...........LL..m
+  m..LL.....*.....LL..m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...*...........*...m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m..LL.....*.....LL..m
+  m..LL...........LL..m
+  m...................m
+  m...................m
+  mmmmmmmmmmmmmmmmmmmmm
+y = 12   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mwwwwwwwwwwwwwwwwwwwm
+  mmmmmmmmmmmmmmmmmmmmm
+y = 13   x →동, z ↓남
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+  mmmmmmmmmmmmmmmmmmmmm
+```
+
+</details>
+
+<details><summary>세로 단면 (텍스트)</summary>
+
+```
+단면 z = 10   x →동, y ↑하늘
+  mmmmmmmmmmmmmmmmmmmmm
+  mwwwwwwwwwwwwwwwwwwwm
+  m...*...........*...m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  ....................m
+  ..........T.........m
+  .........mmm........m
+  .......KKKKKKK......m
+  Jdddddddddddddddddddd
+단면 x = 10   z →남, y ↑하늘
+  mmmmmmmmmmmmmmmmmmmmm
+  mwwwwwwwwwwwwwwwwwwwm
+  m...*...........*...m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m...................m
+  m.........T.........m
+  m........mmm........m
+  m......KKKKKKK......m
+  ddddddddddddddddddddd
+```
+
+</details>
+
+
+## 다듬을 곳
+
+**코드가 지은 첫 판이다.** 전부 한 변 48 이하라 하나도 빠짐없이 손으로 다시 지을 수 있다 —
+`python tools/workshop.py camp`로 깔고 `python tools/grab_workshop.py camp`로 가져온다.
+
+- **목책이 통나무 두 겹뿐이다.** 문루·망대·깃대가 붙을 자리가 많다
+- **마당이 넓고 비어 있다.** 천막·모루·우리·수레 같은 것이 들어가면 진영처럼 보인다
+- **갱도가 지하감옥과 같은 모양이다.** 통로·교차로·막다른 방. 광차 선로나 수직 갱, 무너진
+  천장으로 반쯤 막힌 길이 있으면 좋겠다
+- **군벌의 홀이 단순하다.** 통나무 기둥 넷과 단상이 전부다

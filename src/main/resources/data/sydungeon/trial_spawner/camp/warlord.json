@@ -1,0 +1,79 @@
+{
+  "spawn_range": 4,
+  "total_mobs": 1.0,
+  "simultaneous_mobs": 1.0,
+  "total_mobs_added_per_player": 0.0,
+  "simultaneous_mobs_added_per_player": 0.0,
+  "ticks_between_spawn": 20,
+  "spawn_potentials": [
+    {
+      "weight": 1,
+      "data": {
+        "entity": {
+          "id": "minecraft:pillager",
+          "CustomName": "The Warlord",
+          "CustomNameVisible": true,
+          "PersistenceRequired": true,
+          "attributes": [
+            {
+              "id": "minecraft:max_health",
+              "base": 100.0
+            },
+            {
+              "id": "minecraft:armor",
+              "base": 8.0
+            },
+            {
+              "id": "minecraft:follow_range",
+              "base": 32.0
+            },
+            {
+              "id": "minecraft:knockback_resistance",
+              "base": 0.6
+            },
+            {
+              "id": "minecraft:movement_speed",
+              "base": 0.32
+            }
+          ],
+          "Health": 100.0,
+          "equipment": {
+            "head": {
+              "id": "minecraft:iron_helmet",
+              "count": 1,
+              "components": {
+                "minecraft:enchantments": {
+                  "minecraft:protection": 2
+                }
+              }
+            },
+            "chest": {
+              "id": "minecraft:iron_chestplate",
+              "count": 1
+            },
+            "mainhand": {
+              "id": "minecraft:crossbow",
+              "count": 1,
+              "components": {
+                "minecraft:enchantments": {
+                  "minecraft:piercing": 3,
+                  "minecraft:quick_charge": 2
+                }
+              }
+            }
+          },
+          "drop_chances": {
+            "head": 0.1,
+            "mainhand": 0.15
+          }
+        }
+      }
+    }
+  ],
+  "loot_tables_to_eject": [
+    {
+      "weight": 1,
+      "data": "sydungeon:trial/warlord_reward"
+    }
+  ]
+}

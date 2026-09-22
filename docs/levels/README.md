@@ -11,6 +11,7 @@
 | [swamp.md](swamp.md) | 마녀의 늪 | 21 | 물 위는 마을처럼, 물 밑은 감옥처럼 |
 | [ice.md](ice.md) | 얼음 성채 | 23 | 성벽은 여러 조각, 아성이 시작 |
 | [temple.md](temple.md) | 덩굴에 삼킨 신전 | 27 | 껍데기 하나에 지상과 지하를 같이 넣는다 |
+| [camp.md](camp.md) | 군벌의 진영 | 21 | 성채의 고리를 얇은 목책으로 |
 
 ```bash
 python tools/gen_level_doc.py          # 셋 다 다시 만든다

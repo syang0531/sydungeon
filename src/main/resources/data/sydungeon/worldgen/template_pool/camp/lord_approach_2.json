@@ -1,0 +1,7 @@
+{
+  "fallback": "sydungeon:camp/drift_caps",
+  "elements": [
+    { "weight": 1, "element": { "element_type": "minecraft:single_pool_element",
+        "location": "sydungeon:camp/approach_2", "projection": "rigid", "processors": "sydungeon:camp_weathering" } }
+  ]
+}
