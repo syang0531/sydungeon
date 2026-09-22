@@ -58,9 +58,10 @@ HIGH = 18                        # box height above it
 WARD = 7                         # the courtyard strip a panel carries in front of itself
 PANEL = (KEEP, FOOT + HIGH, WARD + CELL)      # 21 x 25 x 14
 TOWER = (2 * CELL, FOOT + HIGH, 2 * CELL)     # 14 x 25 x 14
-SHAFT_H = 28                     # two cells' worth of ladder, so the cellars stay buried:
-                                 # the fortress stands in mountain biomes and fourteen of
-                                 # fall over the maze's spread is an ordinary slope
+SHAFT_H = 42                     # six cells of ladder. The fortress stands on mountain
+                                 # flanks, which fall further than anything else this mod
+                                 # builds on, and a cellar that surfaces on a slope reads as
+                                 # a box of masonry stuck in the hill (2026-09-22)
 BOSS = (21, 14, 21)
 MIN_BOSS_STEPS = 3
 

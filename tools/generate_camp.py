@@ -58,7 +58,9 @@ YARD = 2 * CELL - FENCE_DEPTH    # the yard a panel carries in front of it, so a
                                  # two cells deep all told and the camp comes to 49 across
 PANEL = (HOUSE, FOOT + HIGH, YARD + FENCE_DEPTH)
 TOWER = (2 * CELL, FOOT + HIGH + CELL, 2 * CELL)
-SHAFT_H = 21
+SHAFT_H = 35                     # badlands falls away thirty blocks inside one structure,
+                                 # so the workings start below the valley floors, not just
+                                 # below the plateau the camp stands on
 BOSS = (21, 14, 21)
 MIN_BOSS_STEPS = 3
 PALE = 5                         # how tall the palisade stands above the yard
@@ -83,6 +85,9 @@ MUD = 'minecraft:packed_mud'
 COBBLE = 'minecraft:cobblestone'
 GRAVEL = 'minecraft:gravel'
 CLAY = 'minecraft:terracotta'
+ROCK = 'minecraft:stone'         # what the mine is cut out of, and therefore what shows
+BAND = 'minecraft:orange_terracotta'   # a course of it every few, so an exposed face reads
+                                       # as a layer of the mesa rather than as masonry
 BARS = 'minecraft:iron_bars'
 LANTERN = 'minecraft:lantern'
 WEB = 'minecraft:cobweb'
@@ -384,6 +389,7 @@ def shaft():
     """Down from the hall's floor into the workings. Shares the longhouse's x and z, so the
     ladder is one unbroken column - verify() climbs it."""
     p = Piece(CELL, SHAFT_H, CELL, MUD)
+    bedrock(p, CELL, SHAFT_H, CELL)
     shaft_wiring(p, SHAFT_H - 1)
     return p
 
@@ -395,18 +401,31 @@ def shaft_wiring(p, top):
         for y in range(top + 1):
             for z in range(CELL):
                 if p.grid.get((x, y, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
-                    p.set(x, y, z, MUD)
-    sink(p, 0, top, off=SHAFT_AT, fill=MUD)
-    p.jigsaw(JIG[0] - SHAFT_AT, top, JIG[1] - SHAFT_AT, 'up_east', EMPTY, MUD,
+                    p.set(x, y, z, ROCK)
+    sink(p, 0, top, off=SHAFT_AT, fill=ROCK)
+    p.jigsaw(JIG[0] - SHAFT_AT, top, JIG[1] - SHAFT_AT, 'up_east', EMPTY, ROCK,
              joint='aligned', name=DOWN, target=DOWN)
-    p.jigsaw(JIG[0] - SHAFT_AT, 0, JIG[1] - SHAFT_AT, 'down_east', POOL['mine_first'], MUD,
+    p.jigsaw(JIG[0] - SHAFT_AT, 0, JIG[1] - SHAFT_AT, 'down_east', POOL['mine_first'], ROCK,
              joint='aligned', priority=PRIORITY, name=DRIFT, target=DRIFT)
 
 
-def drift_room(doors, fill=MUD):
-    """A cell of the workings: earth walls, a floor of dirt, and a timber frame in the
-    doorways - the camp dug this, and it is held up with what they had."""
-    p = Piece(CELL, CELL, CELL, fill)
+def bedrock(p, sx, sy, sz, at=0):
+    """Fill a piece with the ground's own stone, banded like a mesa.
+
+    This is what an exposed piece looks like from outside, and it is the whole reason the
+    walls are stone rather than the camp's packed mud: a hollow box of masonry sticking out of
+    an eroded slope reads as a mistake, and a lump of banded stone reads as the hill
+    (2026-09-22 screenshot)."""
+    for y in range(sy):
+        course = ROCK if (y + at) % 5 else BAND
+        p.box(0, y, 0, sx - 1, y, sz - 1, course)
+
+
+def drift_room(doors, fill=None):
+    """A cell of the workings: rock walls, a floor of dirt, and a timber frame inside - the
+    camp dug this, and it is held up with what they had."""
+    p = Piece(CELL, CELL, CELL, MUD)
+    bedrock(p, CELL, CELL, CELL)
     p.box(1, 1, 1, CELL - 2, CELL - 2, CELL - 2, AIR)
     p.box(0, 0, 0, CELL - 1, 0, CELL - 1, DIRT)
     p.box(1, CELL - 2, 1, CELL - 2, CELL - 2, CELL - 2, PLANK)     # the ceiling boards
@@ -432,7 +451,7 @@ DOOR_AT = {'west': (0, 0, 3, 'west_up'), 'east': (CELL - 1, 0, 3, 'east_up'),
 
 def door(p, side, pool, name=DRIFT, target=DRIFT, priority=0):
     x, y, z, orientation = DOOR_AT[side]
-    p.jigsaw(x, y, z, orientation, pool, MUD, priority=priority, name=name, target=target)
+    p.jigsaw(x, y, z, orientation, pool, ROCK, priority=priority, name=name, target=target)
 
 
 def mine_hub():
@@ -457,7 +476,7 @@ def hub_wiring(p):
         for z in range(CELL):
             for y in (CELL - 2, CELL - 1):
                 if p.grid.get((x, y, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
-                    p.set(x, y, z, MUD)
+                    p.set(x, y, z, ROCK)
     for y in range(1, CELL):
         p.set(jx, y, jz, LOG, {'axis': 'y'})   # the post: the ladder hangs on it and the
                                                # jigsaw stands in it
@@ -516,8 +535,9 @@ def drift(kind):
 
 
 def drift_cap():
-    p = Piece(1, CELL, CELL, MUD)
-    p.jigsaw(0, 0, 3, 'west_up', POOL['drift_caps'], MUD, name=DRIFT, target=DRIFT)
+    p = Piece(1, CELL, CELL, ROCK)
+    bedrock(p, 1, CELL, CELL)
+    p.jigsaw(0, 0, 3, 'west_up', POOL['drift_caps'], ROCK, name=DRIFT, target=DRIFT)
     return p
 
 
@@ -525,7 +545,7 @@ def approach(step):
     """One link of the chain to the warlord. The way in is the only jigsaw named `lord`, so
     the chain cannot be entered through its own continuation (section 13)."""
     p = drift_room(['west', 'east', 'north'])
-    p.jigsaw(0, 0, 3, 'west_up', POOL['drifts'], MUD, name=LORD, target=DRIFT)
+    p.jigsaw(0, 0, 3, 'west_up', POOL['drifts'], ROCK, name=LORD, target=DRIFT)
     nxt = ('lord_approach_%d' % (step + 1)) if step < MIN_BOSS_STEPS else 'lord_approach'
     door(p, 'east', POOL[nxt], name=DRIFT, target=LORD, priority=PRIORITY)
     door(p, 'north', POOL['drifts'])
@@ -537,9 +557,10 @@ def warlord_hall():
     terracotta and his captains in the corners."""
     sx, sy, sz = BOSS
     p = Piece(sx, sy, sz, MUD)
+    bedrock(p, sx, sy, sz)
     p.box(1, 1, 1, sx - 2, sy - 2, sz - 2, AIR)
     p.box(0, 0, 0, sx - 1, 0, sz - 1, DIRT)
-    p.jigsaw(0, 0, sz // 2, 'west_up', EMPTY, MUD, name=LORD, target=DRIFT)
+    p.jigsaw(0, 0, sz // 2, 'west_up', EMPTY, ROCK, name=LORD, target=DRIFT)
     p.box(0, 1, sz // 2 - 1, 0, 4, sz // 2 + 1, AIR)
 
     for x0, z0 in ((3, 3), (3, sz - 5), (sx - 5, 3), (sx - 5, sz - 5)):

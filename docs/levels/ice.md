@@ -188,16 +188,16 @@ flowchart LR
 | `gate` | (-14, -7, 0) | keep의 서 ice_wall 직소 |
 | `panel_end` | (0, -7, -14) | keep의 북 ice_wall 직소 |
 | `panel_end` | (0, -7, 21) | keep의 남 ice_wall 직소 |
-| `shaft` | (7, -28, 7) | keep의 아래 ice_down 직소 |
+| `shaft` | (7, -42, 7) | keep의 아래 ice_down 직소 |
 | `panel` | (21, -7, 0) | keep의 동 ice_wall 직소 |
 | `tower_a` | (-14, -7, -14) | panel_end의 서 ice_corner_a 직소 |
 | `tower_b` | (21, -7, -14) | panel_end의 동 ice_corner_b 직소 |
 | `tower_a` | (-14, -7, 21) | panel_end의 서 ice_corner_a 직소 |
 | `tower_b` | (21, -7, 21) | panel_end의 동 ice_corner_b 직소 |
-| `cellar_hub` | (7, -35, 7) | shaft의 아래 ice_door 직소 |
-| `approach_1` | (7, -35, 14) | cellar_hub의 남 ice_door 직소 |
-| `approach_2` | (14, -35, 14) | approach_1의 동 ice_door 직소 |
-| `approach_3` | (21, -35, 14) | approach_2의 동 ice_door 직소 |
+| `cellar_hub` | (7, -49, 7) | shaft의 아래 ice_door 직소 |
+| `approach_1` | (7, -49, 14) | cellar_hub의 남 ice_door 직소 |
+| `approach_2` | (14, -49, 14) | approach_1의 동 ice_door 직소 |
+| `approach_3` | (21, -49, 14) | approach_2의 동 ice_door 직소 |
 
 ![뼈대](img/ice/_assembly.svg)
 
@@ -2147,7 +2147,7 @@ y = 24   x →동, z ↓남
 </details>
 
 
-### `shaft` — 7×28×7 — 1×4×1 셀
+### `shaft` — 7×42×7 — 1×6×1 셀
 
 아성 바닥에서 바위 속으로 14칸. 아성과 x·z가 같아 사다리가 한 줄로 이어진다.
 
@@ -2156,11 +2156,11 @@ y = 24   x →동, z ↓남
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
 | (5, 0, 3) | ◇ 아래 | `ice_door` | `ice_door` | `ice/cellar_first` |
-| (5, 27, 3) | ◆ 위 | `ice_down` | `ice_down` | `—` |
+| (5, 41, 3) | ◆ 위 | `ice_down` | `ice_down` | `—` |
 
 **뚫린 면** — 아래: x 2–4, z 2–4 (8칸) / 위: x 2–4, z 2–4 (8칸)
 
-**블록** — 심층암 타일 1118, 사다리 28, 직소 2
+**블록** — 심층암 타일 1678, 사다리 42, 직소 2
 
 ![shaft](img/ice/shaft.svg)
 
@@ -2175,7 +2175,7 @@ y = 0   x →동, z ↓남
   VV...VV
   VVVVVVV
   VVVVVVV
-y = 1–26   x →동, z ↓남
+y = 1–40   x →동, z ↓남
   VVVVVVV
   VVVVVVV
   VV...VV
@@ -2183,7 +2183,7 @@ y = 1–26   x →동, z ↓남
   VV...VV
   VVVVVVV
   VVVVVVV
-y = 27   x →동, z ↓남
+y = 41   x →동, z ↓남
   VVVVVVV
   VVVVVVV
   VV...VV
@@ -2226,8 +2226,36 @@ y = 27   x →동, z ↓남
   VV..HVV
   VV..HVV
   VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
+  VV..HVV
   VV..HJV
 단면 x = 3   z →남, y ↑하늘
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
+  VV...VV
   VV...VV
   VV...VV
   VV...VV

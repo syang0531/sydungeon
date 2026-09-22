@@ -90,6 +90,8 @@ STYLE = OrderedDict([
     ('coarse_dirt',           ('d', '#7d5d41', '거친 흙')),
     ('packed_mud',            ('m', '#9a7a5e', '굳은 진흙')),
     ('terracotta',            ('K', '#9b6a52', '테라코타')),
+    ('orange_terracotta',     ('k', '#a05325', '주황 테라코타')),
+    ('stone',                 (',', '#7a7a7a', '돌')),
     ('hay_block',             ('h', '#c8a41c', '건초 더미')),
     ('mossy_cobblestone',     ('#', '#6f7c66', '이끼 낀 조약돌')),
     ('cobblestone',           (',', '#828282', '조약돌')),

@@ -173,18 +173,18 @@ flowchart LR
 |---|---|---|
 | `longhouse` | (0, 0, 0) | 시작 풀 |
 | `gate` | (-14, 0, 0) | longhouse의 서 cmp_wall 직소 |
-| `shaft` | (7, -21, 7) | longhouse의 아래 cmp_down 직소 |
+| `shaft` | (7, -35, 7) | longhouse의 아래 cmp_down 직소 |
 | `panel_end` | (0, 0, -14) | longhouse의 북 cmp_wall 직소 |
 | `panel_end` | (0, 0, 21) | longhouse의 남 cmp_wall 직소 |
 | `panel` | (21, 0, 0) | longhouse의 동 cmp_wall 직소 |
-| `mine_hub` | (7, -28, 7) | shaft의 아래 cmp_drift 직소 |
+| `mine_hub` | (7, -42, 7) | shaft의 아래 cmp_drift 직소 |
 | `tower_a` | (-14, 0, -14) | panel_end의 서 cmp_corner_a 직소 |
 | `tower_b` | (21, 0, -14) | panel_end의 동 cmp_corner_b 직소 |
 | `tower_a` | (-14, 0, 21) | panel_end의 서 cmp_corner_a 직소 |
 | `tower_b` | (21, 0, 21) | panel_end의 동 cmp_corner_b 직소 |
-| `approach_1` | (7, -28, 14) | mine_hub의 남 cmp_drift 직소 |
-| `approach_2` | (14, -28, 14) | approach_1의 동 cmp_drift 직소 |
-| `approach_3` | (21, -28, 14) | approach_2의 동 cmp_drift 직소 |
+| `approach_1` | (7, -42, 14) | mine_hub의 남 cmp_drift 직소 |
+| `approach_2` | (14, -42, 14) | approach_1의 동 cmp_drift 직소 |
+| `approach_3` | (21, -42, 14) | approach_2의 동 cmp_drift 직소 |
 
 ![뼈대](img/camp/_assembly.svg)
 
@@ -1524,7 +1524,7 @@ y = 22–27   x →동, z ↓남
 </details>
 
 
-### `shaft` — 7×21×7 — 1×3×1 셀
+### `shaft` — 7×35×7 — 1×5×1 셀
 
 움집 바닥에서 굳은 진흙을 뚫고 21칸. 움집과 x·z가 같아 사다리가 한 줄이다.
 
@@ -1533,11 +1533,11 @@ y = 22–27   x →동, z ↓남
 | 직소 위치 | 향 | name | target | pool |
 |---|---|---|---|---|
 | (2, 0, 5) | ◇ 아래 | `cmp_drift` | `cmp_drift` | `camp/mine_first` |
-| (2, 20, 5) | ◆ 위 | `cmp_down` | `cmp_down` | `—` |
+| (2, 34, 5) | ◆ 위 | `cmp_down` | `cmp_down` | `—` |
 
 **뚫린 면** — 아래: x 2–4, z 2–4 (8칸) / 위: x 2–4, z 2–4 (8칸)
 
-**블록** — 굳은 진흙 838, 사다리 21, 직소 2
+**블록** — 돌 1119, 주황 테라코타 279, 사다리 35, 직소 2
 
 ![shaft](img/camp/shaft.svg)
 
@@ -1545,29 +1545,125 @@ y = 22–27   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mm...mm
-  mm...mm
-  mmH..mm
-  mmJmmmm
-  mmmmmmm
-y = 1–19   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mm...mm
-  mm...mm
-  mmH..mm
-  mmmmmmm
-  mmmmmmm
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkJkkkk
+  kkkkkkk
+y = 1–4   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 5   x →동, z ↓남
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 6–9   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 10   x →동, z ↓남
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 11–14   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 15   x →동, z ↓남
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 16–19   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
 y = 20   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mm...mm
-  mm...mm
-  mmH..mm
-  mmJmmmm
-  mmmmmmm
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 21–24   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 25   x →동, z ↓남
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 26–29   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 30   x →동, z ↓남
+  kkkkkkk
+  kkkkkkk
+  kk...kk
+  kk...kk
+  kkH..kk
+  kkkkkkk
+  kkkkkkk
+y = 31–33   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  .......
+  .......
+y = 34   x →동, z ↓남
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  ..J....
+  .......
 ```
 
 </details>
@@ -1576,49 +1672,77 @@ y = 20   x →동, z ↓남
 
 ```
 단면 z = 3   x →동, y ↑하늘
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
 단면 x = 3   z →남, y ↑하늘
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
-  mm...mm
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
+  .......
+  .......
+  .......
+  .......
+  kk...kk
 ```
 
 </details>
@@ -1641,7 +1765,7 @@ y = 20   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸) / 위: x 2–4, z 2–4 (8칸)
 
-**블록** — 굳은 진흙 123, 거친 흙 46, 아카시아 울타리 15, 아카시아 판자 15, 사다리 6, 아카시아 원목 5, 직소 4, 랜턴 1
+**블록** — 돌 99, 거친 흙 46, 주황 테라코타 24, 아카시아 울타리 15, 아카시아 판자 15, 사다리 6, 아카시아 원목 5, 직소 4
 
 ![mine_hub](img/camp/mine_hub.svg)
 
@@ -1657,37 +1781,37 @@ y = 0   x →동, z ↓남
   ddddddd
   dddJddd
 y = 1–3   x →동, z ↓남
-  mm...mm
-  mf...fm
-  ......m
-  ......m
-  ..H...m
-  mfL..fm
-  mm...mm
+  .......
+  .f...f.
+  .......
+  .......
+  ..H....
+  .fL..f.
+  .......
 y = 4   x →동, z ↓남
-  mm...mm
-  m*...fm
-  ......m
-  ......m
-  ..H...m
-  mfL..fm
-  mm...mm
+  .......
+  .*...f.
+  .......
+  .......
+  ..H....
+  .fL..f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mw...wm
-  mw...wm
-  mwH..wm
-  mwLwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kw...wk
+  kw...wk
+  kwH..wk
+  kwLwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mm...mm
-  mm...mm
-  mmH..mm
-  mmJmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  ..H....
+  ..J....
+  .......
 ```
 
 </details>
@@ -1706,7 +1830,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 아카시아 울타리 16, 직소 2
+**블록** — 돌 121, 거친 흙 47, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 2
 
 ![drift](img/camp/drift.svg)
 
@@ -1722,29 +1846,29 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1–4   x →동, z ↓남
-  mmmmmmm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -1763,7 +1887,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 아카시아 울타리 16, 직소 2
+**블록** — 돌 121, 거친 흙 47, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 2
 
 ![drift_corner](img/camp/drift_corner.svg)
 
@@ -1779,29 +1903,29 @@ y = 0   x →동, z ↓남
   ddddddd
   dddJddd
 y = 1–4   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ......m
-  ......m
-  ......m
-  mf...fm
-  mm...mm
+  .......
+  .f...f.
+  .......
+  .......
+  .......
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -1822,7 +1946,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 121, 거친 흙 45, 아카시아 판자 25, 아카시아 울타리 16, 직소 4
+**블록** — 돌 97, 거친 흙 45, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 4
 
 ![drift_cross](img/camp/drift_cross.svg)
 
@@ -1838,29 +1962,29 @@ y = 0   x →동, z ↓남
   ddddddd
   dddJddd
 y = 1–4   x →동, z ↓남
-  mm...mm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mm...mm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -1881,7 +2005,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸) / 남: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 121, 거친 흙 45, 아카시아 판자 25, 아카시아 울타리 15, 직소 4, 통 1, 몬스터 스포너 1
+**블록** — 돌 97, 거친 흙 45, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 15, 직소 4, 통 1, 몬스터 스포너 1
 
 ![guard](img/camp/guard.svg)
 
@@ -1897,37 +2021,37 @@ y = 0   x →동, z ↓남
   ddddddd
   dddJddd
 y = 1   x →동, z ↓남
-  mm...mm
-  ma...fm
+  .......
+  .a...f.
   .......
   ...S...
   .......
-  mf...fm
-  mm...mm
+  .f...f.
+  .......
 y = 2–4   x →동, z ↓남
-  mm...mm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mm...mm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -1945,7 +2069,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 157, 거친 흙 48, 아카시아 판자 25, 아카시아 울타리 14, 직소 1, 통 1, 건초 더미 1, 랜턴 1
+**블록** — 돌 133, 거친 흙 48, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 14, 직소 1, 통 1, 건초 더미 1
 
 ![store](img/camp/store.svg)
 
@@ -1961,45 +2085,45 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1   x →동, z ↓남
-  mmmmmmm
-  ma...fm
-  ......m
-  .....cm
-  ......m
-  mh...fm
-  mmmmmmm
+  .......
+  .a...f.
+  .......
+  .....c.
+  .......
+  .h...f.
+  .......
 y = 2–3   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ......m
-  ......m
-  ......m
-  mf...fm
-  mmmmmmm
+  .......
+  .f...f.
+  .......
+  .......
+  .......
+  .f...f.
+  .......
 y = 4   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ......m
-  ...*..m
-  ......m
-  mf...fm
-  mmmmmmm
+  .......
+  .f...f.
+  .......
+  ...*...
+  .......
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2018,7 +2142,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 145, 거친 흙 47, 아카시아 판자 25, 자갈 18, 아카시아 울타리 10, 거미줄 3, 직소 2
+**블록** — 돌 121, 거친 흙 47, 아카시아 판자 25, 주황 테라코타 24, 자갈 18, 아카시아 울타리 10, 거미줄 3, 직소 2
 
 ![cave_in](img/camp/cave_in.svg)
 
@@ -2034,45 +2158,45 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1–2   x →동, z ↓남
-  mmmmmmm
-  mg...gm
+  .......
+  .g...g.
   .g...g.
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 3   x →동, z ↓남
-  mmmmmmm
-  mgggggm
+  .......
+  .ggggg.
   .ggggg.
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 4   x →동, z ↓남
-  mmmmmmm
-  mf...fm
+  .......
+  .f...f.
   ...*...
   .*...*.
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2091,7 +2215,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 157, 거친 흙 48, 철창 32, 아카시아 판자 25, 아카시아 울타리 15, 직소 1, 건초 더미 1, 몬스터 스포너 1
+**블록** — 돌 133, 거친 흙 48, 철창 32, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 15, 직소 1, 건초 더미 1
 
 ![cage](img/camp/cage.svg)
 
@@ -2107,45 +2231,45 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1   x →동, z ↓남
-  mmmmmmm
-  mh...fm
-  ..|||.m
-  ..|S|.m
-  ..|||.m
-  mf...fm
-  mmmmmmm
+  .......
+  .h...f.
+  ..|||..
+  ..|S|..
+  ..|||..
+  .f...f.
+  .......
 y = 2–3   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ..|||.m
-  ..|.|.m
-  ..|||.m
-  mf...fm
-  mmmmmmm
+  .......
+  .f...f.
+  ..|||..
+  ..|.|..
+  ..|||..
+  .f...f.
+  .......
 y = 4   x →동, z ↓남
-  mmmmmmm
-  mf.*.fm
-  ..|||.m
-  ..|.|.m
-  ..|||.m
-  mf...fm
-  mmmmmmm
+  .......
+  .f.*.f.
+  ..|||..
+  ..|.|..
+  ..|||..
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2163,7 +2287,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 157, 거친 흙 48, 아카시아 판자 25, 자갈 22, 아카시아 울타리 11, 수상한 자갈 3, 직소 1, 테라코타 1
+**블록** — 돌 133, 거친 흙 48, 아카시아 판자 25, 주황 테라코타 24, 자갈 22, 아카시아 울타리 11, 수상한 자갈 3, 직소 1
 
 ![dig](img/camp/dig.svg)
 
@@ -2179,45 +2303,45 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1   x →동, z ↓남
-  mmmmmmm
-  mgggggm
-  .g?gggm
-  .ggg?gm
-  .gg?ggm
-  mgggggm
-  mmmmmmm
+  .......
+  .ggggg.
+  .g?ggg.
+  .ggg?g.
+  .gg?gg.
+  .ggggg.
+  .......
 y = 2   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ......m
-  ......m
-  ......m
-  mf...Km
-  mmmmmmm
+  .......
+  .f...f.
+  .......
+  .......
+  .......
+  .f...K.
+  .......
 y = 3–4   x →동, z ↓남
-  mmmmmmm
-  mf...fm
-  ......m
-  ......m
-  ......m
-  mf...fm
-  mmmmmmm
+  .......
+  .f...f.
+  .......
+  .......
+  .......
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2233,7 +2357,7 @@ y = 6   x →동, z ↓남
 |---|---|---|---|---|
 | (0, 0, 3) | ◀ 서 | `cmp_drift` | `cmp_drift` | `camp/drift_caps` |
 
-**블록** — 굳은 진흙 48, 직소 1
+**블록** — 돌 35, 주황 테라코타 13, 직소 1
 
 ![cap](img/camp/cap.svg)
 
@@ -2241,21 +2365,37 @@ y = 6   x →동, z ↓남
 
 ```
 y = 0   x →동, z ↓남
-  m
-  m
-  m
+  k
+  k
+  k
   J
-  m
-  m
-  m
-y = 1–6   x →동, z ↓남
-  m
-  m
-  m
-  m
-  m
-  m
-  m
+  k
+  k
+  k
+y = 1–4   x →동, z ↓남
+  .
+  .
+  .
+  .
+  .
+  .
+  .
+y = 5   x →동, z ↓남
+  k
+  k
+  k
+  k
+  k
+  k
+  k
+y = 6   x →동, z ↓남
+  .
+  .
+  .
+  .
+  .
+  .
+  .
 ```
 
 </details>
@@ -2277,7 +2417,7 @@ y = 1–6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+**블록** — 돌 109, 거친 흙 46, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 3
 
 ![approach_1](img/camp/approach_1.svg)
 
@@ -2293,29 +2433,29 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1–4   x →동, z ↓남
-  mm...mm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2337,7 +2477,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+**블록** — 돌 109, 거친 흙 46, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 3
 
 ![approach_2](img/camp/approach_2.svg)
 
@@ -2353,29 +2493,29 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1–4   x →동, z ↓남
-  mm...mm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2397,7 +2537,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 2–4, y 1–4 (12칸) / 동: z 2–4, y 1–4 (12칸) / 북: x 2–4, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 133, 거친 흙 46, 아카시아 판자 25, 아카시아 울타리 16, 직소 3
+**블록** — 돌 109, 거친 흙 46, 아카시아 판자 25, 주황 테라코타 24, 아카시아 울타리 16, 직소 3
 
 ![approach_3](img/camp/approach_3.svg)
 
@@ -2413,29 +2553,29 @@ y = 0   x →동, z ↓남
   ddddddd
   ddddddd
 y = 1–4   x →동, z ↓남
-  mm...mm
-  mf...fm
+  .......
+  .f...f.
   .......
   .......
   .......
-  mf...fm
-  mmmmmmm
+  .f...f.
+  .......
 y = 5   x →동, z ↓남
-  mmmmmmm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mwwwwwm
-  mmmmmmm
+  kkkkkkk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kwwwwwk
+  kkkkkkk
 y = 6   x →동, z ↓남
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
-  mmmmmmm
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
+  .......
 ```
 
 </details>
@@ -2458,7 +2598,7 @@ y = 6   x →동, z ↓남
 
 **뚫린 면** — 서: z 9–11, y 1–4 (12칸)
 
-**블록** — 굳은 진흙 1398, 거친 흙 440, 아카시아 판자 361, 아카시아 원목 176, 테라코타 49, 트라이얼 스포너 5, 랜턴 4, 건초 더미 2
+**블록** — 돌 1229, 거친 흙 440, 아카시아 판자 361, 아카시아 원목 176, 주황 테라코타 160, 테라코타 49, 굳은 진흙 9, 트라이얼 스포너 5
 
 ![warlord_hall](img/camp/warlord_hall.svg)
 
@@ -2488,181 +2628,225 @@ y = 0   x →동, z ↓남
   ddddddddddddddddddddd
   ddddddddddddddddddddd
 y = 1   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m.h...............h.m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m....T.........T....m
-  m...................m
-  m......KKKKKKK......m
-  m......KKKKKKK......m
-  .......KKKKKKK......m
-  .......KKKKKKK......m
-  .......KKKKKKK......m
-  m......KKKKKKK......m
-  m......KKKKKKK......m
-  m...................m
-  m....T.........T....m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  ..h...............h..
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....T.........T.....
+  .....................
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .......KKKKKKK.......
+  .....................
+  .....T.........T.....
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
 y = 2   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  .........mmm........m
-  .........mmm........m
-  .........mmm........m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+  .....................
+  .........mmm.........
+  .........mmm.........
+  .........mmm.........
+  .....................
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
 y = 3   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  ....................m
-  ..........T.........m
-  ....................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ..........T..........
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
 y = 4   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  ....................m
-  ....................m
-  ....................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
-y = 5–10   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+y = 5   x →동, z ↓남
+  kkkkkkkkkkkkkkkkkkkkk
+  k...................k
+  k...................k
+  k..LL...........LL..k
+  k..LL...........LL..k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k..LL...........LL..k
+  k..LL...........LL..k
+  k...................k
+  k...................k
+  kkkkkkkkkkkkkkkkkkkkk
+y = 6–9   x →동, z ↓남
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
+y = 10   x →동, z ↓남
+  kkkkkkkkkkkkkkkkkkkkk
+  k...................k
+  k...................k
+  k..LL...........LL..k
+  k..LL...........LL..k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k...................k
+  k..LL...........LL..k
+  k..LL...........LL..k
+  k...................k
+  k...................k
+  kkkkkkkkkkkkkkkkkkkkk
 y = 11   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  m...................m
-  m...................m
-  m..LL...........LL..m
-  m..LL.....*.....LL..m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...*...........*...m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m..LL.....*.....LL..m
-  m..LL...........LL..m
-  m...................m
-  m...................m
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .....................
+  .....................
+  ...LL...........LL...
+  ...LL.....*.....LL...
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ....*...........*....
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  ...LL.....*.....LL...
+  ...LL...........LL...
+  .....................
+  .....................
+  .....................
 y = 12   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mwwwwwwwwwwwwwwwwwwwm
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .wwwwwwwwwwwwwwwwwww.
+  .....................
 y = 13   x →동, z ↓남
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
-  mmmmmmmmmmmmmmmmmmmmm
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
+  .....................
 ```
 
 </details>
@@ -2671,34 +2855,34 @@ y = 13   x →동, z ↓남
 
 ```
 단면 z = 10   x →동, y ↑하늘
-  mmmmmmmmmmmmmmmmmmmmm
-  mwwwwwwwwwwwwwwwwwwwm
-  m...*...........*...m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  ....................m
-  ..........T.........m
-  .........mmm........m
-  .......KKKKKKK......m
+  .....................
+  .wwwwwwwwwwwwwwwwwww.
+  ....*...........*....
+  k...................k
+  .....................
+  .....................
+  .....................
+  .....................
+  k...................k
+  .....................
+  ..........T..........
+  .........mmm.........
+  .......KKKKKKK.......
   Jdddddddddddddddddddd
 단면 x = 10   z →남, y ↑하늘
-  mmmmmmmmmmmmmmmmmmmmm
-  mwwwwwwwwwwwwwwwwwwwm
-  m...*...........*...m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m...................m
-  m.........T.........m
-  m........mmm........m
-  m......KKKKKKK......m
+  .....................
+  .wwwwwwwwwwwwwwwwwww.
+  ....*...........*....
+  k...................k
+  .....................
+  .....................
+  .....................
+  .....................
+  k...................k
+  .....................
+  ..........T..........
+  .........mmm.........
+  .......KKKKKKK.......
   ddddddddddddddddddddd
 ```
 
