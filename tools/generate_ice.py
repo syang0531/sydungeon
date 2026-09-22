@@ -37,6 +37,7 @@ from generate_pieces import Piece  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 DST = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon', 'structure', 'ice')
+HAND = os.path.join(ROOT, 'tools', 'handmade', 'ice')
 POOL_JSON = os.path.join(ROOT, 'src', 'main', 'resources', 'data', 'sydungeon', 'worldgen',
                          'template_pool', 'ice')
 
@@ -65,11 +66,14 @@ WALL_TOP = 6                     # the walkway, measured from the courtyard
 CRENEL = 8
 TOWER_TOP = 15
 
-# the way down, in the keep's coordinates: a three by three hole with the ladder in the
-# middle of its east wall, and the jigsaws in that wall rather than in the hole
-HOLE = (3, 5, 3, 5)              # x0 x1 z0 z1
-RUNG = (5, 4)
-JIG = (6, 4)
+# The way down, in the keep's coordinates: a three by three hole in the middle of the hall,
+# the ladder in the middle of its east wall - not in a corner of it - and the jigsaws in that
+# wall rather than in the hole, because a jigsaw becomes a block. SHAFT_AT is where the shaft
+# hangs under the keep, and it is chosen so the hole lands in the middle of that piece too.
+SHAFT_AT = CELL
+HOLE = (KEEP // 2 - 1, KEEP // 2 + 1, KEEP // 2 - 1, KEEP // 2 + 1)      # x0 x1 z0 z1
+RUNG = (KEEP // 2 + 1, KEEP // 2)
+JIG = (KEEP // 2 + 2, KEEP // 2)
 
 BRICK = 'minecraft:stone_bricks'
 CHISEL = 'minecraft:chiseled_stone_bricks'
@@ -127,15 +131,22 @@ def ladder(facing='west'):
 
 
 # ------------------------------------------------------------------------------ the keep
-def sink(p, y0, y1, fill=BRICK):
-    """The hole down and the ladder in it, cut into a piece that shares the keep's
-    coordinates. Carve before writing the jigsaws: the other way round the hole erases them,
-    which is the order trap CLAUDE.md section 11 records."""
-    x0, x1, z0, z1 = HOLE
-    p.box(x0 - 1, y0, z0 - 1, x1 + 1, y1, z1 + 1, fill)
+def sink(p, y0, y1, off=0, fill=BRICK):
+    """The hole down and the ladder in it. `off` is what to subtract to go from the keep's
+    coordinates to this piece's, so the four pieces that share the column cannot drift apart.
+
+    The frame round the hole is only written where the piece had nothing, so a hand-built
+    floor keeps its own blocks. Carve before writing the jigsaws: the other way round the
+    hole erases them, which is the order trap CLAUDE.md section 11 records."""
+    x0, x1, z0, z1 = (v - off for v in HOLE)
+    for x in range(x0 - 1, x1 + 2):
+        for z in range(z0 - 1, z1 + 2):
+            for y in range(y0, y1 + 1):
+                if p.grid.get((x, y, z), (AIR,))[0] == AIR:
+                    p.set(x, y, z, fill)
     p.box(x0, y0, z0, x1, y1, z1, AIR)
     for y in range(y0, y1 + 1):
-        p.set(RUNG[0], y, RUNG[1], *ladder())
+        p.set(RUNG[0] - off, y, RUNG[1] - off, *ladder())
 
 
 def keep():
@@ -196,17 +207,33 @@ def keep():
     p.box(n - 4, 7, 1, n - 2, 7, 3, AIR)
     p.box(1, 14, n - 4, 3, 14, n - 2, AIR)
 
-    p.set(n - 3, 16, n - 3, *chest('ice_keep', 'west'))            # the watch's chest
-    p.set(mid, 2, mid, 'minecraft:campfire',
+    p.set(2, 15, 2, *chest('ice_keep', 'south'))                   # the watch's chest
+    p.set(5, 2, 5, 'minecraft:campfire',                           # clear of the hole
           {'facing': 'north', 'lit': 'true', 'signal_fire': 'false', 'waterlogged': 'false'})
     for x, z in ((4, 4), (n - 5, 4), (4, n - 5), (n - 5, n - 5)):
         p.set(x, 6, z, LANTERN, HANGING)
         p.set(x, 13, z, LANTERN, HANGING)
 
-    sink(p, 0, 0)                                                  # the hole through the floor
+    floor_and_hole(p)
+    return p
+
+
+def floor_and_hole(p):
+    """The ground floor is solid except for the one way down.
+
+    Run over the hand-built keep as well as the code's, which is how the first pass's hole -
+    cut in a corner, before it moved to the middle of the hall - gets filled in without anyone
+    having to remember it."""
+    x0, x1, z0, z1 = HOLE
+    for x in range(KEEP):
+        for z in range(KEEP):
+            if x0 <= x <= x1 and z0 <= z <= z1:
+                continue
+            if p.grid.get((x, 0, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
+                p.set(x, 0, z, BRICK)
+    sink(p, 0, 0)
     p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['down'], BRICK, joint='aligned',
              priority=PRIORITY, name=DOWN, target=DOWN)
-    return p
 
 
 # ------------------------------------------------------------------------- the curtain wall
@@ -368,12 +395,23 @@ def shaft():
     """From the keep's floor down into the rock. It shares the keep's x and z, so the ladder
     is one unbroken column - verify() climbs it."""
     p = Piece(CELL, SHAFT_H, CELL, BRICK)
-    sink(p, 0, SHAFT_H - 1)
-    p.jigsaw(JIG[0], SHAFT_H - 1, JIG[1], 'up_east', EMPTY, BRICK, joint='aligned',
-             name=DOWN, target=DOWN)
-    p.jigsaw(JIG[0], 0, JIG[1], 'down_east', POOL['cellar_first'], BRICK, joint='aligned',
-             priority=PRIORITY, name=CELLAR, target=CELLAR)
+    shaft_wiring(p, SHAFT_H - 1)
     return p
+
+
+def shaft_wiring(p, top):
+    # solid except for the climb. A hand-built shaft that still carries the first pass's hole
+    # - cut in a corner, before it moved to the middle - gets it filled in here.
+    for x in range(CELL):
+        for y in range(top + 1):
+            for z in range(CELL):
+                if p.grid.get((x, y, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
+                    p.set(x, y, z, BRICK)
+    sink(p, 0, top, off=SHAFT_AT)
+    p.jigsaw(JIG[0] - SHAFT_AT, top, JIG[1] - SHAFT_AT, 'up_east', EMPTY, BRICK,
+             joint='aligned', name=DOWN, target=DOWN)
+    p.jigsaw(JIG[0] - SHAFT_AT, 0, JIG[1] - SHAFT_AT, 'down_east', POOL['cellar_first'],
+             BRICK, joint='aligned', priority=PRIORITY, name=CELLAR, target=CELLAR)
 
 
 def room(doors, fill=BRICK):
@@ -405,19 +443,38 @@ def door(p, side, pool, name=CELLAR, target=CELLAR, priority=0):
 def cellar_hub():
     """Where the ladder lands. Three ways into the cellars and one, on its own connector and
     placed first, to the frost lord."""
-    p = room(['west', 'east', 'north', 'south'])
-    x0, x1, z0, z1 = HOLE
-    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)          # the hole first (section 11)
-    p.jigsaw(JIG[0], CELL - 1, JIG[1], 'up_east', EMPTY, BRICK, joint='aligned',
-             name=CELLAR, target=CELLAR)
-    for y in range(1, CELL):
-        p.set(RUNG[0], y, RUNG[1], *ladder())
+    p = room(['west', 'north', 'south'])          # no east door: the ladder's post is there
+    hub_wiring(p)
     door(p, 'west', POOL['cellars'])
-    door(p, 'east', POOL['cellars'])
     door(p, 'north', POOL['cellars'])
     door(p, 'south', POOL['lord_approach_1'], name=CELLAR, target=LORD, priority=PRIORITY)
     p.set(1, 4, 1, LANTERN, HANGING)
     return p
+
+
+def hub_wiring(p):
+    """The hole in the ceiling, in the middle of the cell, and the ladder that comes through it.
+
+    The hole is in the middle now, which means the ladder is too, and a ladder needs a wall.
+    So the post it hangs on runs floor to ceiling, and the jigsaw sits at the top of that post.
+    The room's east door is gone: it would have opened straight into the post.
+
+    The ceiling is closed first, so a hand-built hub that still carries the first pass's hole
+    does not end up with two. Then the hole, then the jigsaw - the other way round the hole
+    erases it (section 11)."""
+    x0, x1, z0, z1 = (v - SHAFT_AT for v in HOLE)
+    jx, jz = JIG[0] - SHAFT_AT, JIG[1] - SHAFT_AT
+    for x in range(CELL):
+        for z in range(CELL):
+            if p.grid.get((x, CELL - 1, z), (AIR,))[0] in (AIR, 'minecraft:ladder'):
+                p.set(x, CELL - 1, z, BRICK)
+    for y in range(1, CELL):                      # the post
+        p.set(jx, y, jz, BRICK)
+    p.box(x0, CELL - 1, z0, x1, CELL - 1, z1, AIR)
+    p.jigsaw(jx, CELL - 1, jz, 'up_east', EMPTY, BRICK, joint='aligned',
+             name=CELLAR, target=CELLAR)
+    for y in range(1, CELL):
+        p.set(RUNG[0] - SHAFT_AT, y, RUNG[1] - SHAFT_AT, *ladder())
 
 
 def cellar(kind):
@@ -575,16 +632,17 @@ def surface_problems(pieces):
 def ladder_problems(pieces):
     """Climb from the cellar floor to the keep's, through all three pieces that share the
     column. A jigsaw is a block, so one standing in the hole is a rung missing."""
-    at = {'keep': 0, 'shaft': -SHAFT_H, 'cellar_hub': -SHAFT_H - CELL}
+    at = {'keep': (0, 0, 0), 'shaft': (SHAFT_AT, -SHAFT_H, SHAFT_AT),
+          'cellar_hub': (SHAFT_AT, -SHAFT_H - CELL, SHAFT_AT)}
     x0, x1, z0, z1 = HOLE
     problems = []
-    for y in range(at['cellar_hub'] + 1, 1):
+    for y in range(at['cellar_hub'][1] + 1, 1):
         for x in range(x0, x1 + 1):
             for z in range(z0, z1 + 1):
-                for name, oy in at.items():
+                for name, (ox, oy, oz) in at.items():
                     piece = pieces[name]
                     if 0 <= y - oy < piece.size[1]:
-                        block = piece.grid[(x, y - oy, z)][0]
+                        block = piece.grid[(x - ox, y - oy, z - oz)][0]
                         break
                 else:
                     problems.append('nothing covers %s on the way down' % ((x, y, z),))
@@ -597,8 +655,52 @@ def ladder_problems(pieces):
     return problems
 
 
+HANGS = {'minecraft:lantern', 'minecraft:soul_lantern', 'minecraft:iron_chain',
+         'minecraft:ladder', 'minecraft:torch', 'minecraft:iron_bars', 'minecraft:vine'}
+AROUND = ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1), (0, 0, -1))
+BEHIND = {'north': (0, 0, 1), 'south': (0, 0, -1), 'east': (-1, 0, 0), 'west': (1, 0, 0)}
+
+
+def fitting_problems(pieces):
+    """Blocks with nothing holding them up, and chests with nothing in them.
+
+    Worth running on every piece and not only the ones this file builds: a hand-built room
+    comes back with whatever was left mid-air in it, and a chest opened in the workshop comes
+    back holding its roll instead of its table."""
+    problems = []
+    for name, piece in sorted(pieces.items()):
+        size = piece.size
+
+        def solid(pos):
+            block = piece.grid.get(pos)
+            return bool(block) and block[0] != AIR and block[0] not in HANGS
+
+        for pos, (block, props) in sorted(piece.grid.items()):
+            props = dict(props or ())
+            if block in (AIR, 'minecraft:jigsaw'):
+                continue
+            inside = all(0 < pos[i] < size[i] - 1 for i in range(3))
+            if block not in HANGS and inside and not any(
+                    solid((pos[0] + d[0], pos[1] + d[1], pos[2] + d[2])) for d in AROUND):
+                problems.append('%s: %s floats at %s' % (name, block.split(':')[-1], pos))
+            if block == 'minecraft:ladder':
+                d = BEHIND[props.get('facing', 'north')]
+                if not solid((pos[0] + d[0], pos[1] + d[1], pos[2] + d[2])):
+                    problems.append('%s: the ladder at %s has nothing behind it' % (name, pos))
+            if block == 'minecraft:lantern':
+                other = 1 if props.get('hanging') == 'true' else -1
+                if not solid((pos[0], pos[1] + other, pos[2])):
+                    problems.append('%s: the lantern at %s hangs on nothing' % (name, pos))
+            if block.endswith('chest'):
+                if 'LootTable' not in (piece.extra.get(pos) or {}):
+                    problems.append('%s: the chest at %s has no loot table' % (name, pos))
+                if not solid((pos[0], pos[1] - 1, pos[2])):
+                    problems.append('%s: the chest at %s stands on nothing' % (name, pos))
+    return problems
+
+
 def verify(pieces):
-    problems = surface_problems(pieces) + ladder_problems(pieces)
+    problems = surface_problems(pieces) + ladder_problems(pieces) + fitting_problems(pieces)
     for name, piece in pieces.items():
         if max(piece.size) > 48:
             problems.append('%s is %s; a structure block saves 48 to a side, so this one '
@@ -612,7 +714,8 @@ def verify(pieces):
     if problems:
         raise SystemExit('the fortress does not hold together')
     print('  checked: the ring closes on 49x49 with the towers in the corners, every piece '
-          'fits a structure block, the ladder is unbroken from the keep to the cellar')
+          'fits a structure block, the ladder is unbroken from the keep to the cellar, '
+          'nothing hangs in mid-air and every chest has a table')
 
 
 # a jigsaw is a block once placed, and a stair is something you stand on, so neither is air
@@ -700,6 +803,49 @@ def walk_problems():
     return problems
 
 
+def handmade(name, built):
+    """A piece rebuilt by hand in the workshop, if there is one, wearing the code's wiring.
+
+    The looks are the human's and the wiring is the generator's (section 16), so what comes
+    out of tools/handmade/ice/ is used for every block except the jigsaws, which are stamped
+    back on from the piece this file would have built. `grab_workshop.py` puts them there,
+    straight out of the world - nobody has to press SAVE."""
+    path = os.path.join(HAND, name + '.nbt')
+    if not os.path.isfile(path):
+        return built
+    root = nbt.read(path)
+    size = tuple(int(v) for v in root['size'])
+    if size != built.size:
+        raise SystemExit('%s was rebuilt at %s but the mod wires it as %s; the box is the one '
+                         'thing that cannot change' % (name, size, built.size))
+    out = Piece(size[0], size[1], size[2], AIR)
+    palette = [(nbt.palette_name(e), nbt.palette_props(e)) for e in root['palette']]
+    for b in root['blocks']:
+        x, y, z = (int(v) for v in b['pos'])
+        block, props = palette[int(b['state'])]
+        out.set(x, y, z, block, dict(props) if props else None,
+                dict(b['nbt']) if 'nbt' in b else None)
+    for pos, (block, props) in built.grid.items():          # the wiring goes back on
+        if block == 'minecraft:jigsaw':
+            out.set(pos[0], pos[1], pos[2], block, dict(props) if props else None,
+                    built.extra.get(pos))
+            continue
+        # Chests, spawners and trial spawners carry nbt, and nbt is the generator's - there
+        # is no way to set a loot table from inside the game (CLAUDE.md section 1). So the
+        # code's furniture goes back wherever the hand-built piece left the space empty, and
+        # where the piece kept the same block, at least the table does: a chest opened in the
+        # workshop comes back holding one roll of it instead.
+        was, now = built.extra.get(pos), out.extra.get(pos)
+        if not was:
+            continue
+        here = out.grid.get(pos, (AIR,))[0]
+        if here == AIR:
+            out.set(pos[0], pos[1], pos[2], block, dict(props) if props else None, dict(was))
+        elif here == block and 'LootTable' in was and (not now or 'LootTable' not in now):
+            out.extra[pos] = dict(was)
+    return out
+
+
 def main():
     if not os.path.isdir(DST):
         os.makedirs(DST)
@@ -721,6 +867,16 @@ def main():
     }
     for step in range(1, MIN_BOSS_STEPS + 1):
         pieces['approach_%d' % step] = approach(step)
+    hand = 0
+    for name in list(pieces):
+        swapped = handmade(name, pieces[name])
+        if swapped is not pieces[name]:
+            pieces[name], hand = swapped, hand + 1
+    if hand:
+        print('  %d pieces came from tools/handmade/ice, wearing this file\'s wiring' % hand)
+        floor_and_hole(pieces['keep'])          # wherever the hall's floor was left open
+        shaft_wiring(pieces['shaft'], SHAFT_H - 1)
+        hub_wiring(pieces['cellar_hub'])
     verify(pieces)
     for name, piece in sorted(pieces.items()):
         piece.write(os.path.join(DST, name + '.nbt'))
