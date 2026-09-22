@@ -75,9 +75,15 @@ HOLE = (KEEP // 2 - 1, KEEP // 2 + 1, KEEP // 2 - 1, KEEP // 2 + 1)      # x0 x1
 RUNG = (KEEP // 2 + 1, KEEP // 2)
 JIG = (KEEP // 2 + 2, KEEP // 2)
 
-BRICK = 'minecraft:stone_bricks'
-CHISEL = 'minecraft:chiseled_stone_bricks'
-STONE = 'minecraft:stone'
+# Above ground the fortress is white, because the ground is: polished diorite is speckled
+# enough that a wall of it does not read flat, and quartz bricks are the crisper white for
+# frames, bands and crenellations. Below ground it turns to deepslate, so the cellars are
+# their own place and the ice in them has something dark to sit against.
+BRICK = 'minecraft:polished_diorite'
+CHISEL = 'minecraft:quartz_bricks'
+STONE = 'minecraft:cobbled_deepslate'
+CELLAR_BRICK = 'minecraft:deepslate_tiles'
+STAIR = 'minecraft:diorite_stairs'
 SNOW = 'minecraft:snow_block'
 PACKED = 'minecraft:packed_ice'
 BLUE = 'minecraft:blue_ice'
@@ -94,6 +100,10 @@ HANGING = {'hanging': 'true', 'waterlogged': 'false'}
 STANDING = {'hanging': 'false', 'waterlogged': 'false'}
 BOTTOM = {'type': 'bottom', 'waterlogged': 'false'}
 GRID = {'north': 'true', 'south': 'true', 'east': 'true', 'west': 'true', 'waterlogged': 'false'}
+
+UNDERGROUND = {'shaft', 'cellar_hub', 'cap', 'frost_hall', 'passage', 'passage_guard',
+               'corner', 'cross', 'cross_guard', 'store', 'larder', 'powder', 'slick',
+               'bear_den'} | {'approach_%d' % i for i in range(1, 4)}
 
 POOL = {k: NS + ':ice/' + k for k in
         ['start', 'panels', 'panels_end', 'gate', 'corner_a', 'corner_b', 'down',
@@ -207,7 +217,6 @@ def keep():
     p.box(n - 4, 7, 1, n - 2, 7, 3, AIR)
     p.box(1, 14, n - 4, 3, 14, n - 2, AIR)
 
-    p.set(2, 15, 2, *chest('ice_keep', 'south'))                   # the watch's chest
     p.set(5, 2, 5, 'minecraft:campfire',                           # clear of the hole
           {'facing': 'north', 'lit': 'true', 'signal_fire': 'false', 'waterlogged': 'false'})
     for x, z in ((4, 4), (n - 5, 4), (4, n - 5), (n - 5, n - 5)):
@@ -279,7 +288,7 @@ def steps(p, x0, z):
     g = FOOT
     for i in range(WALL_TOP):
         x = x0 + i
-        p.set(x, g + 1 + i, z, 'minecraft:stone_brick_stairs',
+        p.set(x, g + 1 + i, z, STAIR,
               {'facing': 'east', 'half': 'bottom', 'shape': 'straight',
                'waterlogged': 'false'})
         for y in range(g + 1, g + 1 + i):                  # the flight is solid underneath
@@ -394,7 +403,7 @@ def mirrored(src, name, target):
 def shaft():
     """From the keep's floor down into the rock. It shares the keep's x and z, so the ladder
     is one unbroken column - verify() climbs it."""
-    p = Piece(CELL, SHAFT_H, CELL, BRICK)
+    p = Piece(CELL, SHAFT_H, CELL, CELLAR_BRICK)
     shaft_wiring(p, SHAFT_H - 1)
     return p
 
@@ -414,7 +423,7 @@ def shaft_wiring(p, top):
              BRICK, joint='aligned', priority=PRIORITY, name=CELLAR, target=CELLAR)
 
 
-def room(doors, fill=BRICK):
+def room(doors, fill=CELLAR_BRICK):
     p = Piece(CELL, CELL, CELL, fill)
     p.box(1, 1, 1, CELL - 2, CELL - 2, CELL - 2, AIR)
     p.box(0, 0, 0, CELL - 1, 0, CELL - 1, PACKED)
@@ -518,8 +527,8 @@ def cellar(kind):
 
 
 def cellar_cap():
-    p = Piece(1, CELL, CELL, BRICK)
-    p.jigsaw(0, 0, 3, 'west_up', POOL['cellar_caps'], BRICK, name=CELLAR, target=CELLAR)
+    p = Piece(1, CELL, CELL, CELLAR_BRICK)
+    p.jigsaw(0, 0, 3, 'west_up', POOL['cellar_caps'], CELLAR_BRICK, name=CELLAR, target=CELLAR)
     return p
 
 
@@ -539,7 +548,7 @@ def frost_hall():
     """His hall: a frozen cistern with the lord on an island of blue ice, four guards in the
     quarters, and no other way out."""
     sx, sy, sz = BOSS
-    p = Piece(sx, sy, sz, BRICK)
+    p = Piece(sx, sy, sz, CELLAR_BRICK)
     p.box(1, 1, 1, sx - 2, sy - 2, sz - 2, AIR)
     p.box(0, 0, 0, sx - 1, 0, sz - 1, PACKED)
     p.jigsaw(0, 0, sz // 2, 'west_up', EMPTY, BRICK, name=LORD, target=CELLAR)
@@ -653,6 +662,116 @@ def ladder_problems(pieces):
                                     % (name, block.split(':')[-1], (x, y, z),
                                        want.split(':')[-1]))
     return problems
+
+
+# ------------------------------------------------------------------- dressing the rooms
+# Furniture is placed by search, not by coordinate: a spot has to be empty, have something
+# solid under it and headroom above. That way a room rebuilt by hand keeps whatever was put
+# in it and the dressing goes wherever it still fits - and nothing ends up in mid-air, which
+# is the one thing hand-editing and code-editing both keep doing (section 21).
+def free(p, region, head=2):
+    x0, x1, y, z0, z1 = region
+    for x in range(x0, x1 + 1):
+        for z in range(z0, z1 + 1):
+            below = p.grid.get((x, y - 1, z), (AIR,))[0]
+            if below == AIR or below in HANGS:
+                continue
+            if any(p.grid.get((x, y + h, z), (AIR,))[0] != AIR for h in range(head)):
+                continue
+            yield (x, y, z)
+
+
+def put(p, region, block, props=None, extra=None):
+    for at in free(p, region):
+        p.set(at[0], at[1], at[2], block, props, extra)
+        return at
+    return None
+
+
+def put_bed(p, region):
+    """Two blocks, and they have to be next to each other."""
+    spots = set(free(p, region))
+    for x, y, z in sorted(spots):
+        if (x, y, z + 1) in spots:
+            p.set(x, y, z, 'minecraft:white_bed', {'facing': 'south', 'part': 'foot'})
+            p.set(x, y, z + 1, 'minecraft:white_bed', {'facing': 'south', 'part': 'head'})
+            return (x, y, z)
+    return None
+
+
+CORNERS = ((1, 6, 1, 6), (14, 19, 1, 6), (1, 6, 14, 19), (14, 19, 14, 19))
+FACE = {'facing': 'south'}
+LIT = {'facing': 'south', 'lit': 'true', 'signal_fire': 'false', 'waterlogged': 'false'}
+
+
+def furnish_keep(p):
+    """Three floors of a castle: the hall, the barracks and the lord's room.
+
+    The hall's corners are a hearth, an armoury, a store and a writing nook; each is a corner
+    of its own so nothing crowds the doors, which are in the middle of every wall."""
+    nw, ne, sw, se = ((x0, x1, 1, z0, z1) for x0, x1, z0, z1 in CORNERS)
+    put(p, nw, 'minecraft:campfire', LIT)                       # the hearth
+    put(p, nw, 'minecraft:cauldron', {'level': '0'})
+    put(p, nw, 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
+    put(p, nw, 'minecraft:white_banner', {'rotation': '8'})
+    put(p, ne, 'minecraft:anvil', FACE)                          # the armoury
+    put(p, ne, 'minecraft:grindstone', {'face': 'floor', 'facing': 'south'})
+    put(p, ne, 'minecraft:smithing_table')
+    put(p, ne, 'minecraft:fletching_table')
+    put(p, ne, 'minecraft:white_banner', {'rotation': '0'})
+    put(p, sw, *chest('ice_store', 'north')[:2], extra=chest('ice_store', 'north')[2])
+    put(p, sw, 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
+    put(p, sw, 'minecraft:loom', FACE)                           # the stores
+    put(p, sw, 'minecraft:cartography_table')
+    put(p, se, 'minecraft:bookshelf')                            # the writing nook
+    put(p, se, 'minecraft:bookshelf')
+    put(p, se, 'minecraft:chiseled_bookshelf', dict(FACE, **{
+        'slot_0_occupied': 'true', 'slot_1_occupied': 'true', 'slot_2_occupied': 'false',
+        'slot_3_occupied': 'true', 'slot_4_occupied': 'false', 'slot_5_occupied': 'true'}))
+    put(p, se, 'minecraft:lectern', dict(FACE, **{'has_book': 'false', 'powered': 'false'}))
+    put(p, se, *chest('ice_store', 'west')[:2], extra=chest('ice_store', 'west')[2])
+
+    barracks = [(x0, x1, 8, z0, z1) for x0, x1, z0, z1 in CORNERS]
+    for region in barracks[:2]:
+        put_bed(p, region)
+    put(p, barracks[0], 'minecraft:white_candle', {'candles': '2', 'lit': 'false',
+                                                   'waterlogged': 'false'})
+    put(p, barracks[1], 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
+    put(p, barracks[2], *chest('ice_store', 'north')[:2],
+        extra=chest('ice_store', 'north')[2])
+    put(p, barracks[2], 'minecraft:bookshelf')
+    put(p, barracks[3], 'minecraft:spawner', None, mob_spawner('minecraft:stray', 1))
+    put(p, barracks[3], 'minecraft:decorated_pot', {'facing': 'south', 'cracked': 'false',
+                                                    'waterlogged': 'false'})
+
+    lord = [(x0, x1, 15, z0, z1) for x0, x1, z0, z1 in CORNERS]
+    put(p, lord[0], *chest('ice_keep', 'south')[:2], extra=chest('ice_keep', 'south')[2])
+    put(p, lord[1], 'minecraft:lectern', dict(FACE, **{'has_book': 'false',
+                                                       'powered': 'false'}))
+    put(p, lord[2], 'minecraft:cauldron', {'level': '0'})
+    put(p, lord[3], 'minecraft:white_candle', {'candles': '3', 'lit': 'false',
+                                               'waterlogged': 'false'})
+    put(p, lord[3], 'minecraft:white_banner', {'rotation': '8'})
+
+
+def furnish(pieces):
+    """The garrison and its stores, in the wall, the courtyard and the keep."""
+    furnish_keep(pieces['keep'])
+    g = FOOT
+    for name in ('panel', 'panel_end', 'gate'):
+        p = pieces[name]
+        ward = (1, 5, g + 1, CELL + 1, PANEL[2] - 2)             # the courtyard side
+        far = (PANEL[0] - 6, PANEL[0] - 2, g + 1, CELL + 1, PANEL[2] - 2)
+        put(p, ward, *chest('ice_store', 'east')[:2], extra=chest('ice_store', 'east')[2])
+        put(p, ward, 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
+        if name != 'gate':                                       # not in the gateway itself
+            put(p, far, 'minecraft:spawner', None, mob_spawner('minecraft:stray', 1))
+        put(p, far, 'minecraft:campfire', LIT)
+    for name in ('tower_a', 'tower_b'):
+        p = pieces[name]
+        watch = (1, TOWER[0] - 2, g + WALL_TOP + 1, 1, TOWER[2] - 2)
+        put(p, watch, *chest('ice_store', 'south')[:2], extra=chest('ice_store', 'south')[2])
+        put(p, watch, 'minecraft:barrel', {'facing': 'up', 'open': 'false'})
 
 
 HANGS = {'minecraft:lantern', 'minecraft:soul_lantern', 'minecraft:iron_chain',
@@ -803,6 +922,32 @@ def walk_problems():
     return problems
 
 
+SWAP = {'minecraft:stone_bricks': BRICK,
+        'minecraft:stone_brick_stairs': STAIR,
+        'minecraft:stone_brick_slab': 'minecraft:diorite_slab',
+        'minecraft:chiseled_stone_bricks': CHISEL,
+        'minecraft:stone': STONE}
+SWAP_UNDER = dict(SWAP, **{'minecraft:stone_bricks': CELLAR_BRICK,
+                           'minecraft:stone_brick_stairs': 'minecraft:deepslate_tile_stairs',
+                           'minecraft:stone_brick_slab': 'minecraft:deepslate_tile_slab',
+                           'minecraft:chiseled_stone_bricks': 'minecraft:chiseled_deepslate'})
+
+
+def repalette(name, piece):
+    """Put the fortress into its own stone.
+
+    The first pass was built out of stone bricks, and so is everything that came back from the
+    workshop, because that is what was standing there to copy. This swaps the family over in
+    one place rather than asking anyone to replace it block by block: above the courtyard to
+    diorite and quartz, below it to deepslate. Nothing else about the piece changes."""
+    table = SWAP_UNDER if name in UNDERGROUND else SWAP
+    for pos, (block, props) in list(piece.grid.items()):
+        if block in table:
+            piece.set(pos[0], pos[1], pos[2], table[block],
+                      dict(props) if props else None, piece.extra.get(pos))
+    return piece
+
+
 def handmade(name, built):
     """A piece rebuilt by hand in the workshop, if there is one, wearing the code's wiring.
 
@@ -877,6 +1022,9 @@ def main():
         floor_and_hole(pieces['keep'])          # wherever the hall's floor was left open
         shaft_wiring(pieces['shaft'], SHAFT_H - 1)
         hub_wiring(pieces['cellar_hub'])
+    for name in pieces:
+        repalette(name, pieces[name])
+    furnish(pieces)
     verify(pieces)
     for name, piece in sorted(pieces.items()):
         piece.write(os.path.join(DST, name + '.nbt'))

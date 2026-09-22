@@ -6,47 +6,21 @@
         {
           "input_predicate": {
             "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_bricks",
-            "probability": 0.16
+            "block": "minecraft:polished_diorite",
+            "probability": 0.12
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
-            "Name": "minecraft:cracked_stone_bricks"
+            "Name": "minecraft:diorite"
           }
         },
         {
           "input_predicate": {
             "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_bricks",
-            "probability": 0.08
-          },
-          "location_predicate": {
-            "predicate_type": "minecraft:always_true"
-          },
-          "output_state": {
-            "Name": "minecraft:mossy_stone_bricks"
-          }
-        },
-        {
-          "input_predicate": {
-            "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_bricks",
-            "probability": 0.1
-          },
-          "location_predicate": {
-            "predicate_type": "minecraft:always_true"
-          },
-          "output_state": {
-            "Name": "minecraft:tuff_bricks"
-          }
-        },
-        {
-          "input_predicate": {
-            "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_bricks",
-            "probability": 0.05
+            "block": "minecraft:polished_diorite",
+            "probability": 0.06
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
@@ -58,14 +32,53 @@
         {
           "input_predicate": {
             "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_bricks",
-            "probability": 0.04
+            "block": "minecraft:polished_diorite",
+            "probability": 0.03
           },
           "location_predicate": {
             "predicate_type": "minecraft:always_true"
           },
           "output_state": {
             "Name": "minecraft:snow_block"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:random_block_match",
+            "block": "minecraft:quartz_bricks",
+            "probability": 0.1
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:chiseled_quartz_block"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:random_block_match",
+            "block": "minecraft:deepslate_tiles",
+            "probability": 0.14
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:cracked_deepslate_tiles"
+          }
+        },
+        {
+          "input_predicate": {
+            "predicate_type": "minecraft:random_block_match",
+            "block": "minecraft:deepslate_tiles",
+            "probability": 0.06
+          },
+          "location_predicate": {
+            "predicate_type": "minecraft:always_true"
+          },
+          "output_state": {
+            "Name": "minecraft:cobbled_deepslate"
           }
         },
         {
@@ -92,32 +105,6 @@
           },
           "output_state": {
             "Name": "minecraft:air"
-          }
-        },
-        {
-          "input_predicate": {
-            "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_brick_stairs",
-            "probability": 0.1
-          },
-          "location_predicate": {
-            "predicate_type": "minecraft:always_true"
-          },
-          "output_state": {
-            "Name": "minecraft:tuff_brick_stairs"
-          }
-        },
-        {
-          "input_predicate": {
-            "predicate_type": "minecraft:random_block_match",
-            "block": "minecraft:stone_brick_slab",
-            "probability": 0.1
-          },
-          "location_predicate": {
-            "predicate_type": "minecraft:always_true"
-          },
-          "output_state": {
-            "Name": "minecraft:tuff_brick_slab"
           }
         }
       ]
