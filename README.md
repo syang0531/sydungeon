@@ -2,6 +2,8 @@
 
 마인크래프트 자바 에디션 모드. **손으로 지은 조각을 직소가 이어 붙여, 매번 다른 던전을 만든다.**
 
+Minecraft **26.2** / **NeoForge 26.2.0.88** 모드 · [CurseForge](https://www.curseforge.com/minecraft/mc-mods/sydungeon) · MIT
+
 ## 무엇이 나오나
 
 던전 **스물일곱** 가지. 보스와 시그니처를 갖는 대규모가 열다섯(오버월드 열·네더 셋·엔드 둘),
@@ -118,3 +120,7 @@ python tools/pack_datapack.py "<월드 경로>"
 ```
 
 그리고 게임에서 `/reload` 후 `/place jigsaw sydungeon:dungeon/start sydungeon:door 10 ~ ~ ~`.
+
+## 라이선스
+
+MIT — [LICENSE](LICENSE).
