@@ -847,7 +847,6 @@ chorus  plaza 21×21×21 (지붕 없는 광장) → 담 미로 여섯 종 → �
 | `tools/level_notes.py` | 그 문서의 설명 문장. 도구가 아니라 원고다 |
 | `tools/simulate.py` | 풀 가중치로 던전 크기·계단 수·층 수 분포를 종이 위에서 굴려 본다 |
 | `tools/inspect_world.py` | 개발 월드 region 파일에서 실제 생성된 던전의 조각·층 분포를 읽는다 |
-| `tools/gen_logo.py` | CurseForge 로고 (`docs/curseforge/logo.png`, `src/main/resources/logo.png`) |
 | `tools/decorate.py` | cell과 dead_end에 상자·스포너 NBT 삽입 |
 | `tools/dump_structure.py` | 조각을 층별 텍스트로 출력 + 직소 목록. 26.2/26.3 팔레트 둘 다 읽음 |
 | `tools/pack_datapack.py` | `data/`를 바닐라 데이터팩 zip으로 묶음. 모드 빌드 없이 26.2 월드에서 `/place`로 확인 |
